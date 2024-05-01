@@ -1,0 +1,65 @@
+@font-face {
+    font-family: "GMM";
+    src: url("./fonts/GmarketSansTTFMedium.ttf") format("truetype");
+}
+  
+@font-face {
+    font-family: "GML";
+    src: url("./fonts/GmarketSansTTFLight.ttf") format("truetype");
+}
+
+.weather-icon {
+    height: 50px;
+    padding: 10px;
+}
+
+.today-weather {
+    font-family: "GMM";
+    font-size: 25px;
+    color: white;
+}
+
+.today-info {
+    display: flex;
+    align-items: center;
+    position: relative;
+    font-family: "GML";
+    color: white;
+    width: 360px;
+    height: 80px;
+    border-radius: 20px;
+    background-color: #3d5d3f;
+}
+
+.tomorrow-info {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    font-family: "GML";
+    color: white;
+    width: 360px;
+    height: 80px;
+    border-radius: 20px;
+    background-color: #28343f;
+}
+
+.weather-info {
+    width: 100px;
+}
+
+.temp-info {
+    position: absolute;
+    right: 24px;
+    color: white;
+    font-family: "GMM";
+    font-size: 20px;
+}
+
+.temp-info2 {
+    position: absolute;
+    right: 24px;
+    color: #ce5151;
+    font-family: "GMM";
+    font-size: 20px;
+}

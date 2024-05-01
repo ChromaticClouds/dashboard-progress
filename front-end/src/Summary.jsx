@@ -1,0 +1,285 @@
+import { React, useEffect, useState } from "react";
+import io from "socket.io-client";
+import { ResponsiveLine } from '@nivo/line'
+
+import "./Summary.css"
+import { faBreadSlice } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+const socket = io.connect("http://localhost:5000");
+
+// make sure parent container have a defined height when using
+// responsive component, otherwise height will be 0 and
+// no chart will be rendered.
+// website examples showcase many properties,
+// you'll often use just a few of them.
+
+const Summary = () => {
+    const [growth_data, set_growth_data] = useState([]);
+    const [env_stats, set_env_stats] = useState([]);
+    const [sensor_stats, set_sensor_stats] = useState([]);
+
+    useEffect(() => {
+        socket.emit("env req", );
+        socket.emit("weeks req", );
+        socket.emit("sensor req", );
+
+        const repeat = setInterval(() => {
+            socket.emit("env req", );
+            socket.emit("weeks req", );
+            socket.emit("sensor req", );
+        }, 2000);
+
+        return () => {
+            clearInterval(repeat);
+        }
+    }, [])
+
+    useEffect(() => {
+        socket.on("env rec", (data) => {
+            set_env_stats(data);
+        });
+        socket.on("weeks rec", (data) => {
+            set_growth_data(data);
+        });
+        socket.on("sensor rec", (data) => {
+            set_sensor_stats(data);
+            console.log(data[1])
+        });
+
+        return () => {
+            socket.off("env rec");
+            socket.off("weeks rec");
+            socket.off("sensor rec");
+        };
+    }, [])
+
+    let now = new Date();
+    let day = now.getDate();
+    let year = now.getFullYear();
+    let month_date = now.getMonth() + 1;
+
+    switch (month_date) {
+        case 1:
+            month_date = " Janualy, ";
+            break;
+        case 2:
+            month_date = " February, ";
+            break;
+        case 3:
+            month_date = " March, ";
+            break;
+        case 4:
+            month_date = " April, ";
+            break;
+        case 5:
+            month_date = " May, ";
+            break;
+        case 6:
+            month_date = " June, ";
+            break;
+        case 7:
+            month_date = " July, ";
+            break;
+        case 8:
+            month_date = " August, ";
+            break;
+        case 9:
+            month_date = " September, ";
+            break;
+        case 10:
+            month_date = " October, ";
+            break;
+        case 11:
+            month_date = " November, ";
+            break;
+        case 12:
+            month_date = "December";
+            break;
+    }
+
+    return (
+        <div>
+            <div>
+                <h4 className = "subtitle">Hello, DCT!</h4>
+                <div className = "date">
+                    <FontAwesomeIcon 
+                        icon = "fa-solid fa-calendar-days"
+                        className = "calender-icon-size"
+                    />
+                    { day < 10 ? '0'+ day : day }
+                    { month_date }
+                    { year }
+                </div>
+                <div className = "summary-container">
+                    <div className = "growth-container">
+                        <div className = "summary-box">
+                            <h4 className = "growth-data-title">Plant growth activity</h4>
+                            { growth_data.map((object, index) => (
+                                <div key = { index } className = "growth-value-sort">
+                                    { object.slice(-3).map((value, index) => (
+                                        <div key={ index } className = "hover-box">
+                                            <div className = { value.avg_growth <= 18 ? "seed-phase" : value.avg_growth <= 20 ? "vegetation" : "final-growth"}>
+                                                <div className = "growth-img-box">
+                                                    <img src = { value.avg_growth <= 18 ? "../images/seeds.png" : value.avg_growth <= 20 ? "../images/sprout.png" : "../images/tomato.png" } />
+                                                </div>
+                                                <div className = "growth-disc">
+                                                    { value.avg_growth <= 18 ? "Seed phase" : value.avg_growth <= 20 ? "Vegetation" : "Final growth"}
+                                                    <div className = "growth-value">
+                                                        Week { value.week_difference }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                            { growth_data.map((object, index) => (
+                                <div key = { index } className = "week-box">
+                                    { object.slice(-3).map((week, index) => (
+                                        <div key={index} className="week-value">
+                                            <div className = { week.avg_growth <= 18 ? "seed-height" : week.avg_growth <= 20 ? "vegetation-height" : "final-growth-height" }></div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                        <div className = "status-sort">
+                            <div className = "growth-status-box">
+                                <div className = "temp-box">
+                                    <FontAwesomeIcon 
+                                        icon = "fa-solid fa-temperature-three-quarters"
+                                        className = "stat-icon"
+                                    />
+                                </div>
+                                <div>
+                                    <div>
+                                        temperature
+                                    </div>
+                                    {env_stats.map((object, index) => (
+                                        <div key={index}>
+                                            {object.map((stat, index) => (
+                                                <div 
+                                                    key={index}
+                                                    className = "stat-value"
+                                                >
+                                                    { stat.inner_temp != null ? stat.inner_temp + " °C" : null}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className = "growth-status-box">
+                                <div className = "humid-box">
+                                    <FontAwesomeIcon 
+                                        icon="fa-solid fa-droplet"
+                                        className = "stat-icon"
+                                    />
+                                </div>
+                                <div>
+                                    <div>
+                                        humidity
+                                    </div>
+                                    {env_stats.map((object, index) => (
+                                        <div key={index}>
+                                            {object.map((stat, index) => (
+                                                <div 
+                                                    key={index}
+                                                    className = "stat-value"
+                                                >
+                                                    { stat.inner_humid != null ? stat.inner_humid + " %" : null}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className = "growth-status-box">
+                                <div className = "lux-box">
+                                    <FontAwesomeIcon 
+                                        icon="fa-regular fa-lightbulb"
+                                        className = "stat-icon"
+                                    />
+                                </div>
+                                <div>
+                                    <div>
+                                        light intensity
+                                    </div>
+                                    {env_stats.map((object, index) => (
+                                        <div key={index}>
+                                            {object.map((stat, index) => (
+                                                <div 
+                                                    key={index}
+                                                    className = "stat-value"
+                                                >
+                                                    { stat.led_measures != null ? stat.led_measures + " lux" : null}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className = "sensor-box-sort">
+                        <h4 className = "sensor-box-title">Farm Statistics</h4>
+                        <div className = "sensor-box">
+                            <FontAwesomeIcon 
+                                icon="fa-solid fa-seedling"
+                                className = "sensor-icon"
+                            />
+                            <div>
+                                <p className = "sensor-subtitle">Soil Humidity</p>
+                                { sensor_stats.map((object, index) => (
+                                    <div key = { index } className = "soil-humid-id">
+                                        {object[0]?.plant_id === "TOMATO001" ? "Tomato 1" : null}
+                                    </div>
+                                ))}
+                            </div>
+                            { sensor_stats.map((object, index) => (
+                                <div key = { index } className = "sensor-value">
+                                    { object[0]?.plant_id == "TOMATO001" && object[0]?.soil_humid + " %"}
+                                </div>
+                            ))}
+                        </div>
+                        <div className = "sensor-box">
+                            <FontAwesomeIcon 
+                                icon="fa-solid fa-fill-drip"
+                                className = "sensor-icon"
+                            />
+                            <div>
+                                <p className = "sensor-subtitle">Watering Amount</p>
+                                <div className = "watering-disc">Liter per week</div>
+                            </div>
+                            { sensor_stats.map((object, index) => (
+                                <div key = { index } className = "sensor-value">
+                                    { object[sensor_stats[1].length - 1]?.week_watering != null && object[sensor_stats[1].length - 1]?.week_watering / 1000 + " L" }
+                                </div>
+                            ))}
+                        </div>
+                        <div className = "sensor-box">
+
+                        </div>
+                    </div>
+                </div>
+                <div className = "monitoring-sort">
+                    <div>
+                        <h4 className = "monitoring-title">Monitoring</h4>
+                        <div className = "monitoring-box">
+                            
+                        </div>
+                    </div>
+                    <div className = "harvest-box-sort">
+                        <h4 className = "monitoring-title">Available Harvest</h4>
+                        <div className = "harvest-box">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default Summary;

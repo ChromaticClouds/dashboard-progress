@@ -1,0 +1,297 @@
+@media (min-width: 1901px) {
+    .summary-container {
+        display: flex;
+    }
+    
+    .subtitle {
+        margin-top: 0;
+        font-family: "GMM";
+        font-size: 36px;
+        color: #293e3c
+    }
+
+    .calender-icon-size {
+        margin-right: 10px;
+        font-size: 25px;
+    }
+
+    .date {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        font-family: "GML";
+        color: #293e3c
+    }
+
+    .summary-box {
+        position: relative;
+        padding: 0px;
+        width: 840px;
+        height: 360px;
+        background-color: white;
+        border-radius: 30px;
+    }
+
+    .growth-data-title {
+        position: relative;
+        padding-left: 30px;
+        padding-top: 30px;
+        font-family: "GMM";
+        font-size: 24px;
+        color: #293e3c;
+    }
+
+    .growth-status-box {
+        display: flex;
+        align-items: center;
+        font-family: "GML";
+        height: 100px;
+        color: #293e3c;
+    }
+
+    .temp-box {
+        width: 70px;
+        height: 70px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #87735c;
+        margin-right: 10px;
+    }
+
+    .humid-box {
+        width: 70px;
+        height: 70px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #5c8783;
+        margin-right: 10px;
+    }
+
+    .lux-box {
+        width: 70px;
+        height: 70px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #506277;
+        margin-right: 10px;
+    }
+
+    .stat-icon {
+        color: white;
+        font-size: 40px;
+    }
+
+    .stat-value {
+        font-family: "GMM";
+        font-size: 24px;
+    }
+
+    .status-sort {
+        width: 840px;
+        justify-content: space-between;
+        display: flex;
+    }
+
+    .week-box {
+        display: flex;
+        font-family: "GML";
+        align-items: end;
+    }
+
+    .week-value {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .growth-value-sort {
+        margin-top: 60px;
+        position: relative;
+        display: flex;
+        justify-content: space-around;
+        height: 180px;
+    }
+
+    .hover-box {
+        width: 240px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .seed-phase {
+        display: flex;
+        position: absolute;
+        width: 240px;
+        height: 84px;
+        border-radius: 100px;
+        background-color: #877c68;
+        bottom: 0px;
+        align-items: center;
+        z-index: 1;
+    }
+
+    .vegetation {
+        display: flex;
+        position: absolute;
+        width: 240px;
+        height: 84px;
+        border-radius: 100px;
+        background-color: #40635f;
+        bottom: 90px;
+        transform: translate(0, 50%);
+        align-items: center;
+        z-index: 1;
+    }
+
+    .final-growth {
+        display: flex;
+        position: absolute;
+        width: 240px;
+        height: 84px;
+        border-radius: 100px;
+        background-color: #1b1e29;
+        top: 0px;
+        align-items: center;
+        z-index: 1;
+    }
+
+    .growth-img-box {
+        display: flex;
+        background-color: white;
+        display: flex;
+        align-self: center;
+        width: 72px;
+        height: 72px;
+        overflow: hidden;
+        border-radius: 50px;
+        margin-left: 6px;
+    }
+    
+    .growth-disc {
+        margin-left: 12px;
+        font-size: 18px;
+        font-family: "GMM";
+        color: white;
+    }
+
+    .growth-value {
+        margin-top: 14px;
+        font-family: "GML";
+        font-size: 14px;
+    }
+
+    .seed-height {
+        position: absolute;
+        border-left: 2px solid black;
+        height: 70px;
+        bottom: 0;
+        padding-right: 160px;
+    }
+
+    .vegetation-height {
+        position: absolute;
+        border-left: 2px solid black;
+        height: 120px;
+        bottom: 0;
+        padding-right: 160px;
+    }
+
+    .final-growth-height {
+        position: absolute;
+        border-left: 2px solid black;
+        height: 160px;
+        bottom: 0;
+        padding-right: 160px;
+    }
+
+    .sensor-box-sort {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        margin-left: 20px;
+        height: 480px;
+    }
+
+    .sensor-box-title {
+        font-size: 24px;
+        font-family: "GMM";
+        color: #293e3c;
+    }
+
+    .sensor-box {
+        position: relative;
+        width: 360px;
+        height: 100px;
+        border-radius: 30px;
+        background-color: white;
+        display: flex;
+        align-items: center;
+    }
+
+    .sensor-icon {
+        margin-left: 20px;
+        font-size: 36px;
+        color: #1b1e29;
+        margin-right: 20px;
+    }
+
+    .sensor-subtitle {
+        font-family: "GMM";
+        font-size: 18px;
+        margin: 0;
+    }
+
+    .soil-humid-id {
+        font-family: "GMM";
+        color: #a49788
+    }
+
+    .watering-disc {
+        font-family: "GMM";
+        color: #6288c9;
+    }
+
+    .sensor-value {
+        position: absolute;
+        right: 20px;
+        font-family: "GML";
+        font-size: 18px;
+    }
+
+    .monitoring-box {
+        width: 840px;
+        height: 72px;
+        background-color: white;
+        border-radius: 20px;
+    }
+
+    .monitoring-sort {
+        display: flex;
+    }
+
+    .monitoring-title {
+        color: #293e3c;
+        font-family: "GMM";
+        font-size: 24px;
+        margin-top: 48px;
+    }
+
+    .harvest-box-sort {
+        margin-left: 20px;
+    }
+
+    .harvest-box {
+        width: 360px;
+        height: 360px;
+        background-color: white;
+        border-radius: 20px;
+    }
+}

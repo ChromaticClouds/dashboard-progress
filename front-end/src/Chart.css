@@ -1,0 +1,208 @@
+@font-face {
+    font-family: "GMM";
+    src: url("./fonts/GmarketSansTTFMedium.ttf") format("truetype");
+}
+  
+@font-face {
+    font-family: "GML";
+    src: url("./fonts/GmarketSansTTFLight.ttf") format("truetype");
+}
+
+body {
+    margin: 0;
+    overflow-y: scroll;
+    height: 500vh;
+}
+
+.flex-container1 {
+    display: flex;
+    justify-content: center;
+    align-content: stretch;
+}
+
+.flex-box1 {
+    display: flex;
+    justify-content: center;
+}
+
+.flex-box2 {
+    display: flex;
+    justify-content: center;
+}
+
+.flex-box3 {
+    justify-content: center;
+}
+
+.flex-box4 {
+    justify-content: center;
+}
+
+.chart-background {
+    background-color: #4d749a;
+    z-index: -1;
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+}
+
+.chart-title {
+    font-family: "GML";
+    box-shadow: 0px 1px 10px 1px black;
+    margin: 0;
+    margin-bottom: 50px;
+    color: white;
+    background-color: #283758;
+    position: fixed;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title-dashboard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+}
+
+.weater-board1 {
+    border-radius: 10px;
+    background-color: #b5c5d4;
+    width: 300px;
+    margin: 5px;
+    height: 100px;
+}
+
+.weater-board2 {
+    border-radius: 10px;
+    background-color: #b5c5d4;
+    width: 200px;
+    margin: 5px;
+    height: 100px;
+}
+
+.weater-board3 {
+    border-radius: 10px;
+    background-color: #b5c5d4;
+    width: 400px;
+    margin: 5px;
+    height: 100px;
+}
+
+.chart-container {
+    padding: 5px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.chart-box1 {
+    width: 500px;
+    display: flex;
+    align-items: center;
+    color: white;
+    background-color: #131d32;
+    border-radius: 10px;
+    text-align: center;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.chart-box2 {
+    width: 700px;
+    display: flex;
+    align-items: center;
+    color: white;
+    background-color: #131d32;
+    border-radius: 10px;
+    text-align: center;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+.chart-box3 {
+    width: 500px;
+    display: flex;
+    color: white;
+    background-color: #131d32;
+    border-radius: 10px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.chart-box4 {
+    width: 640px;
+    height: 480px;
+    display: flex;
+    color: white;
+    background-color: #000000;
+    border-radius: 10px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.chart3 {
+    padding: 30px;
+}
+
+@media (min-width: 1901px) {
+    .chart2 {
+        max-height: 250px;
+        min-height: 250px;
+    }
+    .chart-container .ch1 .ch2 .ch4 .ch5 {
+        height: 300px;
+    }
+    .flex-box3 {
+        display: flex;
+        align-content: stretch;
+    }
+    .chart-box1 {
+        max-width: none;
+    }
+    .chart-box2 {
+        max-width: none;
+    }
+    .chart-box4 {
+        max-width: none;
+    }
+}
+  
+  /* 일정 너비 이하일 때 적용되는 스타일 */
+@media (max-width: 1900px) and (min-width: 1341px) {
+    .chart2 {
+        max-height: 250px;
+        min-height: 250px;
+    }
+    .flex-container1 {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 1340px) {
+    .flex-box1 {
+        flex-direction: column;
+    }
+    .flex-box2 {
+        flex-direction: column;
+    }
+    .flex-container1 {
+        flex-direction: column;
+    }
+    .ch {
+        max-width: 95%;
+        min-width: 95%;
+        min-height: 400px;
+        padding: 10px;
+    }
+    .ch3 {
+        height: 600px;
+    }
+}

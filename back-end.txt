@@ -1,0 +1,146 @@
+const express = require('express');
+const app = express();
+const mysql = require('mysql');
+const http = require('http');
+const { Server } = require('socket.io');
+const cors = require('cors');
+
+app.use(cors());
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:5173",
+        methods: ['GET', 'POST'],
+    },
+});
+
+io.on("connection", (socket) => {
+    console.log(`a user connected: ${socket.id}`);
+
+    
+    /** sending data periodically */
+    const sending_data = async () => {
+        try {
+            const [data1, data2, data3, data4] = await Promise.all([
+                queryData("SELECT * FROM plant"),
+                queryData("SELECT * FROM growth"),
+                queryData("SELECT * FROM environment"),
+                queryData("SELECT * FROM record"),
+            ]);
+
+            // 데이터 전송
+            socket.emit('dataUpdate', {
+                plant: data1,
+                growth: data2,
+                environment: data3,
+                record: data4,
+            });
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    // 클라이언트와 연결되면 데이터 전송 시작
+    setInterval(sending_data, 1000);
+});
+
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'Hylo0825@#',
+    database: 'smart_farm'
+});
+
+db.connect((err) => {
+    if (err) {
+        console.error('MySQL connection error:', err);
+        throw err;
+    } else {
+        console.log('MySQL connected successfully');
+    }
+});
+
+const queryData = (sql) => {
+    return new Promise((resolve, reject) => {
+        db.query(sql, (err, data) => {
+            if (err) {
+            reject(err);
+            } else {
+            resolve(data);
+            }
+        });
+    });
+};
+
+app.get('/', (re, res)=> {
+    return res.json("From Backend Side");
+});
+
+app.get('/daily-water-supply', async (req, res) => {
+    try {
+        /** grouping water supply by day */
+        const amount = `
+            SELECT
+            DATE(timestamp) AS day,
+            SUM(water_supply) AS daily_water_supply_amount
+            FROM
+                environment
+            GROUP BY
+                day;
+        `;
+
+        /** grouping watering counts by day */
+        const count = `
+            SELECT
+            DATE(timestamp) AS day,
+            COUNT(water_supply) AS daily_water_supply_count
+            FROM
+                environment
+            GROUP BY
+                day;
+        `;
+
+        // 파라미터를 배열로 전달하여 쿼리 실행
+        const daily_water_supply_amount = await queryDatabase(amount);
+        const daily_water_supply_count = await queryDatabase(count);
+
+        return res.json({ daily_water_supply_amount, daily_water_supply_count });    
+    } catch (err) {
+        console.error('Error fetching daily water supply data:', err);
+        return res.status(500).json({ error: err.message || "Internal Server Error" });
+    }
+});
+
+app.get('/data', async (req, res) => {
+    try {
+        const [plant, growth, environment, record] = await Promise.all([
+            queryDatabase("SELECT * FROM plant"),
+            queryDatabase("SELECT * FROM growth"),
+            queryDatabase("SELECT * FROM environment"),
+            queryDatabase("SELECT * FROM record"),
+        ]);
+
+        return res.json({ plant, growth, environment, record });
+    } catch (err) {
+        return res.json({ error: err.message || "Internal Server Error" });
+    }
+});
+
+// Promise를 반환하는 함수를 만들어 재사용
+function queryDatabase(sql) {
+    return new Promise((resolve, reject) => {
+        db.query(sql, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
+
+server.listen(5000, () => {
+    console.log("listening");
+});
