@@ -41,6 +41,12 @@
         color: #293e3c;
     }
 
+    .growth-chart-config {
+        position: absolute;
+        z-index: 1;
+        transform: translate(2%, -10%);
+    }
+
     .growth-status-box {
         display: flex;
         align-items: center;

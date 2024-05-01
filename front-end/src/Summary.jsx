@@ -3,7 +3,6 @@ import io from "socket.io-client";
 import { ResponsiveLine } from '@nivo/line'
 
 import "./Summary.css"
-import { faBreadSlice } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const socket = io.connect("http://localhost:5000");
@@ -13,21 +12,61 @@ const socket = io.connect("http://localhost:5000");
 // no chart will be rendered.
 // website examples showcase many properties,
 // you'll often use just a few of them.
+const MyResponsiveLine = ({ data }) => (
+    <ResponsiveLine
+        data={data}
+        margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+        xScale={{ type: 'point' }}
+        yScale={{
+            type: 'linear',
+            min: 'auto',
+            max: 'auto',
+            stacked: true,
+            reverse: false
+        }}
+        yFormat=" >-.2f"
+        curve="natural"
+        axisTop={null}
+        axisRight={null}
+        axisBottom={null}
+        axisLeft={null}
+        enableGridX={false}
+        enableGridY={false}
+        colors={{ scheme: 'dark2' }}
+        enablePoints={false}
+        pointSize={10}
+        pointColor={{ theme: 'background' }}
+        pointBorderWidth={2}
+        pointBorderColor={{ from: 'serieColor' }}
+        pointLabelYOffset={-12}
+        areaOpacity={0}
+        enableSlices="x"
+        legends={[]}
+    />
+)
 
 const Summary = () => {
     const [growth_data, set_growth_data] = useState([]);
     const [env_stats, set_env_stats] = useState([]);
     const [sensor_stats, set_sensor_stats] = useState([]);
+    const [daily_growth, set_daily_growth] = useState([]);
+
+    const growth_value_data = daily_growth.map((object, index) => ({
+        id: `토마토 ${ index + 1 }`,
+        data: object.slice(-24).map(({ day, avg_growth }) => ({ x: day, y: avg_growth}))
+    }))
 
     useEffect(() => {
         socket.emit("env req", );
         socket.emit("weeks req", );
         socket.emit("sensor req", );
+        socket.emit("growth req", );
 
         const repeat = setInterval(() => {
             socket.emit("env req", );
             socket.emit("weeks req", );
             socket.emit("sensor req", );
+            socket.emit("growth req", );
         }, 2000);
 
         return () => {
@@ -44,13 +83,16 @@ const Summary = () => {
         });
         socket.on("sensor rec", (data) => {
             set_sensor_stats(data);
-            console.log(data[1])
         });
+        socket.on("growth rec", (data) => {
+            set_daily_growth(data);
+        })
 
         return () => {
             socket.off("env rec");
             socket.off("weeks rec");
             socket.off("sensor rec");
+            socket.off("growth rec");
         };
     }, [])
 
@@ -94,7 +136,7 @@ const Summary = () => {
             month_date = " November, ";
             break;
         case 12:
-            month_date = "December";
+            month_date = " December, ";
             break;
     }
 
@@ -115,9 +157,14 @@ const Summary = () => {
                     <div className = "growth-container">
                         <div className = "summary-box">
                             <h4 className = "growth-data-title">Plant growth activity</h4>
+                            <div className = "growth-chart-config" style = { { width: "800px", height: "320px" } }>
+                                <MyResponsiveLine 
+                                    data = { growth_value_data }
+                                />
+                            </div>
                             { growth_data.map((object, index) => (
                                 <div key = { index } className = "growth-value-sort">
-                                    { object.slice(-3).map((value, index) => (
+                                    { object.slice(-24).map((value, index) => (
                                         <div key={ index } className = "hover-box">
                                             <div className = { value.avg_growth <= 18 ? "seed-phase" : value.avg_growth <= 20 ? "vegetation" : "final-growth"}>
                                                 <div className = "growth-img-box">

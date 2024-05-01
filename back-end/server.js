@@ -89,6 +89,18 @@ const sql3 = [
     `
 ]
 
+const sql4 = [
+    `
+    SELECT
+        DATE(timestamp) AS day,
+        AVG(growth_amount) AS avg_growth
+    FROM
+        record
+    GROUP BY
+        day;
+    `
+]
+
 io.on('connection', (socket) => {
     socket.on("env req", async () => {
         try {
@@ -116,6 +128,16 @@ io.on('connection', (socket) => {
             console.error(error);
         }
     })
+
+    socket.on("growth req", async () => {
+        try {
+            const results = await Promise.all(sql4.map(q => query(q)));
+            socket.emit("growth rec", results);
+        } catch (error) {
+            console.error(error);
+        }
+    })
+
 });
 
 server.listen(port, () => {
