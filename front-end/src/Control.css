@@ -1,0 +1,155 @@
+.control {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    place-items: center;
+    height: 80px;
+    width: 180px;
+    background-color: white;
+    border-radius: 10px;
+}
+
+.control .field {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.control .field .value {
+    position: absolute;
+}
+
+.control .field .value.left {
+    left: -42px;
+}
+
+.control .field .value.right {
+    right: -40px;
+}
+
+.control .field input {
+    display: none;
+}
+
+.button {
+    width: 60px;
+    height: 30px;
+    cursor: pointer;
+    position: relative;
+    background-color: #978d83;
+    border-radius: 30px;
+    align-items: center;
+    display: flex;
+}
+
+.button::before {
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    content: '';
+    background-color: #ffffff;
+    border-radius: 50%;
+    margin: 2px;
+    transition: ease-in-out;
+    transition-duration: 0.3s;
+}
+
+input:checked + .button {
+    background-color: #664AFF;
+}
+
+input:checked + .button::before {
+    transform: translateX(30px);
+}
+
+.range {
+    text-align: center;
+    place-items: center;
+    height: 80px;
+    width: 180px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 0 65px 0 45px;
+}
+
+.range .slider-value {
+    position: relative;
+    width: 100%;
+}
+
+.range .slider-value span {
+    position: absolute;
+    height: 45px;
+    width: 45px;
+    color: #fff;
+    font-weight: 500;
+    top: -40px;
+    transform: translateX(-50%) scale(0);
+    transform-origin: bottom;
+    transition: transform 0.3s ease-in-out;
+    line-height: 55px;
+    z-index: 2;
+}
+
+.range .slider-value span.show {
+    transform: translateX(-50%) scale(1);
+}
+
+.range .slider-value span:after {
+    position: absolute;
+    content: "";
+    height: 45px;
+    width: 45px;
+    background-color: #664AFF;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    border: 3px solid #fff;
+    z-index: -1;
+    border-top-left-radius: 50%;
+    border-top-right-radius: 50%;
+    border-bottom-left-radius: 50%;
+}
+
+.range .field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.range .field .value {
+    position: absolute;
+    font-size: 18px;
+    font-weight: 600;
+    color: #664AFF;
+}
+
+.range .field .value.left {
+    left: -22px;
+}
+
+.range .field .value.right {
+    right: -43px;
+}
+
+.range .field input {
+    -webkit-appearance: none;
+    height: 3px;
+    width: 100%;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+}
+
+.range .field input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 20px;
+    width: 20px;
+    background-color: #664AFF;
+    border-radius: 50%;
+    border: 1px solid #664AFF;
+    cursor: pointer;
+}

@@ -1,3 +1,6 @@
+const { SerialPort } = require('serialport');
+const { ReadlineParser } = require('@serialport/parser-readline');
+
 const express = require('express');
 const http = require('http');
 const Server = require('socket.io');
@@ -20,7 +23,7 @@ const io = Server(server, {
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Hylo0825@#',
+    password: 'dct_farm',
     database: 'smart_farm'
 });
 
@@ -96,8 +99,19 @@ const sql4 = [
         AVG(growth_amount) AS avg_growth
     FROM
         record
+    WHERE
+        plant_id = "TOMATO001"
     GROUP BY
         day;
+    `
+]
+
+const sql5 = [
+    `
+    SELECT
+    *
+    FROM
+        control;
     `
 ]
 
@@ -138,6 +152,14 @@ io.on('connection', (socket) => {
         }
     })
 
+    socket.on("monitoring req", async () => {
+        try {
+            const results = await Promise.all(sql5.map(q => query(q)));
+            socket.emit("monitoring rec", results);
+        } catch (error) {
+            console.error(error);
+        }
+    })
 });
 
 server.listen(port, () => {
@@ -155,3 +177,39 @@ const query = (sql) => {
         });
     });
 }
+
+const sp = new SerialPort({
+    path: "COM4",
+    baudRate: 9600,
+    dataBits: 8,
+    stopBits: 1,
+    flowControl: false
+});
+const parser = sp.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+
+parser.on("data", (data) => {
+    console.log("Data from Arduino:", data);
+});
+
+io.on('connection', (socket) => {
+    socket.on('led value req', async (value) => {
+        sp.write(`${ value * 51 }\n`);
+        console.log("led value: ", value);
+
+        const sql = `
+        UPDATE
+            control
+        SET 
+            measures = ${ value * 51 }, 
+            power = ${ value > 0 ? 1 : 0}
+        WHERE
+            sensor_type = 'Neopixel LED 1';
+        `
+
+        try {
+            await query(sql);
+        } catch (error) {
+            console.error(error);
+        }
+    });
+})
