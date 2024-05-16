@@ -1,0 +1,4 @@
+{
+    "sketch": "arduino-from-nodejs\\arduino-from-nodejs.ino",
+    "board": "arduino:avr:uno"
+}

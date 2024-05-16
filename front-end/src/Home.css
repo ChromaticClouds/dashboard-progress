@@ -13,6 +13,11 @@ body {
     src: url("./fonts/GmarketSansTTFLight.ttf") format("truetype");
 }
 
+@font-face {
+    font-family: "GSR";
+    src: url("./fonts/ProductSans-Regular.ttf") format("truetype");
+}
+
 .to-chart {
     padding-left: 20px;
 }

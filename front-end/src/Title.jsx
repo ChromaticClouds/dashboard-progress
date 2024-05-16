@@ -6,11 +6,12 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 
 import Weather2 from "./Weather2"
 import Summary from "./Summary";
+import Control from "./Control";
 
 library.add(fas);
 
 const Title = () => {
-    const [icon_index, set_icon_index] = useState(0); // 현재 활성화된 아이콘의 인덱스
+    const [icon_index, set_icon_index] = useState(parseInt(localStorage.getItem('icon-index'))); // 현재 활성화된 아이콘의 인덱스
 
     // 아이콘 배열
     const icons = [
@@ -29,6 +30,7 @@ const Title = () => {
         if (sectionElement) {
             sectionElement.scrollIntoView({ behavior: "auto" });
         }
+        localStorage.setItem('icon-index', index);
     };
 
     useEffect(() => {
@@ -78,7 +80,7 @@ const Title = () => {
                         <div className = "detect"></div>
                     </div>
                     <div className="control-dashboard content" id="jump_to2">
-                        control-dashboard
+                        <Control />
                         <div className = "detect"></div>
                     </div>
                     <div className="chart-dashboard content" id="jump_to3">

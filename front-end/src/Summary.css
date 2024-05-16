@@ -273,6 +273,9 @@
     }
 
     .monitoring-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         width: 840px;
         height: 72px;
         background-color: white;
@@ -299,5 +302,65 @@
         height: 360px;
         background-color: white;
         border-radius: 20px;
+    }
+
+    .monitoring-disc {
+        padding: 40px;
+        font-family: "GMM";
+        font-size: 14px;
+    }
+
+    .monitoring-value-box {
+        margin-top: 8px;
+        height: 280px;
+        overflow: hidden;
+        overflow-y: scroll;
+    }
+
+    .monitoring-value-box::-webkit-scrollbar {
+        background-color: white;
+        width: 12px;
+        border-radius: 15px;
+    }
+
+    .monitoring-value-box::-webkit-scrollbar-thumb {
+        background-color: #b7b2a6;
+        background-clip: padding-box;
+        border: 2px solid transparent;
+        border-radius: 15px;
+    }
+
+    .control-item {
+        display: flex;
+        width: 820px;
+        justify-content: space-between;
+        padding: 5px;
+        font-family: "GML";
+        font-size: 14px;
+    }
+
+    .control-value1 {
+        width: 100%;
+        display: flex;
+        justify-content: baseline;
+    }
+
+    .control-value2 {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding-left: 24px;
+    }
+
+    .control-value3 {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        padding-right: 20px;
+    }
+
+    .control-icon-sort {
+        width: 0;
+        padding-right: 30px;
     }
 }

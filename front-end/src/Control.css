@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "GSR";
+    src: url("./fonts/ProductSans-Regular.ttf") format("truetype");
+}
+
 .control {
     display: flex;
     justify-content: center;
@@ -152,4 +157,255 @@ input:checked + .button::before {
     border-radius: 50%;
     border: 1px solid #664AFF;
     cursor: pointer;
+}
+
+.control-panel-sort {
+    position: relative;
+    margin-left: 40px;
+}
+
+.waterpump {
+    position: relative;
+    font-size: 18px;
+    place-items: center;
+    display: flex;
+}
+
+.waterpump .box {
+    width: 80px;
+    height: 260px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 25px 25px 5px 5px;
+    margin-right: 40px;
+}
+
+.waterpump .disc {
+    position: absolute;
+    left: 40px;
+}
+
+.waterpump .field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+    transform: rotate(-90deg);
+}
+
+.waterpump .top {
+    position: absolute;
+    left: 36px;
+    z-index: 1;
+    color: #fff;
+    font-weight: 600;
+    transform: rotate(90deg);
+}
+
+.waterpump .bottom {
+    position: absolute;
+    right: 114px;
+    z-index: 1;
+    color: #fff;
+    font-weight: 600;
+    transform: rotate(90deg);
+}
+
+.waterpump .value {
+    font-family: "GSR";
+    font-size: 20px;
+    position: absolute;
+    top: 20px;
+}
+
+.waterpump input {
+    position: absolute;
+    right: -50px;
+    width: 180px;
+    height: 20px;
+    -webkit-appearance: none;
+    background-color: transparent;
+    border-radius: 30px;
+    outline: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99;
+}
+
+.waterpump progress {
+    position: absolute;
+    right: -50px;
+    width: 180px;
+    height: 20px;
+    -webkit-appearance: none;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.waterpump progress::-webkit-progress-bar {
+    background-color: #b6bcd5;
+}
+
+.waterpump progress::-webkit-progress-value {
+    background-color: #3648d2;
+}
+
+.disc {
+    font-size: 18px;
+    font-family: "GSR";
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #4a5895
+}
+
+.waterpump input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    outline: 2px solid #3648d2;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+.waterpump .progress {
+    position: absolute;
+    background-color: #4a5895;
+    width: 180px;
+    height: 20px;
+    border-radius: 50px;
+    z-index: 1;
+}
+
+.waterpump .status {
+    margin-top: 32px;
+    width: 80px;
+    height: 80px;
+    background-color: #fff;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "GSR";
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+}
+
+.waterpump .status::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    width: 20px;
+    height: 20px;
+    transform: rotate(45deg);
+    background-color: #fff;
+    z-index: -1;
+}
+
+.waterpump .status .status-icon {
+    color: #3648d2;
+    font-size: 30px;
+}
+
+.waterpump .status .name {
+    margin-top: 5px;
+    color: #1c2034;
+    font-size: 14px;
+}
+
+.waterpump .circle .skill {
+    width: 260px;
+    height: 260px;
+    position: relative;
+}
+
+.waterpump .circle .outer {
+    width: 260px;
+    height: 260px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15), -6px -6px 10px -1px rgba(255, 255, 255, 0.7);
+}
+
+.waterpump .circle .inner {
+    width: 200px;
+    height: 200px;
+    background-color: #e2e2dc;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 4px 4px 6px -1px rgba(0, 0, 0, 0.2), 
+                inset -4px -4px 6px -1px rgba(255, 255, 255, 0.7),
+                -0.5px -0.5px 0px rgba(255, 255, 255, 1), 
+                0.5px 0.5px 0px rgba(0, 0, 0, 0.15),
+                0px 12px 10px -10px rgba(0, 0, 0, 0.05);
+}
+
+.waterpump .circle .inner .number {
+    font-family: "GSR";
+    font-size: 30px;
+    width: 160px;
+    height: 160px;
+    background-color: white;
+    border-radius: 50%;
+    font-weight: 600;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15), -6px -6px 10px -1px rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    z-index: 2;
+    transition: 0.3s;
+}
+
+.waterpump .circle .inner .pushed {
+    font-family: "GSR";
+    font-size: 30px;
+    width: 160px;
+    height: 160px;
+    background-color: white;
+    border-radius: 50%;
+    font-weight: 600;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 4px 4px 6px -1px rgba(0, 0, 0, 0.2), 
+                inset -4px -4px 6px -1px rgba(255, 255, 255, 0.7),
+                -0.5px -0.5px 0px rgba(255, 255, 255, 1), 
+                0.5px 0.5px 0px rgba(0, 0, 0, 0.15),
+                0px 12px 10px -10px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    z-index: 2;
+    transition: 0.3s;
+}
+
+.waterpump .circle .inner .number:hover {
+    background-color: #e2e2e2;
+}
+
+.waterpump .circle circle {
+    fill: none;
+    stroke: url(#GradientColor);
+    stroke-width: 30px;
+    stroke-dasharray: 722.2;
+}
+
+.waterpump .circle svg {
+    position: absolute;
+    top: 0;
+    left: 0;
 }

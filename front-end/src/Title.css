@@ -69,6 +69,7 @@ body {
     .contents-panel {
         flex-grow: 1;
         overflow-y: scroll;
+        overflow-x: hidden;
     }
 
     .contents-panel::-webkit-scrollbar {

@@ -1,6 +1,6 @@
 import { React, useEffect, useState } from "react";
 import io from "socket.io-client";
-import { ResponsiveLine } from '@nivo/line'
+import { ResponsiveLine } from '@nivo/line';
 
 import "./Summary.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,7 +15,7 @@ const socket = io.connect("http://localhost:5000");
 const MyResponsiveLine = ({ data }) => (
     <ResponsiveLine
         data={data}
-        margin={{ top: 50, right: 50, bottom: 50, left: 50 }}
+        margin={{ top: 50, right: 30, bottom: 50, left: 30 }}
         xScale={{ type: 'point' }}
         yScale={{
             type: 'linear',
@@ -50,6 +50,7 @@ const Summary = () => {
     const [env_stats, set_env_stats] = useState([]);
     const [sensor_stats, set_sensor_stats] = useState([]);
     const [daily_growth, set_daily_growth] = useState([]);
+    const [monitoring_data, set_monitoring_data] = useState([]);
 
     const growth_value_data = daily_growth.map((object, index) => ({
         id: `토마토 ${ index + 1 }`,
@@ -61,12 +62,14 @@ const Summary = () => {
         socket.emit("weeks req", );
         socket.emit("sensor req", );
         socket.emit("growth req", );
+        socket.emit("monitoring req");
 
         const repeat = setInterval(() => {
             socket.emit("env req", );
             socket.emit("weeks req", );
             socket.emit("sensor req", );
             socket.emit("growth req", );
+            socket.emit("monitoring req");
         }, 2000);
 
         return () => {
@@ -87,12 +90,17 @@ const Summary = () => {
         socket.on("growth rec", (data) => {
             set_daily_growth(data);
         })
+        socket.on("monitoring rec", (data) => {
+            set_monitoring_data(data);
+        })
 
         return () => {
             socket.off("env rec");
             socket.off("weeks rec");
             socket.off("sensor rec");
             socket.off("growth rec");
+            socket.off("monitoring rec");
+            socket.off("sensor data");
         };
     }, [])
 
@@ -311,16 +319,53 @@ const Summary = () => {
                     </div>
                 </div>
                 <div className = "monitoring-sort">
-                    <div>
+                    <div className = "monitoring-contents">
                         <h4 className = "monitoring-title">Monitoring</h4>
                         <div className = "monitoring-box">
-                            
+                            <h4 className = "monitoring-disc">Indicator</h4>
+                            <h4 className = "monitoring-disc">Status</h4>
+                            <h4 className = "monitoring-disc">Value</h4>
+                        </div>
+                        <div>
+                            {monitoring_data.map((object, index) => (
+                                <div key = { index } className = "monitoring-value-box">
+                                    {object.map((control, index) => (
+                                        <div key = { index } className = "control-item">
+                                            <div className = "control-icon-sort">
+                                                <p>{ control.sensor_type === "Water Pump" && <FontAwesomeIcon icon="fa-solid fa-fill-drip" />}</p>
+                                                <p>{ control.sensor_type === "Cooling Fan" && <FontAwesomeIcon icon="fa-solid fa-fan" />}</p>
+                                                <p>{ control.sensor_type === "Neopixel LED 1" && <FontAwesomeIcon icon="fa-regular fa-lightbulb" />}</p>
+                                                <p>{ control.sensor_type === "Neopixel LED 2" && <FontAwesomeIcon icon="fa-regular fa-lightbulb" />}</p>
+                                                <p>{ control.sensor_type === "Neopixel LED 3" && <FontAwesomeIcon icon="fa-regular fa-lightbulb" />}</p>
+                                                <p>{ control.sensor_type === "Water Level Sensor" && <FontAwesomeIcon icon="fa-solid fa-bars-progress" />}</p>
+                                                <p>{ control.sensor_type === "DHT Sensor" && <FontAwesomeIcon icon="fa-solid fa-temperature-low" />}</p>
+                                                <p>{ control.sensor_type === "Ultrasonic Sensor 1" && <FontAwesomeIcon icon="fa-solid fa-wifi" />}</p>
+                                                <p>{ control.sensor_type === "Ultrasonic Sensor 2" && <FontAwesomeIcon icon="fa-solid fa-wifi" />}</p>
+                                                <p>{ control.sensor_type === "Ultrasonic Sensor 3" && <FontAwesomeIcon icon="fa-solid fa-wifi" />}</p>
+                                                <p>{ control.sensor_type === "Soil Moisture Sensor 1" && <FontAwesomeIcon icon="fa-solid fa-seedling" />}</p>
+                                                <p>{ control.sensor_type === "Soil Moisture Sensor 2" && <FontAwesomeIcon icon="fa-solid fa-seedling" />}</p>
+                                                <p>{ control.sensor_type === "Soil Moisture Sensor 3" && <FontAwesomeIcon icon="fa-solid fa-seedling" />}</p>
+                                                <p>{ control.sensor_type === "Heater" && <FontAwesomeIcon icon="fa-solid fa-fire" />}</p>
+                                            </div>
+                                            <div className = "control-value1">
+                                                <p>{ control.sensor_type }</p>
+                                            </div>
+                                            <div className = "control-value2">
+                                                <p style = { { color: control.power === 1 ? "teal" : "orange" } }>{ control.power === 1 ? "▲" : "▼"}</p>
+                                            </div>
+                                            <div className = "control-value3">
+                                                <p>{ control.measures }</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
                         </div>
                     </div>
                     <div className = "harvest-box-sort">
                         <h4 className = "monitoring-title">Available Harvest</h4>
                         <div className = "harvest-box">
-
+                            <video src = ""></video>
                         </div>
                     </div>
                 </div>

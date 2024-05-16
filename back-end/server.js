@@ -187,29 +187,72 @@ const sp = new SerialPort({
 });
 const parser = sp.pipe(new ReadlineParser({ delimiter: '\r\n' }));
 
+let sensor_data;
 parser.on("data", (data) => {
-    console.log("Data from Arduino:", data);
+    try {
+        sensor_data = JSON.parse(data); // 시리얼 데이터 파싱
+        console.log(sensor_data);
+    } catch (error) {
+        console.error('Error parsing serial data:', error);
+    }
 });
 
 io.on('connection', (socket) => {
-    socket.on('led value req', async (value) => {
-        sp.write(`${ value * 51 }\n`);
-        console.log("led value: ", value);
-
-        const sql = `
-        UPDATE
-            control
-        SET 
-            measures = ${ value * 51 }, 
-            power = ${ value > 0 ? 1 : 0}
-        WHERE
-            sensor_type = 'Neopixel LED 1';
-        `
-
-        try {
-            await query(sql);
-        } catch (error) {
-            console.error(error);
-        }
+    socket.on('sensor data req', () => {
+        socket.emit('sensor data', sensor_data);
     });
+
+    socket.on('led value req', async (value) => {
+        sp.write(`led01_${ value * 51 }\n`);
+    });
+
+    socket.on('led value req2', async (value2) => {
+        sp.write(`led02_${ value2 * 51 }\n`);
+    });
+
+    socket.on('led value req3', async (value3) => {
+        sp.write(`led03_${ value3 * 51 }\n`);
+    });
+
+    socket.on('intensity req', async (value) => {
+        let resistance;
+
+        switch (value) {
+            case "0":
+                resistance = 5;
+                break;
+            case "1":
+                resistance = 4;
+                break;
+            case "2":
+                resistance = 3;
+                break;
+            case "3":
+                resistance = 2;
+                break;
+            case "4":
+                resistance = 1;
+                break;
+            default:
+                resistance = 0;
+                break;
+        }
+
+        sp.write(`res_${ resistance * 10 }`);
+        console.log("resistance value: ", resistance);
+    })
+
+    socket.on('duration req', async (value) => {
+        let duration = value * 2000 + 10000;
+
+        sp.write(`dur_${ duration }`);
+        console.log("duration value: ", duration);
+    })
+
+    socket.on('control on', () => {
+        sp.write("on\n");
+    })
+    socket.on('control off', () => {
+        sp.write("off\n");
+    })
 })
