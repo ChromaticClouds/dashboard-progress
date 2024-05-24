@@ -21,6 +21,9 @@ bool watering_init = false;
 int soil, psoil;
 int water_lev;
 
+unsigned long watering_start = 0; 
+unsigned long watering_end = 0;
+
 // 전역변수를 먼저 선언하여 loop문에서 초기화가 되지 않도록 함
 String control_status;
 String led_type;
@@ -75,6 +78,7 @@ void loop() {
 
   soil = analogRead(SOIL_HUMI); // A0에서 읽은 값 저장
   psoil = map(soil, 1023, 0, 0, 100); // 0 ~ 100으로 soil값 매핑
+  water_lev = analogRead(WATER_LEV);
 
   double distance = measureDistance();
 
@@ -150,39 +154,72 @@ void loop() {
   }
 
   if (watering_init && control_status == "on") {
-    init_level = water_lev;
     if (millis() - pump_start <= duration) {
       digitalWrite(A_1A, HIGH);
       analogWrite(A_1B, resistence);
+
+      if (watering_start == 0) {
+        watering_start = millis();
+        init_level = water_lev;
+      }
+
+      watering_end = 0;
     }
     else if (millis() - pump_start <= duration + waiting) {
       digitalWrite(A_1A, LOW);
       digitalWrite(A_1B, LOW);
+
+      if (watering_end == 0) {
+        watering_end = millis();
+        end_level = water_lev;
+        watering_amount = init_level - end_level;
+      }
     }
     else {
       pump_start = millis();
+      watering_start = 0;
     }
-    end_level = water_lev;
-
-    watering_amount = end_level - init_level;
-  }
-  
-  if (control_status == "off" && psoil <= 40) {
-      init_level = water_lev;
-      if (millis() - pump_start <= pump_duration) {
+  } 
+  else if (control_status == "off" && psoil <= 40) {
+    if (millis() - pump_start <= pump_duration) {
       digitalWrite(A_1A, HIGH);
       analogWrite(A_1B, resistence);
+
+      if (watering_start == 0) {
+        watering_start = millis();
+        init_level = water_lev;
+      }
+
+      watering_end = 0;
     }
     else if (millis() - pump_start <= pump_duration + waiting) {
       digitalWrite(A_1A, LOW);
       digitalWrite(A_1B, LOW);
+
+      if (watering_end == 0) {
+        watering_end = millis();
+        end_level = water_lev;
+        watering_amount = init_level - end_level;
+      }
     }
     else {
       pump_start = millis();
+      watering_start = 0;
     }
-    end_level = water_lev;
+  }
+  else {
+    digitalWrite(A_1A, LOW);
+    digitalWrite(A_1B, LOW);
 
-    watering_amount = end_level - init_level;
+    if (watering_end == 0) {
+      watering_end = millis();
+      watering_amount = init_level - end_level;
+      watering_start = 0;
+    }
+  }
+
+  if (watering_amount < 0) {
+    watering_amount = 0;
   }
 
   String data = "{ ";
@@ -220,6 +257,14 @@ void loop() {
 
   data += "\"led03\": ";
   data += String(intensity3);
+  data += ", ";
+
+  data += "\"pump_start\": ";
+  data += String(pump_start / 1000);
+  data += ", ";
+
+  data += "\"millis()\": ";
+  data += String(millis() / 1000);
   data += " }";
 
   if (millis() - serial_wait >= 2000) {

@@ -1,4 +1,4 @@
-@media (min-width: 1901px) {
+
     .summary-container {
         display: flex;
     }
@@ -7,7 +7,7 @@
         margin-top: 0;
         font-family: "GMM";
         font-size: 36px;
-        color: #293e3c
+        color: #293e3c;
     }
 
     .calender-icon-size {
@@ -30,6 +30,7 @@
         height: 360px;
         background-color: white;
         border-radius: 30px;
+        box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15);
     }
 
     .growth-data-title {
@@ -62,7 +63,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: #87735c;
         margin-right: 10px;
     }
 
@@ -73,7 +73,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: #5c8783;
         margin-right: 10px;
     }
 
@@ -84,8 +83,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: #506277;
         margin-right: 10px;
+    }
+
+    .growth-status-box .color {
+        background-color: #60769c;
     }
 
     .stat-icon {
@@ -138,7 +140,7 @@
         width: 240px;
         height: 84px;
         border-radius: 100px;
-        background-color: #877c68;
+        background-color: #5fa0c3;
         bottom: 0px;
         align-items: center;
         z-index: 1;
@@ -150,7 +152,7 @@
         width: 240px;
         height: 84px;
         border-radius: 100px;
-        background-color: #40635f;
+        background-color: #4468ac;
         bottom: 90px;
         transform: translate(0, 50%);
         align-items: center;
@@ -163,7 +165,7 @@
         width: 240px;
         height: 84px;
         border-radius: 100px;
-        background-color: #1b1e29;
+        background-color: #38407f;
         top: 0px;
         align-items: center;
         z-index: 1;
@@ -179,6 +181,7 @@
         overflow: hidden;
         border-radius: 50px;
         margin-left: 6px;
+        box-shadow: 4px 4px 10px -1px rgba(0, 0, 0, 0.5);
     }
     
     .growth-disc {
@@ -236,10 +239,11 @@
         position: relative;
         width: 360px;
         height: 100px;
-        border-radius: 30px;
+        border-radius: 10px 30px;
         background-color: white;
         display: flex;
         align-items: center;
+        box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15);
     }
 
     .sensor-icon {
@@ -280,6 +284,7 @@
         height: 72px;
         background-color: white;
         border-radius: 20px;
+        box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15);
     }
 
     .monitoring-sort {
@@ -302,6 +307,8 @@
         height: 360px;
         background-color: white;
         border-radius: 20px;
+        box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
     }
 
     .monitoring-disc {
@@ -363,4 +370,3 @@
         width: 0;
         padding-right: 30px;
     }
-}

@@ -187,13 +187,13 @@ const sp = new SerialPort({
 });
 const parser = sp.pipe(new ReadlineParser({ delimiter: '\r\n' }));
 
-let sensor_data;
+let sensor_data
 parser.on("data", (data) => {
     try {
-        sensor_data = JSON.parse(data); // 시리얼 데이터 파싱
+        sensor_data = JSON.parse(data);
         console.log(sensor_data);
     } catch (error) {
-        console.error('Error parsing serial data:', error);
+        console.error(error);
     }
 });
 
@@ -247,6 +247,46 @@ io.on('connection', (socket) => {
 
         sp.write(`dur_${ duration }`);
         console.log("duration value: ", duration);
+    })
+
+    socket.on('recent watering req', async (value) => {
+        const sql = `
+            SELECT
+                timestamp
+            FROM 
+                environment
+            WHERE
+                environment_id = (SELECT MAX(environment_id) FROM environment)
+            AND
+                water_supply > 0;
+        `;
+
+        try {
+            const results = await query(sql);
+            const recent = new Date(results[0].timestamp);
+            socket.emit('recent watering rec', recent);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    })
+
+    socket.on('heater power req', (power) => {
+        if (power) {
+            console.log("heater on");
+        }
+        else {
+            console.log("heater off");
+        }
+    })
+
+    socket.on('heater temp req', (value) => {
+        sp.write(`heater_${ value }\n`)
+        console.log(`heater_${ value }`)
+    })
+    socket.on('cooler temp req', (value) => {
+        sp.write(`cooler_${ value }\n`)
+        console.log(`cooler_${ value }`)
     })
 
     socket.on('control on', () => {

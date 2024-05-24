@@ -1,51 +1,20 @@
 import { React, useEffect, useState } from "react";
 import io from "socket.io-client";
-import { ResponsiveLine } from '@nivo/line';
+import LineChart from "../chart/LineChart";
 
 import "./Summary.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const socket = io.connect("http://localhost:5000");
-
-// make sure parent container have a defined height when using
-// responsive component, otherwise height will be 0 and
-// no chart will be rendered.
-// website examples showcase many properties,
-// you'll often use just a few of them.
-const MyResponsiveLine = ({ data }) => (
-    <ResponsiveLine
-        data={data}
-        margin={{ top: 50, right: 30, bottom: 50, left: 30 }}
-        xScale={{ type: 'point' }}
-        yScale={{
-            type: 'linear',
-            min: 'auto',
-            max: 'auto',
-            stacked: true,
-            reverse: false
-        }}
-        yFormat=" >-.2f"
-        curve="natural"
-        axisTop={null}
-        axisRight={null}
-        axisBottom={null}
-        axisLeft={null}
-        enableGridX={false}
-        enableGridY={false}
-        colors={{ scheme: 'dark2' }}
-        enablePoints={false}
-        pointSize={10}
-        pointColor={{ theme: 'background' }}
-        pointBorderWidth={2}
-        pointBorderColor={{ from: 'serieColor' }}
-        pointLabelYOffset={-12}
-        areaOpacity={0}
-        enableSlices="x"
-        legends={[]}
-    />
-)
-
 const Summary = () => {
+    let socket;
+    useEffect(() => {
+        socket = io.connect("http://localhost:5000");
+
+        return () => {
+            socket.disconnect();
+        }
+    }, [])
+
     const [growth_data, set_growth_data] = useState([]);
     const [env_stats, set_env_stats] = useState([]);
     const [sensor_stats, set_sensor_stats] = useState([]);
@@ -149,8 +118,8 @@ const Summary = () => {
     }
 
     return (
-        <div>
-            <div>
+        <div className = "board">
+            <div className = "sub-contents">
                 <h4 className = "subtitle">Hello, DCT!</h4>
                 <div className = "date">
                     <FontAwesomeIcon 
@@ -166,7 +135,7 @@ const Summary = () => {
                         <div className = "summary-box">
                             <h4 className = "growth-data-title">Plant growth activity</h4>
                             <div className = "growth-chart-config" style = { { width: "800px", height: "320px" } }>
-                                <MyResponsiveLine 
+                                <LineChart 
                                     data = { growth_value_data }
                                 />
                             </div>
@@ -201,7 +170,7 @@ const Summary = () => {
                         </div>
                         <div className = "status-sort">
                             <div className = "growth-status-box">
-                                <div className = "temp-box">
+                                <div className = "temp-box color">
                                     <FontAwesomeIcon 
                                         icon = "fa-solid fa-temperature-three-quarters"
                                         className = "stat-icon"
@@ -226,7 +195,7 @@ const Summary = () => {
                                 </div>
                             </div>
                             <div className = "growth-status-box">
-                                <div className = "humid-box">
+                                <div className = "humid-box color">
                                     <FontAwesomeIcon 
                                         icon="fa-solid fa-droplet"
                                         className = "stat-icon"
@@ -251,7 +220,7 @@ const Summary = () => {
                                 </div>
                             </div>
                             <div className = "growth-status-box">
-                                <div className = "lux-box">
+                                <div className = "lux-box color">
                                     <FontAwesomeIcon 
                                         icon="fa-regular fa-lightbulb"
                                         className = "stat-icon"
@@ -365,7 +334,7 @@ const Summary = () => {
                     <div className = "harvest-box-sort">
                         <h4 className = "monitoring-title">Available Harvest</h4>
                         <div className = "harvest-box">
-                            <video src = ""></video>
+                            
                         </div>
                     </div>
                 </div>

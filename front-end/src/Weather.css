@@ -28,7 +28,8 @@
     width: 360px;
     height: 80px;
     border-radius: 20px;
-    background-color: #3d5d3f;
+    background-color: #555e90;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.3);
 }
 
 .tomorrow-info {
@@ -42,6 +43,7 @@
     height: 80px;
     border-radius: 20px;
     background-color: #28343f;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.3);
 }
 
 .weather-info {
