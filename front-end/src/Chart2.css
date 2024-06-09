@@ -1,0 +1,146 @@
+.chart-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.chart-container .sort {
+    margin-bottom: 40px;
+}
+
+.chart-container .height {
+    flex-grow: 1;
+}
+
+.chart-container .flex-box {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.chart-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px 30px;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15);
+}
+
+.chart4 > div {
+    font-family: "GSR";
+    font-size: 18px;
+    font-weight: 600;
+    color: #585858;
+}
+
+.chart4 p {
+    position: absolute;
+    right: 64px;
+    font-size: 20px;
+    font-family: "GSR";
+    color: #585858;
+}
+
+.chart4 span {
+    position: absolute;
+    right: 56px;
+    font-size: 20px;
+    font-family: "GSR";
+    color: #585858;
+}
+
+.sub-chart {
+    position: absolute;
+    right: 0px;
+    bottom: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 60px;
+}
+
+.sub-chart.wind {
+    right: -10px;
+    bottom: 0;
+}
+
+.sub-chart .arrow {
+    width: 32px;
+}
+
+@media (min-width: 1901px) {
+    .chart1 {
+        width: 380px;
+        height: 360px;
+    }
+
+    .chart2 {
+        width: 720px;
+        height: 360px;
+    }
+
+    .chart3 {
+        width: 480px;
+        height: 540px;
+    }
+
+    .chart4 {
+        width: 270px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .chart5 {
+        width: 620px;
+        height: 260px;
+    }
+}
+
+@media (max-width: 1900px) and (min-width: 1041px) {
+    .chart-box {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px 30px;
+        box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15);
+    }
+
+    .chart1 {
+        flex-grow: 1;
+        width: 300px;
+        height: 320px;
+    }
+
+    .chart2 {
+        flex-grow: 1;
+        width: 640px;
+        height: 320px;
+    }
+
+    .chart3 {
+        flex-grow: 1;
+        width: 400px;
+        height: 540px;
+    }
+
+    .chart4 {
+        flex-grow: 1;
+        width: 540px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .chart5 {
+        flex-grow: 1;
+        width: 540px;
+        height: 260px;
+    }
+}

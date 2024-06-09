@@ -3,6 +3,104 @@
     src: url("./fonts/ProductSans-Regular.ttf") format("truetype");
 }
 
+.todolist-window {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.todolist-window .sort {
+    display: flex;
+    flex-direction: column;
+    font-family: "GSR";
+}
+
+.todolist-window .sort .bar {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+}
+
+.todolist-window .sort .bar p {
+    color: #fff;
+    font-size: 30px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.todolist-window .window-icon {
+    color: #fff;
+    font-size: 42px;
+    cursor: pointer;
+    align-self: flex-end;
+    padding-bottom: 20px;
+}
+
+.todolist-window .book-cover {
+    width: 860px;
+    height: 610px;
+    background-color: #f3f0ef;
+    border-radius: 20px;
+    position: relative;
+    display: flex;
+}
+
+.todo-list .title {
+    font-family: "GSR";
+    width: calc(100% - 50px);
+    margin: 40px 20px;
+    height: 40px;
+    border: 0;
+    outline: 0;
+    border-bottom: 1px solid #8e8e8e;
+    font-size: 20px;
+}
+
+.book-cover .calender-box {
+    margin-left: 50px;
+}
+
+.book-cover .calender-box.todo-lists {
+    width: 350px;
+}
+
+.book-cover .sort {
+    display: flex;
+}
+
+.book-cover h2 {
+    font-family: "GSR";
+    margin: 0;
+    font-size: 28px;
+}
+
+.todo-list {
+    margin-top: 50px;
+    width: 100%;
+    height: 510px;
+    border-radius: 20px;
+    background-color: #fff;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.3);
+}
+
+.todo-list .date-list {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.todo-list .date-list > div {
+    border-radius: 30px;
+    padding: 10px 14px;
+    background-color: #2d2b42;
+    color: #fff;
+}
+
 body {
     user-select: none;
     overflow: hidden;
@@ -15,14 +113,12 @@ body {
     height: 100vh;
 }
 
-.info-pic {
-    height: 500px;
-}
-
 .icons {
     margin-top: 100px;
     color: #070526;
     font-size: 30px;
+    display: flex;
+    align-items: center;
 }
 
 .content {
@@ -33,520 +129,195 @@ body {
 
 .board {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    min-width: 95%;
-    max-width: 95%;
+    width: 100%;
+    min-width: 480px;
     overflow: hidden;
     align-content: center;
 }
 
-@media (min-width: 1901px) {
-    .icon-panel .contents-panel .info-panel {
-        height: 100vh;
-    }
-
-    .summary-dashboard {
-        padding-top: 60px;
-        width: 100%;
-        background-color: #e2e2dc;
-    }
-    
-    .control-dashboard {
-        padding-top: 60px;
-        width: 100%;
-        background-color: #e2e2dc;
-    }
-    
-    .chart-dashboard {
-        padding-top: 60px;
-        width: 100%;
-        height: 100vh;
-        background-color: #e2e2dc;
-    }
-    
-    .video-dashboard {
-        width: 100%;
-        height: 100vh;
-        background-color: #e2e2dc;
-    }
-    
-    .db-dashboard {
-        width: 100%;
-        height: 100vh;
-        background-color: #e2e2dc;
-    }
-
-    .icon-panel {
-        width: 120px;
-        background-color: #e2e2dc;
-    }
-
-    .contents-panel {
-        flex-grow: 1;
-        overflow-y: scroll;
-        overflow-x: hidden;
-    }
-
-    .contents-panel::-webkit-scrollbar {
-        background-color: white;
-        width: 12px;
-    }
-    
-    .contents-panel::-webkit-scrollbar-thumb {
-        background-color: #5b9ca6;
-        background-clip: padding-box;
-        border: 2px solid transparent;
-        border-radius: 15px;
-    }
-
-    .info-panel {
-        width: 460px;
-        background-color: #2d2b42;
-        position: relative;
-    }
-
-    .icons-bar {
-        display: flex;
-        justify-content: center;
-        background-color: white;
-        min-width: 120px;
-        max-width: 120px;
-        height: 100vh;
-        position: fixed;
-        border-top-right-radius: 20px;
-        border-bottom-right-radius: 20px;
-        z-index: 1;
-    }
-
-    .icons {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .icon {
-        padding: 14px;
-        border-radius: 20px;
-        margin-bottom: 40px;
-    }
-
-    .icon:hover {
-        background-color: #e5e5dd;
-        cursor: pointer;
-    }
-
-    .clicked_icon {
-        color: white;
-        background-color: #070526;
-        padding: 14px;
-        border-radius: 20px;
-        margin-bottom: 40px;
-    }
-
-    .clicked_icon:hover {
-        cursor: pointer;
-    }
-
-    .info-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: #172631;
-        width: 460px;
-        height: 100vh;
-        position: fixed;
-        right: 0;
-        z-index: 1;
-        overflow: hidden;
-    }
-
-    .weather-content {
-        display: flex;
-        place-items: center;
-        flex-direction: column;
-        position: absolute;
-        border-radius: 30px 30px 0 0;
-        background-color: #172631;
-        width: 460px;
-        height: 100%;
-        top: 400px;
-        overflow: scroll;
-        -webkit-appearance: none;
-    }
-
-    .weather-content::-webkit-scrollbar {
-        -webkit-appearance: none;
-        width: 0px;
-    }
-
-    .calender-container {
-        font-family: "GSR";
-        font-weight: 600;
-        width: 360px;
-        background-color: #fff;
-        border-radius: 30px;
-        margin-top: 50px;
-        margin-bottom: 420px;
-        box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.3);
-        position: relative;
-    }
-
-    .calender-container header {
-        display: flex;
-        align-items: center;
-        padding: 25px 30px 0px;
-        justify-content: space-between;
-    }
-
-    .calender-container header .current-date {
-        font-size: 1.25rem;
-        font-weight: 600;
-        border-radius: 50px;
-        padding: 10px;
-        margin-left: -10px;
-        cursor: pointer;
-    }
-
-    .calender-container header .current-date:hover {
-        background-color: #f2f2f2;
-    }
-
-    .calender-container header .chevron-icons {
-        display: flex;
-    }
-
-    .calender-container header .chevron-icons span {
-        display: flex;
-        height: 38px;
-        width: 38px;
-        color: #878787;
-        margin: 0 1px;
-        cursor: pointer;
-        text-align: center;
-        line-height: 38px;
-        border-radius: 50%;
-        font-size: 24px;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .calender-container header .chevron-icons span:hover {
-        background-color: #f2f2f2;
-    }
-
-    .calender-container header .chevron-icons span:last-child {
-        margin-right: -10px;
-    }
-
-    .calender {
-        padding: 20px;
-    }
-
-    .calender ul {
-        font-family: "GSR";
-        display: flex;
-        list-style: none;
-        flex-wrap: wrap;
-        padding: 0;
-        text-align: center;
-    }
-
-    .calender .days {
-        margin-bottom: 10px;
-    }
-
-    .calender .weeks li {
-        font-weight: 500;
-    }
-
-    .calender ul li {
-        width: calc(100% / 7);
-        position: relative;
-    }
-
-    .calender .days li {
-        z-index: 1;
-        cursor: pointer;
-        margin-top: 30px;
-        font-weight: 500;
-    }
-
-    .calender .days li.inactive {
-        color: #aaa;
-    }
-
-    .calender .days li.active {
-        color: #fff;
-    }
-
-    .calender .days li::before {
-        position: absolute;
-        content: "";
-        height: 40px;
-        width: 40px;
-        top: 50%;
-        left: 50%;
-        z-index: -1;
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-    }
-
-    .calender .days li:hover::before {
-        background-color: #f2f2f2;
-    }
-
-    .calender .days li.active::before {
-        background-color: #7d82c6;
-    }
-
-    .calender-container .month-change {
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        z-index: 1;
-        background-color: #fff;
-        border-radius: 30px;
-    }
-
-    .month-change p {
-        font-size: 1.25rem;
-        margin-left: 30px;
-    }
-
-    .calender-container .month-list {
-        position: absolute;
-        width: 100%;
-        height: 90%;
-        color: #000;
-        display: grid;
-        grid-template-columns: repeat(3, auto);
-        bottom: 0;
-        transition: transform 0.3s;
-    }
-
-    .month-list > div {
-        display: grid;
-        place-items: center;
-    }
-
-    .month-list > div > div {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100px;
-        height: 100px;
-        border-radius: 30px;
-        text-align: center;
-        cursor: pointer;
-        font-size: 30px;
-        font-weight: 500;
-    }
-
-    .active-month {
-        background-color: #7d82c6;
-        color: #fff
-    }
-
-    .inactive-month:hover {
-        background-color: #f2f2f2;
-    }
-}
-  
-@media (max-width: 1900px) and (min-width: 1041px) {
-    .icon-panel .contents-panel .info-panel {
-        height: 100vh;
-    }
-
-    .summary-dashboard {
-        padding-top: 60px;
-        width: 100%;
-        background-color: #e2e2dc;
-    }
-    
-    .control-dashboard {
-        padding-top: 120px;
-        width: 100%;
-        background-color: #e2e2dc;
-    }
-    
-    .chart-dashboard {
-        width: 100%;
-        height: 100vh;
-        background-color: #e2e2dc;
-    }
-    
-    .video-dashboard {
-        width: 100%;
-        height: 100vh;
-        background-color: #e2e2dc;
-    }
-    
-    .db-dashboard {
-        width: 100%;
-        height: 100vh;
-        background-color: #e2e2dc;
-    }
-
-    .icon-panel {
-        width: 120px;
-        background-color: #e2e2dc;
-    }
-
-    .contents-panel {
-        flex-grow: 1;
-        overflow-y: scroll;
-        overflow-x: hidden;
-    }
-
-    .contents-panel::-webkit-scrollbar {
-        background-color: white;
-        width: 12px;
-    }
-    
-    .contents-panel::-webkit-scrollbar-thumb {
-        background-color: #5b9ca6;
-        background-clip: padding-box;
-        border: 2px solid transparent;
-        border-radius: 15px;
-    }
-
-    .info-panel {
-        width: 460px;
-        background-color: #2d2b42;
-    }
-
-    .icons-bar {
-        display: flex;
-        justify-content: center;
-        background-color: white;
-        min-width: 120px;
-        max-width: 120px;
-        height: 100vh;
-        position: fixed;
-        border-top-right-radius: 20px;
-        border-bottom-right-radius: 20px;
-        z-index: 1;
-    }
-
-    .icons {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .icon {
-        padding: 14px;
-        border-radius: 20px;
-        margin-bottom: 40px;
-    }
-
-    .icon:hover {
-        background-color: #e5e5dd;
-        cursor: pointer;
-    }
-
-    .clicked_icon {
-        color: white;
-        background-color: #070526;
-        padding: 14px;
-        border-radius: 20px;
-        margin-bottom: 40px;
-    }
-
-    .clicked_icon:hover {
-        cursor: pointer;
-    }
-
-    .info-content {
-        display: flex;
-        flex-direction: column;
-        background-color: #172631;
-        width: 460px;
-        height: 100vh;
-        position: fixed;
-        right: 0;
-        z-index: 1;
-        overflow: hidden;
-    }
-
-    .weather-content {
-        display: flex;
-        place-items: center;
-        flex-direction: column;
-        position: absolute;
-        border-radius: 30px 30px 0 0;
-        background-color: #172631;
-        width: 460px;
-        height: 100%;
-        top: 400px;
-        overflow: scroll;
-        -webkit-appearance: none;
-    }
-
-    .calender-container {
-        font-family: "GSR";
-    }
+.summary-dashboard {
+    width: 100%;
+    background-color: #e2e2dc;
 }
 
-@media (max-width: 1040px) {
-    .smart-dashboard {
-        left: 0;
-    }
+.control-dashboard {
+    padding-top: 60px;
+    width: 100%;
+    background-color: #e2e2dc;
+}
 
-    .icons-bar {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: white;
-        min-width: 100px;
-        max-width: 100px;
-        height: 100vh;
-        position: fixed;
-        left: -100px;
-        transition: left 0.3s ease;
-    }
+.chart-dashboard {
+    padding-top: 60px;
+    width: 100%;
+    background-color: #e2e2dc;
+}
 
-    .icons-bar.open {
-        transition: right 0.3s ease;
-        left: 0;
-    }
-    
-    .icons {
-        border: 1px solid red;
-        flex-direction: column;
-        display: flex;
-        align-content: center;
-        justify-content: center;
-    }
+.video-dashboard {
+    width: 100%;
+    height: 100vh;
+    background-color: #e2e2dc;
+}
 
-    .icon {
-        padding: 14px;
-        margin: 5px;
-        border-radius: 20px;
-    }
+.db-dashboard {
+    width: 100%;
+    height: 100vh;
+    background-color: #e2e2dc;
+}
 
-    .icon:hover {
-        cursor: pointer;
-        background-color: #e5e5dd;
-    }
+.contents-panel {
+    flex-grow: 1;
+    flex-shrink: 29;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: relative;
+}
 
-    .clicked_icon {
-        color: white;
-        background-color: #070526;
-        padding: 14px;
-        border-radius: 20px;
-        margin: 5px;
-    }
+.contents-panel::-webkit-scrollbar {
+    background-color: white;
+    width: 12px;
+}
 
-    .clicked_icon:hover {
-        cursor: pointer;
-    }
+.contents-panel::-webkit-scrollbar-thumb {
+    background-color: #5b9ca6;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+    border-radius: 15px;
+}
 
-    .info-dashboard {
-        background-color: black;
-        height: 100vh;
-        position: fixed;
-        right: 0;
-        z-index: 0;
-    }
+.info-panel {
+    width: 460px;
+    height: 100vh;
+    background-color: #2d2b42;
+    position: relative;
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #172631;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.info-box {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    width: 360px;
+    height: 360px;
+    border-radius: 30px 90px;
+    background-color: #28343f;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.3);
+}
+
+.now {
+    margin: 0;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-family: "GMM";
+    font-size: 28px;
+    color: #fff;
+}
+
+.main-info {
+    width: 360px;
+    height: 360px;
+    display: flex;
+    z-index: 0;
+}
+
+.info-box span {
+    position: absolute;
+    right: 20px;
+    bottom: 10px;
+    font-family: "GSR";
+    font-size: 64px;
+    color: #fff;
+}
+
+.icon-panel {
+    width: 120px;
+    height: 100vh;
+    background-color: #e2e2dc;
+}
+
+.icons-bar {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: white;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    z-index: 2;
+}
+
+.icons {
+    display: flex;
+    flex-direction: column;
+}
+
+.icon {
+    width: 36px;
+    height: 36px;
+    padding: 12px;
+    border-radius: 20px;
+    margin-bottom: 40px;
+}
+
+.icon:hover {
+    background-color: #e5e5dd;
+    cursor: pointer;
+}
+
+.clicked_icon {
+    color: white;
+    width: 36px;
+    height: 36px;
+    padding: 12px;
+    background-color: #070526;
+    border-radius: 20px;
+    margin-bottom: 40px;
+}
+
+.clicked_icon:hover {
+    cursor: pointer;
+}
+
+.weather-content {
+    display: flex;
+    place-items: center;
+    flex-direction: column;
+    position: absolute;
+    border-radius: 50px 50px 0 0;
+    background-color: #172631;
+    width: 460px;
+    height: 100%;
+    top: 460px;
+    overflow: scroll;
+    -webkit-appearance: none;
+    z-index: 1;
+    box-shadow: 0px 0px 10px -1px rgba(0, 0, 0, 0.3);
+}
+
+.content-up {
+    margin-top: 20px;
+    font-size: 30px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.weather-content::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 0px;
 }

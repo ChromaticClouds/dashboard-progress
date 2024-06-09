@@ -10,6 +10,9 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 
+const { server2 } = require('./chart');
+const { mongo } = require('./mongo')
+
 let port = 5000;
 
 const server = http.createServer(app);
@@ -41,7 +44,7 @@ const sql = [
         environment_id = (SELECT MAX(environment_id) FROM environment);
     `,
     `
-    SELECT 
+    SELECT
         inner_humid 
     FROM 
         environment 
@@ -50,11 +53,11 @@ const sql = [
     `,
     `
     SELECT 
-        led_measures 
+        brightness 
     FROM 
-        record
+        environment
     WHERE 
-        record_id = (SELECT MAX(record_id) FROM record);
+        environment_id = (SELECT MAX(environment_id) FROM environment);
     `
 ]
 
@@ -193,7 +196,7 @@ parser.on("data", (data) => {
         sensor_data = JSON.parse(data);
         console.log(sensor_data);
     } catch (error) {
-        console.error(error);
+        
     }
 });
 
@@ -295,4 +298,10 @@ io.on('connection', (socket) => {
     socket.on('control off', () => {
         sp.write("off\n");
     })
+})
+
+let chart_port = 5100;
+
+server2.listen(chart_port, () => {
+    console.log(`server is running on ${ chart_port } port`)
 })

@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
 import io from "socket.io-client";
 import "./Control.css";
 
 import BulletChart from '../chart/BulletChart';
 import BulletChart2 from '../chart/BulletChart2';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Icon } from "./Icon";
+import { Icon } from "./icon/Icon";
 
 let socket;
 const Control = () => {
@@ -82,7 +81,7 @@ const Control = () => {
 
     const water_level = water_lev;
 
-    const is_checked = (e) => {
+    const is_checked = (e) => { // 전체 센서 이벤트 제어
         const checked_value = e.target.checked;
         set_checked(checked_value);
         localStorage.setItem('check-slider', checked_value);
@@ -96,6 +95,7 @@ const Control = () => {
         }
     }
 
+    // LED 슬라이더 3개 value 스테이트 저장
     const slider_changed_1 = (input) => {
         const new_value = input.target.value;
         set_value1(new_value);
@@ -114,7 +114,8 @@ const Control = () => {
         set_show_value3(true);
         localStorage.setItem('slider-data3', new_value);
     };
-
+    
+    // 펌프 스테이트 저장
     const get_intensity = (input) => {
         const intensity_value = input.target.value;
         set_intenstiy(intensity_value);
@@ -275,6 +276,7 @@ const Control = () => {
         left: `${(value3 / 5) * 100}%`,
     };
 
+    // 온도 디스플레이 표시용
     const temperature = [
         {
             "ranges": [ 0, 15, 17, 23, 25, 28, 40 ],
@@ -282,7 +284,7 @@ const Control = () => {
             "markers": [ 24 ]
         }
     ]
-
+    // 습도 디스플레이 표시용
     const humidity = [
         {
             "ranges": [ 0, 40, 65, 80, 100 ],
@@ -297,6 +299,7 @@ const Control = () => {
     const slider_min_x = 0;
     const slider_max_x = 240;
 
+    /** 드래그 이벤트 저장 스테이트 */
     const [dragging_h, set_dragging_h] = useState(false);
     const [initial_mouse_x, set_initial_mouse_x] = useState(0);
     const [slider_x, set_slider_x] = useState(() => {
@@ -344,6 +347,7 @@ const Control = () => {
         }
     }
 
+    // 슬라이더 스테이트 변경 될 때마다 재렌더링 방지
     const desired_heat = useCallback(() => {
         const temp_range_start = 15;
         const temp_range = 20;
@@ -365,6 +369,7 @@ const Control = () => {
         set_desire_cool(desired_cool());
     }, [desired_cool])
 
+    // 설정한 온도를 소수점 제거해서 전송
     useEffect(() => {
         socket.emit("heater temp req", desire_heat.toFixed(0));
     }, [desire_heat]);
@@ -372,6 +377,7 @@ const Control = () => {
         socket.emit("cooler temp req", desire_cool.toFixed(0));
     }, [desire_cool]);
 
+    // 설정한 온도를 클라이언트 내부 저장소에 저장
     useEffect(() => {
         localStorage.setItem('slider_x', slider_x);
     }, [slider_x]);
@@ -379,6 +385,7 @@ const Control = () => {
         localStorage.setItem('slider_x2', slider_x2);
     }, [slider_x2]);
 
+    // 슬라이더 애니메이션 CSS 조절
     const heat_element_style = (temp_number) => {
         const near_distance = 3;
         const lift_distance = 12;
@@ -399,7 +406,8 @@ const Control = () => {
         const element_y = Math.min(dist_y * lift_distance, 0);
         return `translate3d(0, ${ element_y }px, 0)`
     }
-
+    
+    // 온도 제어 전원 여부 기억
     const [heater_operate, set_heater_operate] = useState(() => {
         const saved = localStorage.getItem('heater-power');
         return saved === 'true';
@@ -409,6 +417,7 @@ const Control = () => {
         return saved === 'true';
     })
 
+    // 히터, 쿨러 전원여부 스테이트 저장 및 전송
     const heater_rotate = () => {
         set_heater_operate(prevState => {
             const newState = !prevState;
@@ -424,6 +433,7 @@ const Control = () => {
         })
     }
 
+    // 히터, 쿨러 전원여부 클라이언트 저장소에 저장
     useEffect(() => {
         localStorage.setItem('heater-power', heater_operate);
     }, [heater_operate])

@@ -1,18 +1,14 @@
 import React from 'react';
 import { Routes, Route, ScrollRestoration } from 'react-router-dom';
 import Title from "./Title";
-import Weather from "./Weather"
-import Weather2 from "./Weather2"
-import Summary from './Summary';
+import Calender from './Calendar/Calendar';
 
 const Home = () => {
     return (
         <div>
             <Routes>
                 <Route path="/main" element={<Title />} />
-                <Route path="/summary" element={<Summary />} />
-                <Route path="/weather" element={<Weather />} />
-                <Route path="/weather2" element={<Weather2 />} />
+                <Route path="/calender" element={<Calender />} />
             </Routes>
         </div>
     );

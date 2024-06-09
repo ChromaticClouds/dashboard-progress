@@ -120,7 +120,19 @@ const Summary = () => {
     return (
         <div className = "board">
             <div className = "sub-contents">
-                <h4 className = "subtitle">Hello, DCT!</h4>
+                <div className = "category">
+                    <div className = "margin"></div>
+                    <div className = "button">
+                        Tomato1
+                    </div>
+                    <div className = "button">
+                        Tomato2
+                    </div>
+                    <div className = "button">
+                        Tomato3
+                    </div>
+                </div>
+                <h4 className = "subtitle">Summary Dashboard</h4>
                 <div className = "date">
                     <FontAwesomeIcon 
                         icon = "fa-solid fa-calendar-days"
@@ -187,7 +199,7 @@ const Summary = () => {
                                                     key={index}
                                                     className = "stat-value"
                                                 >
-                                                    { stat.inner_temp != null ? stat.inner_temp + " °C" : null}
+                                                    { stat.inner_temp != null ? stat.inner_temp + " °C" : ''}
                                                 </div>
                                             ))}
                                         </div>
@@ -212,7 +224,7 @@ const Summary = () => {
                                                     key={index}
                                                     className = "stat-value"
                                                 >
-                                                    { stat.inner_humid != null ? stat.inner_humid + " %" : null}
+                                                    { stat.inner_humid != null ? stat.inner_humid + " %" : ''}
                                                 </div>
                                             ))}
                                         </div>
@@ -237,7 +249,7 @@ const Summary = () => {
                                                     key={index}
                                                     className = "stat-value"
                                                 >
-                                                    { stat.led_measures != null ? stat.led_measures + " lux" : null}
+                                                    { stat.brightness != null ? stat.brightness : ''}
                                                 </div>
                                             ))}
                                         </div>
@@ -249,10 +261,12 @@ const Summary = () => {
                     <div className = "sensor-box-sort">
                         <h4 className = "sensor-box-title">Farm Statistics</h4>
                         <div className = "sensor-box">
-                            <FontAwesomeIcon 
-                                icon="fa-solid fa-seedling"
-                                className = "sensor-icon"
-                            />
+                            <div>
+                                <FontAwesomeIcon 
+                                    icon="fa-solid fa-seedling"
+                                    className = "sensor-icon"
+                                />
+                            </div>
                             <div>
                                 <p className = "sensor-subtitle">Soil Humidity</p>
                                 { sensor_stats.map((object, index) => (
@@ -274,7 +288,7 @@ const Summary = () => {
                             />
                             <div>
                                 <p className = "sensor-subtitle">Watering Amount</p>
-                                <div className = "watering-disc">Liter per week</div>
+                                <div className = "watering-disc">Per a Week</div>
                             </div>
                             { sensor_stats.map((object, index) => (
                                 <div key = { index } className = "sensor-value">

@@ -1,7 +1,11 @@
 import { React, useEffect, useState } from 'react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import WindSub from "../chart/SubChart2";
 import './Weather.css'
 
-const Weather2 = () => {
+const Weather2 = ({ set_current }) => {
+    const [weather, set_weather] = useState({});
+
     let today_temp = null;
     let today_sky = null;
     let today_pty = null;
@@ -30,6 +34,7 @@ const Weather2 = () => {
         pty: '',
         icon: null,
         icon2: null,
+        temp: 0,
         maxTemp: 0,
         minTemp: 0
     });
@@ -70,6 +75,10 @@ const Weather2 = () => {
             host_weather();
         }
     }, [latitude, longitude, x, y]);
+
+    useEffect(() => {
+        set_current(오늘날씨)
+    }, [오늘날씨])
     
     useEffect(() => {
         get_location();
@@ -236,166 +245,169 @@ const Weather2 = () => {
         let today = th_year + "" + th_month + "" + th_day;
         let tomorrow = tm_year + "" + tm_month + "" + tm_day;
 
-        var xhr = new XMLHttpRequest();
-        var url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst'; /*URL*/
-        var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'TdQd3Xt%2B4OHiUyXW4OunKFr6rCLsJlVInxrkdZfIhQ45NtLhK4pmxQyEZSBnqfv2PS1%2BSxVF6h7h3GWe%2BlQXeQ%3D%3D'; /*Service Key*/
-        queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
-        queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('1000'); /**/
-        queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('JSON'); /**/
-        queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(base_date); /**/
-        queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent(base_time); /**/
-        queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent(x); /**/
-        queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent(y); /**/
-        xhr.open('GET', url + queryParams);
-        xhr.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                let json = this.responseText;
-                let obj = JSON.parse(json);
-                let parse_response = obj.response;
-                let parse_body = parse_response.body;
-                let parse_items = parse_body.items;
-                let parse_item = parse_items.item;
-                
-                parse_item.forEach(item => {
-                    let category = item.category;
-                    let fc_date = item.fcstDate;
-                    let fc_time = item.fcstTime;
-                    let value = parseInt(item.fcstValue);
+        const url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst';
+        const serviceKey = 'TdQd3Xt%2B4OHiUyXW4OunKFr6rCLsJlVInxrkdZfIhQ45NtLhK4pmxQyEZSBnqfv2PS1%2BSxVF6h7h3GWe%2BlQXeQ%3D%3D';
+        const queryParams = new URLSearchParams({
+            serviceKey: decodeURIComponent(serviceKey),
+            pageNo: '1',
+            numOfRows: '1000',
+            dataType: 'JSON',
+            base_date: base_date,
+            base_time: base_time,
+            nx: x,
+            ny: y
+        }).toString();
 
-                    if (category == "TMP" && fc_date == today && fc_time == th_hour) {
-                        today_temp = value;
+        fetch(`${url}?${queryParams}`)
+        .then(response => response.json())
+        .then(data => {
+            const parse_response = data.response;
+            const parse_body = parse_response.body;
+            const parse_items = parse_body.items;
+            const parse_item = parse_items.item;
+
+            parse_item.forEach(item => {
+                const category = item.category;
+                const fc_date = item.fcstDate;
+                const fc_time = item.fcstTime;
+                const value = parseInt(item.fcstValue, 10);
+
+                if (category === "TMP" && fc_date === today && fc_time === th_hour) {
+                    today_temp = value;
+                }
+
+                if (category === "SKY" && fc_date === today && fc_time === th_hour) {
+                    switch (value) {
+                        case 1:
+                            today_sky = "맑음";
+                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/clear-day.svg";
+                            break;
+                        case 2:
+                            today_sky = "구름 조금";
+                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/partly-cloudy-day.svg";
+                            break;
+                        case 3:
+                            today_sky = "구름 많음";
+                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/cloudy.svg";
+                            break;
+                        case 4:
+                            today_sky = "흐림";
+                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/overcast.svg";
+                            break;
                     }
+                }
 
-                    if (category == "SKY" && fc_date == today && fc_time == th_hour) {
-                        switch (value) {
-                            case 1:
-                                today_sky = "맑음"
-                                today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/clear-day.svg";
-                                break;
-                            case 2:
-                                today_sky = "구름 조금";
-                                today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/partly-cloudy-day.svg";
-                                break;
-                            case 3:
-                                today_sky = "구름 많음";
-                                today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/cloudy.svg"
-                                break;
-                            case 4:
-                                today_sky = "흐림";
-                                today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/overcast.svg"
-                                break;
-                        }
+                if (category === "PTY" && fc_date === today && fc_time === th_hour) {
+                    switch (value) {
+                        case 1:
+                            today_pty = "비";
+                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/drizzle.svg";
+                            break;
+                        case 2:
+                            today_pty = "비/눈";
+                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/sleet.svg";
+                            break;
+                        case 3:
+                            today_pty = "눈";
+                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/snow.svg";
+                            break;
+                        case 4:
+                            today_pty = "소나기";
+                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/rain.svg";
+                            break;
                     }
+                }
 
-                    if (category == "PTY" && fc_date == today && fc_time == th_hour) {
-                        switch (value) {
-                            case 1:
-                                today_pty = "비";
-                                today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/drizzle.svg"
-                                break;
-                            case 2:
-                                today_pty = "비/눈";
-                                today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/sleet.svg"
-                                break;
-                            case 3:
-                                today_pty = "눈";
-                                today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/snow.svg"
-                                break;
-                            case 4:
-                                today_pty = "소나기";
-                                today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/rain.svg"
-                                break;
-                        }
+                if (category === "TMX" && fc_date === today) {
+                    today_max_temp = value;
+                }
+
+                if (category === "TMN" && fc_date === today) {
+                    today_min_temp = value;
+                }
+
+                if (category === "SKY" && fc_date === tomorrow && fc_time === th_hour) {
+                    switch (value) {
+                        case 1:
+                            tomorrow_sky = "맑음";
+                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/clear-day.svg";
+                            break;
+                        case 2:
+                            tomorrow_sky = "구름 조금";
+                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/partly-cloudy-day.svg";
+                            break;
+                        case 3:
+                            tomorrow_sky = "구름 많음";
+                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/cloudy.svg";
+                            break;
+                        case 4:
+                            tomorrow_sky = "흐림";
+                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/overcast.svg";
+                            break;
                     }
+                }
 
-                    if (category == "TMX" && fc_date == today) {
-                        today_max_temp = value;
+                if (category === "PTY" && fc_date === tomorrow && fc_time === th_hour) {
+                    switch (value) {
+                        case 1:
+                            tomorrow_pty = "비";
+                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/drizzle.svg";
+                            break;
+                        case 2:
+                            tomorrow_pty = "비/눈";
+                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/sleet.svg";
+                            break;
+                        case 3:
+                            tomorrow_pty = "눈";
+                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/snow.svg";
+                            break;
+                        case 4:
+                            tomorrow_pty = "소나기";
+                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/rain.svg";
+                            break;
                     }
+                }
 
-                    if (category == "TMN" && fc_date == today) {
-                        today_min_temp = value;
-                    }
+                if (category === "TMX" && fc_date === tomorrow) {
+                    tomorrow_max_temp = value;
+                }
 
-                    if (category == "SKY" && fc_date == tomorrow && fc_time == th_hour) {
-                        switch (value) {
-                            case 1:
-                                tomorrow_sky = "맑음";
-                                tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/clear-day.svg";
-                                break;
-                            case 2:
-                                tomorrow_sky = "구름 조금";
-                                tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/partly-cloudy-day.svg";
-                                break;
-                            case 3:
-                                tomorrow_sky = "구름 많음";
-                                tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/cloudy.svg";
-                                break;
-                            case 4:
-                                tomorrow_sky = "흐림";
-                                tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/overcast.svg"
-                                break;
-                        }
-                    }
+                if (category === "TMN" && fc_date === tomorrow) {
+                    tomorrow_min_temp = value;
+                }
 
-                    if (category == "PTY" && fc_date == tomorrow && fc_time == th_hour) {
-                        switch (value) {
-                            case 1:
-                                tomorrow_pty = "비";
-                                tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/drizzle.svg"
-                                break;
-                            case 2:
-                                tomorrow_pty = "비/눈";
-                                tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/sleet.svg"
-                                break;
-                            case 3:
-                                tomorrow_pty = "눈";
-                                tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/snow.svg"
-                                break;
-                            case 4:
-                                tomorrow_pty = "소나기";
-                                tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/rain.svg"
-                                break;
-                        }
-                    }
-
-                    if (category == "TMX" && fc_date == tomorrow) {
-                        tomorrow_max_temp = value;
-                    }
-
-                    if (category == "TMN" && fc_date == tomorrow) {
-                        tomorrow_min_temp = value;
-                    }
-
-                    오늘날씨저장({
-                        month: th_month,
-                        day: th_day,
-                        sky: today_sky,
-                        pty: today_pty,
-                        icon: today_sky_icon,
-                        icon2: today_pty_icon,
-                        maxTemp: today_max_temp,
-                        minTemp: today_min_temp
-                    });
-            
-                    내일날씨저장({
-                        month: tm_month,
-                        day: tm_day,
-                        sky: tomorrow_sky,
-                        pty: tomorrow_pty,
-                        icon: tomorrow_sky_icon,
-                        icon2: tomorrow_pty_icon,
-                        maxTemp: tomorrow_max_temp,
-                        minTemp: tomorrow_min_temp
-                    });
+                오늘날씨저장({
+                    month: th_month,
+                    day: th_day,
+                    sky: today_sky,
+                    pty: today_pty,
+                    icon: today_sky_icon,
+                    icon2: today_pty_icon,
+                    temp: today_temp,
+                    maxTemp: today_max_temp,
+                    minTemp: today_min_temp
                 });
-            }
-        };
 
-        xhr.send('');
+                내일날씨저장({
+                    month: tm_month,
+                    day: tm_day,
+                    sky: tomorrow_sky,
+                    pty: tomorrow_pty,
+                    icon: tomorrow_sky_icon,
+                    icon2: tomorrow_pty_icon,
+                    maxTemp: tomorrow_max_temp,
+                    minTemp: tomorrow_min_temp
+                });
+            });
+        })
+        .catch(error => console.error('Error fetching data:', error));
     }
 
     return (
-        <div>
+        <div className = 'weather-container'>
+            <>
+                <WindSub set_weather = { set_weather }/>
+            </>
             <h4 className = "today-weather">Short-term forecast</h4>
             <div className = "today-info">
                 <img src = { 오늘날씨.pty == null ? 오늘날씨.icon : 오늘날씨.icon2 } className = 'weather-icon'/>
@@ -413,6 +425,32 @@ const Weather2 = () => {
                     { 내일날씨.pty == null ? 내일날씨.sky : 내일날씨.pty }
                 </div>
                 <div className = "temp-info2">{ 내일날씨.maxTemp }° / { 내일날씨.minTemp }°</div>
+            </div>
+
+            <div className = 'line'></div>
+
+            <div className = 'status-container'>
+                <div className = 'status-box'>
+                    <div className = 'box-icon'>
+                        <FontAwesomeIcon icon="fa-solid fa-wind" />
+                    </div>
+                    <span>{ weather.main ? weather.main.pressure + " mb": 0 + " mb"}</span>
+                    <p>pressure</p>
+                </div>
+                <div className = 'status-box'>
+                    <div className = 'box-icon visibility'>
+                        <FontAwesomeIcon icon="fa-solid fa-eye" />
+                    </div>
+                    <span>{ weather.visibility ? (weather.visibility / 1000).toFixed(0) + " km" : 0 + " km"}</span>
+                    <p>visibility</p>
+                </div>
+                <div className = 'status-box'>
+                    <div className = 'box-icon humidity'>
+                        <FontAwesomeIcon icon="fa-solid fa-droplet" />
+                    </div>
+                    <span>{ weather.main ? weather.main.humidity + "%" : 0 + "%" }</span>
+                    <p>humidity</p>
+                </div>
             </div>
         </div>
     )

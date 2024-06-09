@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@nivo/bullet": "^0.87.0",
+    "axios": "^1.7.2",
     "chart.js": "^4.4.1",
     "chartjs-plugin-datalabels": "^2.2.0",
     "react": "^18.2.0",

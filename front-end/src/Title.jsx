@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 
+import Calender from "./Calendar/Calendar";
 import Weather2 from "./Weather2"
 import Summary from "./Summary";
 import Control from "./Control";
@@ -57,104 +58,127 @@ const Title = () => {
         };
     }, []);
 
+    const [rotated, set_rotated] = useState(false);
+
+    const rotate = () => {
+        set_rotated(!rotated)
+    }
+
+    const [current, set_current] = useState({})
+    const [isvisible, set_isvisible] = useState(false);
 
     const [current_date, set_current_date] = useState({
         year: new Date().getFullYear(),
         month: new Date().getMonth(),
-        string_month: new Date().getMonth().toLocaleString('en-GB', { month: 'long'})
+        string_month: new Date().toLocaleString('en-GB', { month: 'long' })
     });
 
-    const [prev_last_days, set_prev_last_days] = useState([]);
-    const [days, set_days] = useState([]);
-    const [next_init_days, set_next_init_days] = useState([]);
-    const [active_day, set_active_day] = useState(new Date().getDate());
+    const [clicked_date, set_clicked_date] = useState({
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() + 1,
+        day: new Date().getDate(),
+    })
 
-    const [month_change_style, set_month_change_style] = useState({ zIndex: -1 });
-    const [scale, set_scale] = useState(1.3);
+    const [date_clicked, set_date_clicked] = useState({
+        year: new Date().getFullYear(),
+        month: 1,
+        day: 1,
+    })
 
-    const month_list = Array.from(Array(12), (_, i) => new Date(current_date.year, i).getMonth() + 1);
-
-    const prev_month = () => {
-        set_current_date((prev) => {
-            let new_month = prev.month - 1;
-            let new_year = prev.year;
-            if (new_month < 0) {
-                new_month = 11;
-                new_year -= 1;
-            }
-            let new_string_month = new Date(new_year, new_month).toLocaleString('en-GB', { month: 'long'})
-
-            return { year: new_year, month: new_month, string_month: new_string_month }
-        })
-    }
-
-    const next_month = () => {
-        set_current_date((next) => {
-            let new_month = next.month + 1;
-            let new_year = next.year;
-            if (new_month > 11) {
-                new_month = 0;
-                new_year += 1;
-            }
-            let new_string_month = new Date(new_year, new_month).toLocaleString('en-GB', { month: 'long'})
-
-            return { year: new_year, month: new_month, string_month: new_string_month }
-        })
-    }
+    const [day, set_day] = useState('');
 
     useEffect(() => {
-        const date = new Date(current_date.year, current_date.month)
-        const current_year = date.getFullYear();
-        const current_month = date.getMonth();
-        const current_string_month = date.toLocaleString('en-GB', { month: 'long'});
+        let week = '';
+        let getDay = new Date(clicked_date.year, clicked_date.month - 1, clicked_date.day).getDay();
 
-        set_active_day(new Date().getDate());
-
-        set_current_date({
-            year: current_year,
-            month: current_month,
-            string_month: current_string_month,
-        })
-
-        let last_date_of_prev = new Date(current_year, current_month, 0).getDate();
-        let first_date_of_month = new Date(current_year, current_month, 1);
-        let last_date_of_month = new Date(current_year, current_month + 1, 0).getDate();
-        let day_of_week = first_date_of_month.getDay();
-
-        const prev_month_days = [];
-        for (let i = day_of_week -1; i >= 0; i--) {
-            prev_month_days.push(last_date_of_prev - i);
+        switch (getDay) {
+            case 0:
+                week = 'Sun'
+                break;
+            case 1:
+                week = 'Mon'
+                break;
+            case 2:
+                week = 'Tue'
+                break;
+            case 3: 
+                week = 'Wed'
+                break;
+            case 4:
+                week = 'Thu'
+                break;
+            case 5:
+                week = 'Fri'
+                break;
+            case 6:
+                week = 'Sat'
+                break;
         }
-        set_prev_last_days(prev_month_days);
 
-        const days_array = Array.from(Array(last_date_of_month), (_, i) => i + 1);
-        set_days(days_array);
-
-        const next_month_days = [];
-        const total_days = 42;
-        for (let i = 1; i <= total_days - (prev_month_days.length + days_array.length); i++) {
-            next_month_days.push(i);
-        }
-        set_next_init_days(next_month_days)
-    }, [current_date.year, current_date.month])
-
-    const host_month = (value) => {
-        set_current_date({
-            year: current_date.year,
-            month: value,
-            string_month: new Date(current_date.year, value).toLocaleString('en-GB', { month: 'long' })
-        })
-
-        set_month_change_style({ zIndex: -1 })
-    }
-
-    const current_date_click = () => {
-        set_month_change_style({ zIndex: 1 });
-        set_scale(1);
-    }
+        set_day(week);
+    }, [clicked_date])
 
     return (
         <div>
+            <div 
+                className="todolist-window" 
+                style={{
+                    visibility: isvisible ? "visible" : "hidden"
+                }}
+                onClick={() => set_isvisible(!isvisible)}
+            >
+                <div className="sort">
+                    <div className="bar">
+                        <p>ToDoList - { clicked_date.year }
+                            /{ clicked_date.month }
+                            /{ clicked_date.day < 10 
+                            ? '0' + clicked_date.day 
+                            : clicked_date.day }</p>
+                        <FontAwesomeIcon 
+                            icon="fa-solid fa-xmark" 
+                            className="window-icon"
+                            onClick={() => set_isvisible(!isvisible)}
+                        />
+                    </div>
+                    <div className="book-cover"
+                        onClick={(e) => {e.stopPropagation()}}
+                    >
+                        <div className="calender-box">
+                            <Calender
+                                setDate = { set_current_date }
+                                className="calender"
+                                setVisible = { set_date_clicked }
+                                dateChange = { current_date }
+                                setClickDate = { set_clicked_date }
+                            />
+                        </div>
+                        <div className="calender-box todo-lists">
+                            <div className="todo-list">
+                                <input
+                                    className="title"
+                                    placeholder="Title"
+                                    autoComplete="off"
+                                ></input>
+                                <div className="date-list">
+                                    <div>
+                                        { day }
+                                        , { clicked_date.month < 10 ? '0' + clicked_date.month : clicked_date.month }/
+                                        { clicked_date.day < 10 ? '0' + clicked_date.day : clicked_date.day }
+                                    </div>
+                                    <div>
+                                        { day }
+                                        , { clicked_date.month < 10 ? '0' + clicked_date.month : clicked_date.month }/
+                                        { clicked_date.day < 10 ? '0' + clicked_date.day : clicked_date.day }
+                                    </div>
+                                </div>
+                                <input
+                                    type="time"
+                                ></input>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div className = "ui-container">
                 <div className = "icon-panel">
                     <div className="icons-bar">
@@ -195,61 +219,36 @@ const Title = () => {
                 </div>
                 <div className = "info-panel">
                     <div className = "info-content">
-                        <div className="weather-content">
-                            <Weather2 />
-                            <div className="calender-container">
-                                <header>
-                                    <p className = "current-date" onClick = { current_date_click }>{ current_date.string_month } { current_date.year }</p>
-                                    <div className = "chevron-icons">
-                                        <span><FontAwesomeIcon icon="fa-solid fa-chevron-left" onClick = { prev_month }/></span>
-                                        <span><FontAwesomeIcon icon="fa-solid fa-chevron-right" onClick = { next_month }/></span>
-                                    </div>
-                                </header>
-                                <div className = "calender">
-                                    <ul className="week">
-                                        <li>Sun</li>
-                                        <li>Mon</li>
-                                        <li>Tue</li>
-                                        <li>Wed</li>
-                                        <li>Thu</li>
-                                        <li>Fri</li>
-                                        <li>Sat</li>
-                                    </ul>
-                                    <ul className="days">
-                                        {prev_last_days.map((o, i) => (
-                                            <li key = {i} className = "inactive">{o}</li>
-                                        ))}
-                                        {days.map((o, i) => (
-                                            <li key = {i} className = { current_date.year === new Date().getFullYear() && current_date.month === new Date().getMonth() && o === active_day ? "active" : ""  }>{o}</li>
-                                        ))}
-                                        {next_init_days.map((o, i) => (
-                                            <li key = {i} className = "inactive">{o}</li>
-                                        ))}
-                                    </ul> 
-                                </div>
-                                <div className = "month-change" style = { month_change_style }>
-                                    <p>{ current_date.year }</p>
-                                    <div className = "month-list" style = { { transform: `scale(${ scale })` } }>
-                                        { month_list.map((month) => (
-                                            <div key = { month }>
-                                                <div 
-                                                    className = { 
-                                                        current_date.year === new Date().getFullYear() && 
-                                                        month === new Date().getMonth() + 1 
-                                                        ? "active-month" 
-                                                        : "inactive-month"
-                                                    }
-                                                    onClick = { () => { host_month(month - 1), set_scale(1.3) } }
-                                                >
-                                                    { month }
-                                                </div>
-                                            </div>
-                                        )) }
-                                    </div>
-                                </div>
-                            </div>
+                        <div className="weather-content" style = {{
+                            top: rotated ? '0' : '460px',
+                            transition: 'top 0.5s ease-in-out'
+                        }}>
+                            <FontAwesomeIcon
+                                icon="fa-solid fa-chevron-up" 
+                                className="content-up"
+                                onClick = { rotate }
+                                style = {{
+                                    transform: rotated ? 'rotate(180deg)' : 'rotate(0deg)',
+                                    transition: 'transform 0.3s ease-in-out'
+                                }} // 버튼 클릭 시, 위젯 슬라이드 업
+                            />
+                            <Weather2 set_current={set_current} />
+                            <Calender
+                                rotate = { rotated }
+                                setDate = { set_current_date }
+                                dateChange = { current_date }
+                                clicked = { isvisible } // 빈 공간 또는 'X' 클릭 스테이트를 넘겨줌
+                                setVisible = { set_isvisible } // 날짜 클릭 후, 팝업창을 띄울 스테이트 저장
+                                setClickDate = { set_clicked_date }
+                            />
                         </div>
-                        <img src = "../images/smartfarm.png" className = "info-pic"/>
+                        <div className="info-box">
+                            <h4 className="now">Now</h4>
+                            <div className="main-info">
+                                <img src = { current.pty == null ? current.icon : current.icon2 } className = "info-icon"/>
+                            </div>
+                            <span>{ current.temp }°</span>
+                        </div>
                     </div>
                 </div>
             </div>
