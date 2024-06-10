@@ -4,9 +4,11 @@
 }
 
 .other-list {
+    margin-top: 40px;
     width: 100%;
     height: 600px;
     background-color: #fff;
+    border-radius: 20px;
 }
 
 body {

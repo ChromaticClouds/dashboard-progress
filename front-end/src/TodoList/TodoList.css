@@ -129,7 +129,7 @@
 .todo-list .date-list > div > input {
     margin-top: 20px;
     height: 30px;
-    width: 120px;
+    width: 110px;
     border-radius: 30px;
     padding: 0 10px;
     border: 1px solid #767676;
@@ -146,6 +146,11 @@
     outline: 0;
     background-color: #ededed;
     font-size: 16px;
+}
+
+.todo-input.left {
+    margin-top: 50px;
+    align-self: baseline;
 }
 
 .submit-form {

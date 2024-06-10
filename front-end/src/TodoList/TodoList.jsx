@@ -291,6 +291,23 @@ const TodoList = (props) => {
                                         ></input>
                                     </div>
                                 </div>
+                                <select>
+                                    <option value="1">
+                                        <FontAwesomeIcon icon="fa-solid fa-tree" />
+                                        선택해주세요.
+                                    </option>
+                                    <option value="2">물 주기</option>
+                                    <option value="3">영양분 공급</option>
+                                    <option value="4">씨앗 심기</option>
+                                    <option value="5">지지대 심기</option>
+                                    <option value="6">화분 옮겨심기</option>
+                                    <option value="7">토양비축</option>
+                                </select>
+                                <input
+                                    className="todo-input left"
+                                    placeholder="Todo for..."
+                                    autoComplete="off"
+                                ></input>
                             </div>
                         </div>
                     </div>
