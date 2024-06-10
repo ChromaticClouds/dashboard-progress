@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 
-import Calender from "./Calendar/Calendar";
+import Calendar from "./TodoList/Calendar";
+import TodoList from "./ToDoList/ToDoList";
 import Weather2 from "./Weather2"
 import Summary from "./Summary";
 import Control from "./Control";
@@ -64,121 +65,18 @@ const Title = () => {
         set_rotated(!rotated)
     }
 
-    const [current, set_current] = useState({})
-    const [isvisible, set_isvisible] = useState(false);
+    const [current, set_current] = useState({});
 
-    const [current_date, set_current_date] = useState({
-        year: new Date().getFullYear(),
-        month: new Date().getMonth(),
-        string_month: new Date().toLocaleString('en-GB', { month: 'long' })
-    });
-
-    const [clicked_date, set_clicked_date] = useState({
-        year: new Date().getFullYear(),
-        month: new Date().getMonth() + 1,
-        day: new Date().getDate(),
-    })
-
-    const [date_clicked, set_date_clicked] = useState({
-        year: new Date().getFullYear(),
-        month: 1,
-        day: 1,
-    })
-
-    const [day, set_day] = useState('');
-
-    useEffect(() => {
-        let week = '';
-        let getDay = new Date(clicked_date.year, clicked_date.month - 1, clicked_date.day).getDay();
-
-        switch (getDay) {
-            case 0:
-                week = 'Sun'
-                break;
-            case 1:
-                week = 'Mon'
-                break;
-            case 2:
-                week = 'Tue'
-                break;
-            case 3: 
-                week = 'Wed'
-                break;
-            case 4:
-                week = 'Thu'
-                break;
-            case 5:
-                week = 'Fri'
-                break;
-            case 6:
-                week = 'Sat'
-                break;
-        }
-
-        set_day(week);
-    }, [clicked_date])
+    const [visible, setVisible] = useState(false);
+    const [date, setDate] = useState({});
 
     return (
         <div>
-            <div 
-                className="todolist-window" 
-                style={{
-                    visibility: isvisible ? "visible" : "hidden"
-                }}
-                onClick={() => set_isvisible(!isvisible)}
-            >
-                <div className="sort">
-                    <div className="bar">
-                        <p>ToDoList - { clicked_date.year }
-                            /{ clicked_date.month }
-                            /{ clicked_date.day < 10 
-                            ? '0' + clicked_date.day 
-                            : clicked_date.day }</p>
-                        <FontAwesomeIcon 
-                            icon="fa-solid fa-xmark" 
-                            className="window-icon"
-                            onClick={() => set_isvisible(!isvisible)}
-                        />
-                    </div>
-                    <div className="book-cover"
-                        onClick={(e) => {e.stopPropagation()}}
-                    >
-                        <div className="calender-box">
-                            <Calender
-                                setDate = { set_current_date }
-                                className="calender"
-                                setVisible = { set_date_clicked }
-                                dateChange = { current_date }
-                                setClickDate = { set_clicked_date }
-                            />
-                        </div>
-                        <div className="calender-box todo-lists">
-                            <div className="todo-list">
-                                <input
-                                    className="title"
-                                    placeholder="Title"
-                                    autoComplete="off"
-                                ></input>
-                                <div className="date-list">
-                                    <div>
-                                        { day }
-                                        , { clicked_date.month < 10 ? '0' + clicked_date.month : clicked_date.month }/
-                                        { clicked_date.day < 10 ? '0' + clicked_date.day : clicked_date.day }
-                                    </div>
-                                    <div>
-                                        { day }
-                                        , { clicked_date.month < 10 ? '0' + clicked_date.month : clicked_date.month }/
-                                        { clicked_date.day < 10 ? '0' + clicked_date.day : clicked_date.day }
-                                    </div>
-                                </div>
-                                <input
-                                    type="time"
-                                ></input>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <TodoList 
+                setVisible = { visible }
+                setCancel = { setVisible }
+                setDate = { date }
+            />
             <div className = "ui-container">
                 <div className = "icon-panel">
                     <div className="icons-bar">
@@ -233,14 +131,17 @@ const Title = () => {
                                 }} // 버튼 클릭 시, 위젯 슬라이드 업
                             />
                             <Weather2 set_current={set_current} />
-                            <Calender
-                                rotate = { rotated }
-                                setDate = { set_current_date }
-                                dateChange = { current_date }
-                                clicked = { isvisible } // 빈 공간 또는 'X' 클릭 스테이트를 넘겨줌
-                                setVisible = { set_isvisible } // 날짜 클릭 후, 팝업창을 띄울 스테이트 저장
-                                setClickDate = { set_clicked_date }
-                            />
+                            <div className="calendar" style = {{ 
+                                marginBottom: rotated ? "40px" : "500px"
+                            }}>
+                                <Calendar
+                                    setVisible = { setVisible }
+                                    setDate = { setDate }
+                                />
+                                <div className="other-list">
+
+                                </div>
+                            </div>
                         </div>
                         <div className="info-box">
                             <h4 className="now">Now</h4>

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './Calendar.css'
 import PropTypes from 'prop-types';
 
-const Calender = (props) => {
+const Calendar = (props) => {
     const [current_date, set_current_date] = useState({
         year: new Date().getFullYear(),
         month: new Date().getMonth(),
@@ -17,15 +17,6 @@ const Calender = (props) => {
 
     const [month_change_style, set_month_change_style] = useState({ visibility: 'hidden' });
     const [scale, set_scale] = useState(1.3);
-    const [isvisible, set_isvisible] = useState(false);
-
-    useEffect(() => {
-        set_isvisible(props.clicked)
-    }, [props.clicked])
-
-    useEffect(() => {
-        set_current_date(props.dateChange)
-    }, [props.dateChange])
 
     const month_list = Array.from(Array(12), (_, i) => i + 1);
 
@@ -56,7 +47,6 @@ const Calender = (props) => {
     };
 
     useEffect(() => {
-        const date = new Date(current_date.year, current_date.month);
         const last_date_of_prev = new Date(current_date.year, current_date.month, 0).getDate();
         const first_date_of_month = new Date(current_date.year, current_date.month, 1);
         const last_date_of_month = new Date(current_date.year, current_date.month + 1, 0).getDate();
@@ -93,8 +83,16 @@ const Calender = (props) => {
         set_scale(1);
     };
 
+    const [visible] = useState(false);
+
+    const week = (year, month, day) => {
+        let date = new Date(year, month - 1, day).getDay();
+
+        return date;
+    };
+
     return (
-        <div className="calender-container" style={{ marginBottom: props.rotate ? '0px' : '500px' }}>
+        <div className="calender-container">
             <header>
                 <p className="current-date" onClick={current_date_click}>
                     {current_date.string_month} {current_date.year}
@@ -120,15 +118,17 @@ const Calender = (props) => {
                             key={i}
                             className="inactive" 
                             onClick={(e) => {
-                            set_isvisible(!isvisible);
-                            props.setVisible(!isvisible);
-                            props.setDate(current_date);
-                            props.setClickDate({
-                                year: current_date.month == 0 ? current_date.year - 1 : current_date.year,
-                                month: current_date.month == 0 ? 12 : current_date.month, 
-                                day: o 
-                            })
-                        }}>{o}</li>
+                                props.setVisible(!visible);
+                                props.setDate({
+                                    year: current_date.month === 0 ? current_date.year - 1 : current_date.year,
+                                    month: current_date.month === 0 ? 12 : current_date.month,
+                                    day: o,
+                                    week: week(current_date.year, current_date.month, o)
+                                });
+                            }}
+                        >
+                            {o}
+                        </li>
                     ))}
                     {days.map((o, i) => (
                         <li 
@@ -139,32 +139,33 @@ const Calender = (props) => {
                                 ? "active" 
                                 : ""} 
                             onClick={(e) => {
-                            set_isvisible(!isvisible);
-                            props.setVisible(!isvisible);
-                            props.setDate(current_date);
-                            props.setClickDate({ 
-                                year: current_date.year, 
-                                month: current_date.month + 1, 
-                                day: o 
-                            })
-                        }}>
+                                props.setVisible(!visible);
+                                props.setDate({
+                                    year: current_date.year,
+                                    month: current_date.month + 1,
+                                    day: o,
+                                    week: week(current_date.year, current_date.month + 1, o)
+                                });
+                            }}
+                        >
                             {o}
                         </li>
                     ))}
                     {next_init_days.map((o, i) => (
-                        <li 
-                            key={i}
+                        <li
                             className="inactive" 
                             onClick={() => {
-                            set_isvisible(!isvisible);
-                            props.setVisible(!isvisible);
-                            props.setDate(current_date);
-                            props.setClickDate({ 
-                                year: current_date.month + 2 == 13 ? current_date.year + 1 : current_date.year,
-                                month: current_date.month + 2 == 13 ? 1 : current_date.month + 2, 
-                                day: o 
-                            })
-                        }}>{o}</li>
+                                props.setVisible(!visible);
+                                props.setDate({
+                                    year: current_date.month + 2 === 13 ? current_date.year + 1 : current_date.year,
+                                    month: current_date.month + 2 === 13 ? 1 : current_date.month + 2,
+                                    day: o,
+                                    week: week(current_date.year, current_date.month + 2, o)
+                                });
+                            }}
+                        >
+                            {o}
+                        </li>
                     ))}
                 </ul>
             </div>
@@ -190,8 +191,4 @@ const Calender = (props) => {
     );
 };
 
-Calender.propTypes = {
-    setDate: PropTypes.func.isRequired
-};
-
-export default Calender;
+export default Calendar;

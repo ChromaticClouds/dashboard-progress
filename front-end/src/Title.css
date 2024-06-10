@@ -3,102 +3,10 @@
     src: url("./fonts/ProductSans-Regular.ttf") format("truetype");
 }
 
-.todolist-window {
-    position: fixed;
+.other-list {
     width: 100%;
-    height: 100%;
-    z-index: 3;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.todolist-window .sort {
-    display: flex;
-    flex-direction: column;
-    font-family: "GSR";
-}
-
-.todolist-window .sort .bar {
-    display: flex;
-    justify-content: space-between;
-    margin: 0;
-}
-
-.todolist-window .sort .bar p {
-    color: #fff;
-    font-size: 30px;
-    font-weight: 600;
-    margin: 0;
-}
-
-.todolist-window .window-icon {
-    color: #fff;
-    font-size: 42px;
-    cursor: pointer;
-    align-self: flex-end;
-    padding-bottom: 20px;
-}
-
-.todolist-window .book-cover {
-    width: 860px;
-    height: 610px;
-    background-color: #f3f0ef;
-    border-radius: 20px;
-    position: relative;
-    display: flex;
-}
-
-.todo-list .title {
-    font-family: "GSR";
-    width: calc(100% - 50px);
-    margin: 40px 20px;
-    height: 40px;
-    border: 0;
-    outline: 0;
-    border-bottom: 1px solid #8e8e8e;
-    font-size: 20px;
-}
-
-.book-cover .calender-box {
-    margin-left: 50px;
-}
-
-.book-cover .calender-box.todo-lists {
-    width: 350px;
-}
-
-.book-cover .sort {
-    display: flex;
-}
-
-.book-cover h2 {
-    font-family: "GSR";
-    margin: 0;
-    font-size: 28px;
-}
-
-.todo-list {
-    margin-top: 50px;
-    width: 100%;
-    height: 510px;
-    border-radius: 20px;
+    height: 600px;
     background-color: #fff;
-    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.3);
-}
-
-.todo-list .date-list {
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-}
-
-.todo-list .date-list > div {
-    border-radius: 30px;
-    padding: 10px 14px;
-    background-color: #2d2b42;
-    color: #fff;
 }
 
 body {
@@ -219,6 +127,10 @@ body {
     box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.3);
 }
 
+.calendar {
+    margin-top: 40px;
+}
+
 .now {
     margin: 0;
     position: absolute;
@@ -267,7 +179,7 @@ body {
     flex-direction: column;
 }
 
-.icon {
+.icon-array .icon {
     width: 36px;
     height: 36px;
     padding: 12px;
@@ -275,12 +187,12 @@ body {
     margin-bottom: 40px;
 }
 
-.icon:hover {
+.icon-array .icon:hover {
     background-color: #e5e5dd;
     cursor: pointer;
 }
 
-.clicked_icon {
+.icon-array .clicked_icon {
     color: white;
     width: 36px;
     height: 36px;

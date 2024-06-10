@@ -1,0 +1,160 @@
+.todolist-window {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.todolist-window .sort {
+    display: flex;
+    flex-direction: column;
+    font-family: "GSR";
+}
+
+.todolist-window .sort .bar {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+}
+
+.todolist-window .sort .bar p {
+    color: #fff;
+    font-size: 30px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.todolist-window .window-icon {
+    color: #fff;
+    font-size: 42px;
+    cursor: pointer;
+    align-self: flex-end;
+    padding-bottom: 20px;
+}
+
+.todolist-window .book-cover {
+    background-color: #f3f0ef;
+    border-radius: 20px;
+    position: relative;
+    display: flex;
+    padding: 40px;
+}
+
+.book-cover .calendar-box {
+    height: 100%;
+}
+
+.book-cover .calendar-box.todo-lists {
+    margin-top: -40px;
+    margin-left: 40px;
+    width: 350px;
+}
+
+.book-cover .sort {
+    display: flex;
+}
+
+.book-cover h2 {
+    font-family: "GSR";
+    margin: 0;
+    font-size: 28px;
+}
+
+.todo-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+    width: 100%;
+    height: 630px;
+    border-radius: 20px;
+    background-color: #fff;
+    box-shadow: 3px 3px 10px -1px rgba(0, 0, 0, 0.3);
+}
+
+.todo-list .title {
+    font-family: "GSR";
+    width: calc(100% - 40px);
+    margin: 20px 20px;
+    height: 40px;
+    border: 0;
+    outline: 0;
+    border-bottom: 1px solid #8e8e8e;
+    font-size: 20px;
+}
+
+.todo-list .space {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: calc(100% - 40px);
+    height: 320px;
+    border-bottom: 1px solid #8e8e8e;
+    color: #767676;
+}
+
+.todo-list .space .icon {
+    font-size: 30px;
+}
+
+.todo-list .date-list {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.todo-list .date-list .active {
+    border-radius: 30px;
+    padding: 10px 14px;
+    background-color: #2d2b42;
+    text-align: center;
+    color: #fff;
+}
+
+.todo-list .date-list .active.inactive {
+    background-color: #fff;
+    color: #000;
+}
+
+.todo-list .date-list > div > div {
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.todo-list .date-list > div > input {
+    margin-top: 20px;
+    height: 30px;
+    width: 120px;
+    border-radius: 30px;
+    padding: 0 10px;
+    border: 1px solid #767676;
+    outline: 0;
+}
+
+.todo-input {
+    margin-left: 20px;
+    padding: 0 20px;
+    width: 60%;
+    height: 40px;
+    border-radius: 30px;
+    border: 1px solid #d2d2d2;
+    outline: 0;
+    background-color: #ededed;
+    font-size: 16px;
+}
+
+.submit-form {
+    margin-top: 40px;
+    border-radius: 20px;
+    width: 100%;
+    height: 86px;
+    background-color: #fff;
+    box-shadow: 3px 3px 10px -1px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+}
