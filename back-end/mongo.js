@@ -19,6 +19,8 @@ const DataSchema = new mongoose.Schema({
     startHour: Date,
     endDate: Date,
     endHour: Date,
+    color: Number,
+    event: Number,
     date: { type: Date, default: Date.now }
 });
 

@@ -16,22 +16,41 @@ library.add(fas);
 const Title = () => {
     const [icon_index, set_icon_index] = useState(parseInt(localStorage.getItem('icon-index')));
 
-    // 아이콘 배열
+    /** 객체 형태로 아이콘 데이터 저장 */
     const icons = [
-        { icon: ["fas", "home"], text: "Home", sectionId: "jump_to1" },
-        { icon: ["fas", "toggle-on"], text: "Control", sectionId: "jump_to2" },
-        { icon: ["fas", "chart-simple"], text: "Statistics", sectionId: "jump_to3" },
-        { icon: ["fas", "video"], text: "Videos", sectionId: "jump_to4" },
-        { icon: ["fas", "server"], text: "Database", sectionId: "jump_to5" }
+        { 
+            icon: ["fas", "home"], 
+            text: "Home", 
+            sectionId: "jump_to1" 
+        },
+        { 
+            icon: ["fas", "toggle-on"],
+            text: "Control", 
+            sectionId: "jump_to2" 
+        },
+        { 
+            icon: ["fas", "chart-simple"], 
+            text: "Statistics", 
+            sectionId: "jump_to3" 
+        },
+        { 
+            icon: ["fas", "video"], 
+            text: "Videos", 
+            sectionId: "jump_to4" 
+        },
+        { 
+            icon: ["fas", "server"], 
+            text: "Database", 
+            sectionId: "jump_to5" 
+        }
     ];
 
     // 아이콘 클릭 핸들러
     const icon_click = (index) => {
-        set_icon_index(index);
         const sectionId = icons[index].sectionId;
         const sectionElement = document.getElementById(sectionId);
         if (sectionElement) {
-            sectionElement.scrollIntoView({ behavior: "auto" });
+            sectionElement.scrollIntoView({ behavior: "smooth" });
         }
         localStorage.setItem('icon-index', index);
     };

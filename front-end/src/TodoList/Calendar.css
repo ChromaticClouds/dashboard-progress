@@ -108,12 +108,128 @@
     transform: translate(-50%, -50%);
 }
 
+.calender .days li::after {
+    position: absolute;
+    content: "";
+    height: 40px;
+    width: 52px;
+    top: 50%;
+    left: 50%;
+    z-index: -1;
+    transform: translate(-50%, -50%);
+}
+
 .calender .days li:hover::before {
     background-color: #f2f2f2;
 }
 
 .calender .days li.active::before {
     background-color: #282b4f;
+    color: #fff;
+}
+
+.calender .days li.init.fin.red::before {
+    background-color: #d56262;
+}
+
+.calender .days li.init.fin.yellow::before {
+    background-color: #e9bd5f;
+}
+
+.calender .days li.init.fin.green::before {
+    background-color: #93eb73;
+}
+
+.calender .days li.init.fin.blue::before {
+    background-color: #7587c7;
+}
+
+.calender .days li.init.fin.purple::before {
+    background-color: #b079d1;
+}
+/*
+    시작 날짜 색 지정
+*/
+.calender .days li.init.red::before {
+    background-color: #d56262;
+}
+
+.calender .days li.init.yellow::before {
+    background-color: #e9bd5f;
+}
+
+.calender .days li.init.green::before {
+    background-color: #93eb73;
+}
+
+.calender .days li.init.blue::before {
+    background-color: #7587c7;
+}
+
+.calender .days li.init.purple::before {
+    background-color: #b079d1;
+}
+/*
+    종료 날짜 색 지정
+*/
+.calender .days li.fin.red::before {
+    background-color: #d56262;
+}
+
+.calender .days li.fin.yellow::before {
+    background-color: #e9bd5f;
+}
+
+.calender .days li.fin.green::before {
+    background-color: #93eb73;
+}
+
+.calender .days li.fin.blue::before {
+    background-color: #7587c7;
+}
+
+.calender .days li.fin.purple::before {
+    background-color: #b079d1;
+}
+/*
+    범위 날짜 색 지정
+*/
+.calender .days li.between.red::after {
+    background-color: #d56262;
+}
+
+.calender .days li.between.yellow::after {
+    background-color: #e9bd5f;
+}
+
+.calender .days li.between.green::after {
+    background-color: #93eb73;
+}
+
+.calender .days li.between.blue::after {
+    background-color: #7587c7;
+}
+
+.calender .days li.between.purple::after {
+    background-color: #b079d1;
+}
+/*
+    범위 지정 시, 모양 지정
+*/
+.calender .days li.init.ranged::before {
+    border-radius: 50px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-left: 3px;
+    width: 46px;
+}
+
+.calender .days li.fin.ranged::before {
+    border-radius: 50px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: -3px;
+    width: 46px;
 }
 
 .calender-container .month-change {

@@ -10,7 +10,7 @@ const BulletChart = ({ data /* see data tab */ }) => (
         measureBorderColor={{ from: 'color', modifiers: [] }}
         measureBorderWidth={3}
         measureSize={0.2}
-        rangeColors="seq:yellow_orange_red"
+        rangeColors="seq:viridis"
         measureColors="oranges"
         markerColors="seq:cool"
         isInteractive={false}

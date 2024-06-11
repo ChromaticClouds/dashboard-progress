@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './Calendar.css'
-import PropTypes from 'prop-types';
 
 const Calendar = (props) => {
     const [current_date, set_current_date] = useState({
@@ -91,6 +90,77 @@ const Calendar = (props) => {
         return date;
     };
 
+    const isActiveDay = (day) => {
+        const currentDate = new Date();
+        return current_date.year === currentDate.getFullYear() &&
+               current_date.month === currentDate.getMonth() &&
+               day === active_day;
+    };
+
+    const [status, setStatus] = useState([]);
+
+    useEffect(() => {
+        setStatus(props.onStatus);
+    }, [props.onStatus]);
+
+    const [initDate, setInitDate] = useState({});
+    const [finDate, setFinDate] = useState({});
+    const [color, setColor] = useState({});
+
+    useEffect(() => {
+        if (status) {
+            Object.keys(status).forEach(key => {
+                const item = status[key];
+                setInitDate(item.initDate);
+                setFinDate(item.finDate);
+                setColor(item.color);
+            });
+        }
+    }, [status]);
+
+    const isStartDate = (day) => {
+        return current_date.year === initDate.year &&
+               current_date.month === initDate.month - 1 &&
+               day === initDate.day;
+    };
+
+    const isEndDate = (day) => {
+        return current_date.year === finDate.year &&
+               current_date.month === finDate.month - 1 &&
+               day === finDate.day;
+    };
+
+    const isBetweenDate = (day) => {
+        if (initDate.year === finDate.year && initDate.month === finDate.month) {
+            // 시작일과 종료일이 같은 년도와 같은 월에 있는 경우
+            return current_date.year === initDate.year &&
+                   current_date.month === initDate.month - 1 &&
+                   day > initDate.day &&
+                   day < finDate.day;
+        } else {
+            // 시작일과 종료일이 다른 년도나 다른 월에 있는 경우
+            if (current_date.year === initDate.year && current_date.month === initDate.month - 1) {
+                return day > initDate.day;
+            } else if (current_date.year === finDate.year && current_date.month === finDate.month - 1) {
+                return day < finDate.day;
+            } else if (current_date.year > initDate.year && current_date.year < finDate.year) {
+                return true;
+            } else if (current_date.year === initDate.year && current_date.month > initDate.month - 1) {
+                return true;
+            } else if (current_date.year === finDate.year && current_date.month < finDate.month - 1) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    };
+
+    const isSame = () => {
+        return initDate.year === finDate.year &&
+               initDate.month - 1 === finDate.month - 1 &&
+               initDate.day === finDate.day;
+    }
+
     return (
         <div className="calender-container">
             <header>
@@ -133,11 +203,14 @@ const Calendar = (props) => {
                     {days.map((o, i) => (
                         <li 
                             key={i} 
-                            className={current_date.year === new Date().getFullYear() 
-                                && current_date.month === new Date().getMonth() 
-                                && o === active_day 
-                                ? "active" 
-                                : ""} 
+                            className={`
+                                ${isActiveDay(o) ? "active" : ""} 
+                                ${isStartDate(o) ? "init" : ""} 
+                                ${isEndDate(o) ? "fin" : ""}
+                                ${isBetweenDate(o)  ? "between" : ""}
+                                ${isSame() ? "" : "ranged"}
+                                ${ color }`
+                            }
                             onClick={(e) => {
                                 props.setVisible(!visible);
                                 props.setDate({
