@@ -131,30 +131,13 @@ const Calendar = (props) => {
     };
 
     const isBetweenDate = (day) => {
-        if (initDate.year === finDate.year && initDate.month === finDate.month) {
-            // 시작일과 종료일이 같은 년도와 같은 월에 있는 경우
-            return current_date.year === initDate.year &&
-                   current_date.month === initDate.month - 1 &&
-                   day > initDate.day &&
-                   day < finDate.day;
-        } else {
-            // 시작일과 종료일이 다른 년도나 다른 월에 있는 경우
-            if (current_date.year === initDate.year && current_date.month === initDate.month - 1) {
-                return day > initDate.day;
-            } else if (current_date.year === finDate.year && current_date.month === finDate.month - 1) {
-                return day < finDate.day;
-            } else if (current_date.year > initDate.year && current_date.year < finDate.year) {
-                return true;
-            } else if (current_date.year === initDate.year && current_date.month > initDate.month - 1) {
-                return true;
-            } else if (current_date.year === finDate.year && current_date.month < finDate.month - 1) {
-                return true;
-            } else {
-                return false;
-            }
-        }
+        const currentDate = new Date(current_date.year, current_date.month, day);
+        const startDate = new Date(initDate.year, initDate.month - 1, initDate.day);
+        const endDate = new Date(finDate.year, finDate.month - 1, finDate.day);
+    
+        return currentDate > startDate && currentDate < endDate;
     };
-
+    
     const isSame = () => {
         return initDate.year === finDate.year &&
                initDate.month - 1 === finDate.month - 1 &&
