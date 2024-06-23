@@ -34,7 +34,7 @@ db.connect((error) => {
     error ? console.log(`MySQL connecting failed: ${error}`) : console.log("MySQL connected");
 });
 
-const sql = [
+const env = [
     `
     SELECT 
         inner_temp 
@@ -61,23 +61,67 @@ const sql = [
     `
 ]
 
-const sql2 = [
+const weeks = [
     `
     SELECT 
-        FLOOR((DATEDIFF(record.timestamp, plant.timestamp) / 7) + 1) AS week_difference,
-        AVG(record.growth_amount) AS avg_growth
-    FROM 
-        record
-    JOIN 
-        plant ON record.plant_id = plant.plant_id
-    WHERE 
-        record.plant_id = 'TOMATO001'
-    GROUP BY 
-        week_difference;
+        week_difference,
+        avg_growth
+    FROM (
+        SELECT 
+            FLOOR((DATEDIFF(record.timestamp, plant.timestamp) / 7) + 1) AS week_difference,
+            AVG(record.growth_amount) AS avg_growth
+        FROM 
+            record
+        JOIN 
+            plant ON record.plant_id = plant.plant_id
+        WHERE 
+            record.plant_id = 'TOMATO001'
+        GROUP BY week_difference ORDER BY week_difference DESC LIMIT 3
+    ) sub
+    ORDER BY
+        week_difference ASC;
+    `,
+    `
+        SELECT 
+        week_difference,
+        avg_growth
+    FROM (
+        SELECT 
+            FLOOR((DATEDIFF(record.timestamp, plant.timestamp) / 7) + 1) AS week_difference,
+            AVG(record.growth_amount) AS avg_growth
+        FROM 
+            record
+        JOIN 
+            plant ON record.plant_id = plant.plant_id
+        WHERE 
+            record.plant_id = 'TOMATO002'
+        GROUP BY week_difference ORDER BY week_difference DESC LIMIT 3
+    ) sub
+    ORDER BY
+        week_difference ASC;
+    `,
+    `
+    SELECT 
+        week_difference,
+        avg_growth
+    FROM (
+        SELECT 
+            FLOOR((DATEDIFF(record.timestamp, plant.timestamp) / 7) + 1) AS week_difference,
+            AVG(record.growth_amount) AS avg_growth
+        FROM 
+            record
+        JOIN 
+            plant ON record.plant_id = plant.plant_id
+        WHERE 
+            record.plant_id = 'TOMATO002'
+        GROUP BY week_difference ORDER BY week_difference DESC LIMIT 3
+    ) sub
+    ORDER BY
+        week_difference ASC;
     `
 ]
 
-const sql3 = [
+const sensor = [
     `
     SELECT
         soil_humid, plant_id
@@ -95,21 +139,61 @@ const sql3 = [
     `
 ]
 
-const sql4 = [
+const growth = [
     `
     SELECT
-        DATE(timestamp) AS day,
-        AVG(growth_amount) AS avg_growth
-    FROM
-        record
-    WHERE
-        plant_id = "TOMATO001"
-    GROUP BY
-        day;
+        day,
+        avg_growth
+    FROM (
+        SELECT
+            DATE(timestamp) AS day,
+            AVG(growth_amount) AS avg_growth
+        FROM
+            record
+        WHERE 
+            plant_id = "TOMATO001"
+        GROUP BY day ORDER BY day DESC LIMIT 7
+    ) sub
+    ORDER BY
+        day ASC;
+    `,
+    `
+    SELECT
+        day,
+        avg_growth
+    FROM (
+        SELECT
+            DATE(timestamp) AS day,
+            AVG(growth_amount) AS avg_growth
+        FROM
+            record
+        WHERE 
+            plant_id = "TOMATO002"
+        GROUP BY day ORDER BY day DESC LIMIT 7
+    ) record
+    ORDER BY
+        day ASC;
+    `,
+    `
+    SELECT
+        day,
+        avg_growth
+    FROM (
+        SELECT
+            DATE(timestamp) AS day,
+            AVG(growth_amount) AS avg_growth
+        FROM
+            record
+        WHERE 
+            plant_id = "TOMATO003"
+        GROUP BY day ORDER BY day DESC LIMIT 7
+    ) record
+    ORDER BY
+        day ASC;
     `
 ]
 
-const sql5 = [
+const monitering = [
     `
     SELECT
     *
@@ -121,16 +205,16 @@ const sql5 = [
 io.on('connection', (socket) => {
     socket.on("env req", async () => {
         try {
-            const results = await Promise.all(sql.map(q => query(q)));
+            const results = await Promise.all(env.map(q => query(q)));
             socket.emit("env rec", results);
         } catch (error) {
             console.error(error);
         }
     })
 
-    socket.on("weeks req", async () => {
+    socket.on("weeks req", async (host) => {
         try {
-            const results = await Promise.all(sql2.map(q => query(q)));
+            const results = await query(weeks[host.week - 1]);
             socket.emit("weeks rec", results);
         } catch (error) {
             console.error(error);
@@ -139,16 +223,16 @@ io.on('connection', (socket) => {
 
     socket.on("sensor req", async () => {
         try {
-            const results = await Promise.all(sql3.map(q => query(q)));
+            const results = await Promise.all(sensor.map(q => query(q)));
             socket.emit("sensor rec", results);
         } catch (error) {
             console.error(error);
         }
     })
 
-    socket.on("growth req", async () => {
+    socket.on("growth req", async (host) => {
         try {
-            const results = await Promise.all(sql4.map(q => query(q)));
+            const results = await query(growth[host.growth - 1]);
             socket.emit("growth rec", results);
         } catch (error) {
             console.error(error);
@@ -157,7 +241,7 @@ io.on('connection', (socket) => {
 
     socket.on("monitoring req", async () => {
         try {
-            const results = await Promise.all(sql5.map(q => query(q)));
+            const results = await Promise.all(monitering.map(q => query(q)));
             socket.emit("monitoring rec", results);
         } catch (error) {
             console.error(error);
@@ -190,7 +274,7 @@ const sp = new SerialPort({
 });
 const parser = sp.pipe(new ReadlineParser({ delimiter: '\r\n' }));
 
-let sensor_data
+let sensor_data;
 parser.on("data", (data) => {
     try {
         sensor_data = JSON.parse(data);

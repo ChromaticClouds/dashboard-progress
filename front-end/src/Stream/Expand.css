@@ -1,0 +1,59 @@
+.x-icon {
+    position: absolute;
+    top: -60px;
+    right: -10px;
+    font-size: 40px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.embed-container {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 99;
+    transition: all 0.3s ease-in-out;
+}
+
+.embed-box {
+    width: 1280px;
+    height: 720px;
+    border: 10px solid #fff;
+    position: relative;
+    transition: height 0.3s ease-in-out
+}
+
+.embed-box .size {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000;
+}
+
+.embed-error {
+    width: 100%;
+    height: 100%;
+    background-color: #454141;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+    justify-content: center;
+}
+
+.embed-error p {
+    font-family: "GSR";
+    font-size: 40px;
+    margin: 0;
+}
+
+.embed-error h3 {
+    font-weight: 100;
+}

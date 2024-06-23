@@ -109,12 +109,12 @@ const Calendar = (props) => {
 
     useEffect(() => {
         if (status) {
-            Object.keys(status).forEach(key => {
-                const item = status[key];
+            const item = status[0];
+            if (item) {
                 setInitDate(item.initDate);
                 setFinDate(item.finDate);
                 setColor(item.color);
-            });
+            }
         }
     }, [status]);
 
@@ -143,6 +143,19 @@ const Calendar = (props) => {
                initDate.month - 1 === finDate.month - 1 &&
                initDate.day === finDate.day;
     }
+
+    useEffect(() => {
+        if (!props.isVisible) {
+            setInitDate({});
+            setFinDate({});
+        }
+    }, [props.isVisible])
+
+    useEffect(() => {
+        if (props.isVisible) {
+            set_current_date(props.currentDate);
+        }
+    }, [props.currentDate])
 
     return (
         <div className="calender-container">
@@ -187,13 +200,13 @@ const Calendar = (props) => {
                         <li 
                             key={i} 
                             className={`
-                                ${isActiveDay(o) ? "active" : ""} 
-                                ${isStartDate(o) ? "init" : ""} 
+                                ${isActiveDay(o) ? "active" : ""}
+                                ${isStartDate(o) ? "init" : ""}
                                 ${isEndDate(o) ? "fin" : ""}
-                                ${isBetweenDate(o)  ? "between" : ""}
+                                ${isBetweenDate(o) ? "between" : ""}
                                 ${isSame() ? "" : "ranged"}
-                                ${ color }`
-                            }
+                                ${color}`
+                            }                            
                             onClick={(e) => {
                                 props.setVisible(!visible);
                                 props.setDate({

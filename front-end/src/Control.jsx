@@ -19,14 +19,17 @@ const Control = () => {
 
     const [monitoring, set_monitoring_data] = useState([]);
     const [checked, set_checked] = useState(localStorage.getItem('check-slider') === 'true');
+
     const [value1, set_value1] = useState(localStorage.getItem('slider-data1') || 0);
     const [value2, set_value2] = useState(localStorage.getItem('slider-data2') || 0);
     const [value3, set_value3] = useState(localStorage.getItem('slider-data3') || 0); 
     const [show_value1, set_show_value1] = useState(false);
     const [show_value2, set_show_value2] = useState(false);
     const [show_value3, set_show_value3] = useState(false);
+
     const [intensity, set_intenstiy] = useState(localStorage.getItem('intensity-data') || 0);
     const [duration, set_duration] = useState(localStorage.getItem('duration-data') || 0);
+
     const [recent_date, set_recent_date] = useState(new Date());
 
     const [push, set_push] = useState(false);
@@ -72,10 +75,12 @@ const Control = () => {
 
     useEffect(() => {
         socket.on('sensor data', (data) => {
-            set_sensor_data(data);
-            set_water_lev(data.water_level);
-            set_temp(data.temperature);
-            set_humid(data.humidity);
+            if (data) {
+                set_sensor_data(data);
+                set_water_lev(data.water_level);
+                set_temp(data.temperature);
+                set_humid(data.humidity);
+            }
         })
     }, []);
 
@@ -577,7 +582,7 @@ const Control = () => {
                                         <div className="outer">
                                             <div className="inner">
                                                 <div className = { push ? "pushed" : "number" } onClick = { pushed }>
-                                                    { water_level >= 430 ? ((water_level - 430) / 300 * 100).toFixed(1) : 0 } %
+                                                    { water_level.toFixed(1) } %
                                                     <div className = 'disc'>Water Level</div>
                                                 </div>
                                             </div>
@@ -589,7 +594,7 @@ const Control = () => {
                                                     <stop offset = "100%" stopColor = '#3da0be' />
                                                 </linearGradient>
                                             </defs>
-                                            <circle cx = "130" cy = "130" r = "115" strokeLinecap = 'round' style = { { strokeDashoffset: `${ water_level >= 430 ? 722.2 - (water_level - 430) / 300 * 100 * 7.22 : 722.2}`} }></circle>
+                                            <circle cx = "130" cy = "130" r = "115" strokeLinecap = 'round' style = { { strokeDashoffset: `${ water_level * 7.22 + 100 * 7.22 }`} }></circle>
                                         </svg>
                                     </div>
                                 </div>

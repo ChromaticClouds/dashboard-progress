@@ -7,12 +7,15 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
     const [date, setDate] = useState({}); // Calendar 컴포넌트의 클릭된 날짜의 year, month, day, week 스테이트 할당
     const [startToggle, setStartToggle] = useState(false); // 시작 날짜의 토글 여부
     const [endToggle, setEndToggle] = useState(false); // 종료 날짜의 토글 여부
-
     const [startDate, setStartDate] = useState(['', {}]); // 날짜의 데이터를 배열 형식으로 보관 ['날짜포맷', { yaer, month, day }]
     const [endDate, setEndDate] = useState(['', {}]);
-
     const [startTime, setStartTime] = useState('08:00'); // 디폴트 타임
     const [endTime, setEndTime] = useState('09:00');
+    const [currentDate, setCurrentDate] = useState({
+        year: new Date().getFullYear(),
+        month: new Date().getMonth(),
+        string_month: new Date().toLocaleString('en-GB', { month: 'long' })
+    });
 
     const week = (date) => { // getDay() 메서드로 받아온 week 스테이트 키값을 스트링 포맷
         let getDay = '';
@@ -97,6 +100,14 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
             ]);
         }
     };
+
+    useEffect(() => {
+        setCurrentDate({
+            year: date.year,
+            month: date.month - 1,
+            string_month: new Date(date.year, date.month - 1, date.day).toLocaleString('en-GB', { month: 'long' })
+        })
+    }, [date])
 
     useEffect(() => {
         if (startToggle) {
@@ -221,6 +232,15 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
 
     const [visible, setVisible] = useState(false);
 
+    useEffect(() => {
+        if (props.setVisible) {
+            setVisible(true)
+        }
+        else {
+            setVisible(false)
+        }
+    }, [props.setVisible])
+
     // color 드롭다운 메뉴 활성여부
     const [showColor, setShowColor] = useState(false);
     const dropdown = () => {
@@ -297,21 +317,26 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
     const [status, setStatus] = useState([])
 
     useEffect(() => {
-        if (props.setVisible) {
+        if ((startToggle || endToggle) && props.setVisible) {
             const status = [
                 {
                     initDate: startDate[1],
                     finDate: endDate[1],
-                    color: items[0].color, 
+                    color: items[0].color,
                 }
             ];
-            
             setStatus(status);
         }
-    }, [items, startDate, endDate, props.onStatus])
+    }, [items, startDate, endDate, startToggle, endToggle, props.setVisible])
 
-    const recruitDate = () => {
+    const enterData = e => {
+        if (e.key == "Enter") {
+            alert("엔터 왜 침?");
+        } 
+    }
 
+    const recruitData = () => {
+        alert("왜 누름?");
     }
 
     return (
@@ -351,20 +376,23 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
                         <div>
                             <div className="calendar-box">
                                 <Calendar
+                                    isVisible = { visible }
                                     setVisible = { setVisible }
                                     setDate = { setDate }
                                     onStatus = { status }
+                                    currentDate = { currentDate }
                                 />
                                 <div className="submit-form">
                                     <input
                                         className="todo-input"
                                         placeholder={`Add todo-list on ${date.month}/${date.day}`}
                                         autoComplete="off"
+                                        onKeyDown={enterData}
                                     ></input>
                                      <FontAwesomeIcon 
                                         icon="fa-solid fa-circle-chevron-right" 
                                         className="icon"
-                                        onClick={() => alert("왜 누름?")}
+                                        onClick={recruitData}
                                     />
                                 </div>
                             </div>
@@ -457,11 +485,12 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
                                         className="todo-input left"
                                         placeholder="Todo for..."
                                         autoComplete="off"
+                                        onKeyDown={enterData}
                                     ></input>
                                     <FontAwesomeIcon 
                                         icon="fa-solid fa-circle-chevron-right" 
                                         className="icon"
-                                        onClick={() => recruitDate()}
+                                        onClick={recruitData}
                                     />
                                 </div>
                             </div>

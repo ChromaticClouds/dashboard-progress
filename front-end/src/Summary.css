@@ -10,8 +10,23 @@
         margin-bottom: 60px;
     }
 
-    .category .margin {
-        margin-right: 20px;
+    .category .button-container {
+        display: flex;
+        position: relative;
+    }
+
+    .button-container .active-bar {
+        width: 100px;
+        height: 4px;
+        position: absolute;
+        background-color: #4d5bc5;
+        bottom: 0;
+        margin-left: 40px;
+        transition: all 0.2s ease-out;
+    }
+
+    .category .first {
+        margin-left: 30px;
     }
 
     .category .button {
@@ -25,11 +40,15 @@
         height: 100%;
         cursor: pointer;
         color: #a49788;
+        transition: all 0.3s ease-in-out;
     }
 
     .category .button:hover {
         color: #4d5bc5;
-        font-weight: 600;
+    }
+
+    .button.color {
+        color: #4d5bc5;
     }
     
     .summary-container {
@@ -66,7 +85,11 @@
         box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15);
     }
 
-    .growth-data-title {
+    .summary-box .phase {
+        transition: all 0.5s ease-in-out;
+    }
+
+    .summary-box .title {
         position: relative;
         padding-left: 30px;
         padding-top: 30px;
@@ -75,16 +98,26 @@
         color: #293e3c;
     }
 
-    .growth-chart-config {
+    .summary-box .chart {
+        width: 800px;
+        height: 320px;
         position: absolute;
-        z-index: 1;
+        z-index: 2;
         transform: translate(2%, -10%);
     }
 
-    .growth-status-box {
+    .summary-box .sort {
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .env-box {
         display: flex;
         align-items: center;
-        font-family: "GML";
+        font-family: "GSR";
+        font-weight: lighter;
+        font-size: 18px;
         height: 100px;
         color: #293e3c;
     }
@@ -119,7 +152,7 @@
         margin-right: 10px;
     }
 
-    .growth-status-box .color {
+    .env-box .color {
         background-color: #60769c;
     }
 
@@ -129,7 +162,7 @@
     }
 
     .stat-value {
-        font-family: "GMM";
+        font-family: "GSR";
         font-size: 24px;
     }
 
@@ -143,6 +176,7 @@
         display: flex;
         font-family: "GML";
         align-items: end;
+        z-index: 0;
     }
 
     .week-value {
@@ -153,7 +187,7 @@
         padding-right: 20px;
     }
 
-    .growth-value-sort {
+    .growth-box {
         margin-top: 60px;
         position: relative;
         display: flex;
@@ -161,7 +195,7 @@
         height: 180px;
     }
 
-    .hover-box {
+    .growth-box .status {
         width: 240px;
         display: flex;
         justify-content: center;
@@ -174,7 +208,7 @@
         height: 84px;
         border-radius: 100px;
         background-color: #5fa0c3;
-        bottom: 0px;
+        top: 50%;
         align-items: center;
         z-index: 1;
     }
@@ -187,7 +221,7 @@
         border-radius: 100px;
         background-color: #4468ac;
         bottom: 90px;
-        transform: translate(0, 50%);
+        top: 25%;
         align-items: center;
         z-index: 1;
     }
@@ -199,7 +233,7 @@
         height: 84px;
         border-radius: 100px;
         background-color: #38407f;
-        top: 0px;
+        top: 0;
         align-items: center;
         z-index: 1;
     }

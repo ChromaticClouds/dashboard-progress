@@ -1,20 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import "./Title.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 
+import Expand from "./Stream/Expand";
 import Calendar from "./TodoList/Calendar";
 import TodoList from "./ToDoList/ToDoList";
 import Weather2 from "./Weather2"
 import Summary from "./Summary";
 import Control from "./Control";
 import Chart from "./Chart2";
+import Video from "./Stream/Video";
+import ObjectDetection from "./Detection/ObjectDetection";
 
 library.add(fas);
 
 const Title = () => {
-    const [icon_index, set_icon_index] = useState(parseInt(localStorage.getItem('icon-index')));
+    const [iconIndex, setIconIndex] = useState(parseInt(localStorage.getItem('icon-index')) || 0);
 
     /** 객체 형태로 아이콘 데이터 저장 */
     const icons = [
@@ -24,59 +27,70 @@ const Title = () => {
             sectionId: "jump_to1" 
         },
         { 
-            icon: ["fas", "toggle-on"],
-            text: "Control", 
+            icon: ["fas", "cloud"], 
+            text: "Database", 
             sectionId: "jump_to2" 
         },
         { 
             icon: ["fas", "chart-simple"], 
-            text: "Statistics", 
+            text: "Chart", 
             sectionId: "jump_to3" 
         },
         { 
-            icon: ["fas", "video"], 
-            text: "Videos", 
+            icon: ["fas", "toggle-on"],
+            text: "Control", 
             sectionId: "jump_to4" 
         },
         { 
-            icon: ["fas", "server"], 
-            text: "Database", 
+            icon: ["fas", "video"], 
+            text: "Video", 
             sectionId: "jump_to5" 
-        }
+        },
     ];
 
+    const sectionRefs = useRef([]);
+
     // 아이콘 클릭 핸들러
-    const icon_click = (index) => {
-        const sectionId = icons[index].sectionId;
-        const sectionElement = document.getElementById(sectionId);
+    const iconClick = (index) => {
+        const sectionElement = sectionRefs.current[index];
         if (sectionElement) {
             sectionElement.scrollIntoView({ behavior: "smooth" });
         }
         localStorage.setItem('icon-index', index);
     };
 
+    const setSectionRef = useCallback((node, index) => {
+        if (node) {
+            sectionRefs.current[index] = node;
+        }
+    }, []);
+
+    let options = {
+        threshold: 0.5,
+    };
     useEffect(() => {
-        let detect = document.querySelectorAll(".detect");
-
-        let observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    const index = Array.from(detect).indexOf(entry.target);
-                    set_icon_index(index)
+        const observer = new IntersectionObserver((entries) => {
+            const visibleEntries = entries.filter(entry => entry.isIntersecting);
+            if (visibleEntries.length > 0) {
+                const firstVisibleEntry = visibleEntries[0];
+                const index = sectionRefs.current.indexOf(firstVisibleEntry.target);
+                if (index !== -1) {
+                    setIconIndex(index);
+                    localStorage.setItem('icon-index', index);
                 }
-            });
+            }
+        }, options);
+
+        sectionRefs.current.forEach((ref) => {
+            if (ref) observer.observe(ref);
         });
 
-        detect.forEach((c) => {
-            observer.observe(c);
-        });
-    
         return () => {
-            detect.forEach((c) => {
-                observer.unobserve(c);
+            sectionRefs.current.forEach((ref) => {
+                if (ref) observer.unobserve(ref);
             });
         };
-    }, []);
+    }, [sectionRefs]);
 
     const [rotated, set_rotated] = useState(false);
 
@@ -89,8 +103,18 @@ const Title = () => {
     const [visible, setVisible] = useState(false);
     const [date, setDate] = useState({});
 
+    const [onCancel, setOnCancel] = useState(true);
+    const [embed, setEmbed] = useState(<div></div>);
+    const [embedError, setEmbedError] = useState(false);
+
     return (
         <div>
+            <Expand 
+                onEmbed = { embed }
+                onCancel={ setOnCancel }
+                isVisible={ onCancel }
+                embedError={ embedError }
+            />
             <TodoList 
                 setVisible = { visible }
                 setCancel = { setVisible }
@@ -104,8 +128,8 @@ const Title = () => {
                                 <div key = { index } className = "icon-array">
                                     <FontAwesomeIcon
                                         icon={icon.icon}
-                                        className={index === icon_index ? "clicked_icon" : "icon"}
-                                        onClick={() => icon_click(index)}
+                                        className={index === iconIndex ? "clicked_icon" : "icon"}
+                                        onClick={() => iconClick(index)}
                                     />
                                 </div>
                             ))}
@@ -113,26 +137,38 @@ const Title = () => {
                     </div>
                 </div>
                 <div className = "contents-panel">
-                    <div className = "summary-dashboard content" id="jump_to1">
-                        <Summary />
-                        <div className = "detect"></div>
-                    </div>
-                    <div className="control-dashboard content" id="jump_to2">
-                        <Control />
-                        <div className = "detect"></div>
-                    </div>
-                    <div className="chart-dashboard content" id="jump_to3">
-                        <Chart />
-                        <div className = "detect"></div>
-                    </div>
-                    <div className="video-dashboard content" id="jump_to4">
-                        video-dashboard
-                        <div className = "detect"></div>
-                    </div>
-                    <div className="db-dashboard content" id="jump_to5">
-                        <div className = "detect"></div>
-                        db-dashboard
-                    </div>
+                    {icons.map((icon, index) => (
+                        <div
+                            key={index}
+                            className={`${icon.text.toLowerCase()}-dashboard content`}
+                            id={icon.sectionId}
+                            ref={(node) => setSectionRef(node, index)}
+                        >
+                            {
+                                index === 0 && <Summary />
+                            }
+                            {
+                                index === 1 && <ObjectDetection />
+                            }
+                            {
+                                index === 2 && <Chart />
+                            }
+                            {
+                                index === 3 && <Control />
+                            }
+                            {
+                                index === 4 && <Video 
+                                    setEmbed={setEmbed} 
+                                    onCancel={setOnCancel} 
+                                    setEmbedError={setEmbedError} 
+                                />
+                            }
+                        </div>
+                    ))}
+                    <footer>
+                        <h2>& Smart Farm &</h2>
+                        <p>DCT</p>
+                    </footer>
                 </div>
                 <div className = "info-panel">
                     <div className = "info-content">
@@ -157,8 +193,16 @@ const Title = () => {
                                     setVisible = { setVisible }
                                     setDate = { setDate }
                                 />
-                                <div className="other-list">
-
+                                <div className="todo-list">
+                                    <div className="todo-bar">
+                                        <p>Todo-List 📅</p>
+                                    </div>
+                                    <div className="lists">
+                                        <div className="non-exist">
+                                            <FontAwesomeIcon icon="fa-solid fa-face-sad-tear" className="icon" />
+                                            <h3 className="text">No Schedule...</h3>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

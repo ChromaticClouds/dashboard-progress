@@ -5,10 +5,14 @@ import LineChart from "../chart/LineChart";
 import "./Summary.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+let socket;
 const Summary = () => {
-    let socket;
     useEffect(() => {
         socket = io.connect("http://localhost:5000");
+
+        socket.emit("env req");
+        socket.emit("sensor req");
+        socket.emit("monitoring req");
 
         return () => {
             socket.disconnect();
@@ -21,30 +25,33 @@ const Summary = () => {
     const [daily_growth, set_daily_growth] = useState([]);
     const [monitoring_data, set_monitoring_data] = useState([]);
 
-    const growth_value_data = daily_growth.map((object, index) => ({
-        id: `토마토 ${ index + 1 }`,
-        data: object.slice(-24).map(({ day, avg_growth }) => ({ x: day, y: avg_growth}))
-    }))
-
+    const [host, setHost] = useState(1);
+    
     useEffect(() => {
-        socket.emit("env req", );
-        socket.emit("weeks req", );
-        socket.emit("sensor req", );
-        socket.emit("growth req", );
-        socket.emit("monitoring req");
-
         const repeat = setInterval(() => {
-            socket.emit("env req", );
-            socket.emit("weeks req", );
-            socket.emit("sensor req", );
-            socket.emit("growth req", );
+            socket.emit("env req");
+            socket.emit("sensor req");
             socket.emit("monitoring req");
         }, 2000);
 
         return () => {
             clearInterval(repeat);
         }
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        socket.emit("growth req", { growth: host });
+        socket.emit("weeks req", { week: host });
+
+        const repeat = setInterval(() => {
+            socket.emit("growth req", { growth: host });
+            socket.emit("weeks req", { week: host });
+        }, 2000);
+
+        return () => {
+            clearInterval(repeat);
+        }
+    }, [host])
 
     useEffect(() => {
         socket.on("env rec", (data) => {
@@ -62,15 +69,6 @@ const Summary = () => {
         socket.on("monitoring rec", (data) => {
             set_monitoring_data(data);
         })
-
-        return () => {
-            socket.off("env rec");
-            socket.off("weeks rec");
-            socket.off("sensor rec");
-            socket.off("growth rec");
-            socket.off("monitoring rec");
-            socket.off("sensor data");
-        };
     }, [])
 
     let now = new Date();
@@ -117,19 +115,67 @@ const Summary = () => {
             break;
     }
 
+    const [growthValue, setGrowthValue] = useState([
+        {
+            id: '1',
+            data: [
+                {
+                    x: new Date().toLocaleDateString(),
+                    y: 1
+                }
+            ]
+        },
+    ]);
+
+    useEffect(() => {
+        const growth = [
+            {
+                id: '토마토',
+                data: daily_growth.map(object => {
+                    const day = new Date(object.day).toLocaleDateString();
+                    const avg_growth = parseFloat(object.avg_growth.toFixed(1));
+                    if (isNaN(avg_growth)) {
+                        console.error(`Invalid growth value: ${object.avg_growth}`);
+                    }
+                    return {
+                        x: day,
+                        y: avg_growth
+                    };
+                }).filter(point => !isNaN(point.y)) // Filter out invalid data points
+            }
+        ];
+
+        setGrowthValue(growth)
+    }, [daily_growth, host]);
+
     return (
         <div className = "board">
             <div className = "sub-contents">
                 <div className = "category">
-                    <div className = "margin"></div>
-                    <div className = "button">
-                        Tomato1
-                    </div>
-                    <div className = "button">
-                        Tomato2
-                    </div>
-                    <div className = "button">
-                        Tomato3
+                    <div className="button-container">
+                        <div 
+                            className = {`button first ${host === 1 ? "color" : ""}`} 
+                            onClick = {() => setHost(1)}
+                        >
+                            Tomato1
+                        </div>
+                        <div 
+                            className = {`button ${host === 2 ? "color" : ""}`}
+                            onClick = {() => setHost(2)}
+                        >
+                            Tomato2
+                        </div>
+                        <div 
+                            className = {`button ${host === 3 ? "color" : ""}`}
+                            onClick = {() => setHost(3)}
+                        >
+                            Tomato3
+                        </div>
+                        <div 
+                            className="active-bar"
+                            style={{marginLeft: host === 1 ? "40px" : host === 2 ? "190px" : "340px"}}
+                        >
+                        </div>
                     </div>
                 </div>
                 <h4 className = "subtitle">Summary Dashboard</h4>
@@ -143,45 +189,75 @@ const Summary = () => {
                     { year }
                 </div>
                 <div className = "summary-container">
-                    <div className = "growth-container">
+                    <div>
                         <div className = "summary-box">
-                            <h4 className = "growth-data-title">Plant growth activity</h4>
-                            <div className = "growth-chart-config" style = { { width: "800px", height: "320px" } }>
+                            <h4 className = "title">Plant growth activity</h4>
+                            <div className = "chart">
                                 <LineChart 
-                                    data = { growth_value_data }
+                                    data = { growthValue }
                                 />
                             </div>
-                            { growth_data.map((object, index) => (
-                                <div key = { index } className = "growth-value-sort">
-                                    { object.slice(-24).map((value, index) => (
-                                        <div key={ index } className = "hover-box">
-                                            <div className = { value.avg_growth <= 18 ? "seed-phase" : value.avg_growth <= 20 ? "vegetation" : "final-growth"}>
+                            <div className="sort">
+                                { growth_data.map((object, index) => (
+                                    <div className = "growth-box" key = {index}>
+                                        <div className = "status phase">
+                                            <div className = {
+                                                    `
+                                                        phase
+                                                        ${
+                                                            object.avg_growth <= 5 ? "seed-phase" :
+                                                            object.avg_growth <= 15 ? "vegetation" : 
+                                                            "final-growth"
+                                                        }
+                                                    `
+                                                }
+                                            >
                                                 <div className = "growth-img-box">
-                                                    <img src = { value.avg_growth <= 18 ? "../images/seeds.png" : value.avg_growth <= 20 ? "../images/sprout.png" : "../images/tomato.png" } />
+                                                    <img src = { 
+                                                        object.avg_growth <= 5 ? "../images/seeds.png" :
+                                                        object.avg_growth <= 15 ? "../images/sprout.png" :
+                                                        "../images/tomato.png" 
+                                                        } 
+                                                    />
                                                 </div>
                                                 <div className = "growth-disc">
-                                                    { value.avg_growth <= 18 ? "Seed phase" : value.avg_growth <= 20 ? "Vegetation" : "Final growth"}
+                                                    { 
+                                                        object.avg_growth <= 5 ? "Seed phase" :
+                                                        object.avg_growth <= 15 ? "Vegetation" :
+                                                        "Final growth"
+                                                    }
                                                     <div className = "growth-value">
-                                                        Week { value.week_difference }
+                                                        Week { object.week_difference }
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            ))}
-                            { growth_data.map((object, index) => (
-                                <div key = { index } className = "week-box">
-                                    { object.slice(-3).map((week, index) => (
-                                        <div key={index} className="week-value">
-                                            <div className = { week.avg_growth <= 18 ? "seed-height" : week.avg_growth <= 20 ? "vegetation-height" : "final-growth-height" }></div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="sort">
+                                { growth_data.map((object, index) => (
+                                    <div className = "week-box" key = {index}>
+                                        <div className="week-value">
+                                            <div className = {
+                                                `
+                                                    phase
+                                                    ${
+                                                        object.avg_growth <= 5 ? "seed-height" :
+                                                        object.avg_growth <= 15 ? "vegetation-height" :
+                                                        "final-growth-height"
+                                                    }
+                                                `
+                                                }
+                                            >
+                                            </div>
                                         </div>
-                                    ))}
-                                </div>
-                            ))}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                         <div className = "status-sort">
-                            <div className = "growth-status-box">
+                            <div className = "env-box">
                                 <div className = "temp-box color">
                                     <FontAwesomeIcon 
                                         icon = "fa-solid fa-temperature-three-quarters"
@@ -206,7 +282,7 @@ const Summary = () => {
                                     ))}
                                 </div>
                             </div>
-                            <div className = "growth-status-box">
+                            <div className = "env-box">
                                 <div className = "humid-box color">
                                     <FontAwesomeIcon 
                                         icon="fa-solid fa-droplet"
@@ -231,7 +307,7 @@ const Summary = () => {
                                     ))}
                                 </div>
                             </div>
-                            <div className = "growth-status-box">
+                            <div className = "env-box">
                                 <div className = "lux-box color">
                                     <FontAwesomeIcon 
                                         icon="fa-regular fa-lightbulb"

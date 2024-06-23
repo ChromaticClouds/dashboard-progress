@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-
+const fs = require('fs');
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -16,9 +16,9 @@ const DataSchema = new mongoose.Schema({
     todo: String,
     message: String,
     startDate: Date,
-    startHour: Date,
+    startTime: Date,
     endDate: Date,
-    endHour: Date,
+    endTime: Date,
     color: Number,
     event: Number,
     date: { type: Date, default: Date.now }

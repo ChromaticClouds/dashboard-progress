@@ -280,19 +280,19 @@ const Weather2 = ({ set_current }) => {
                     switch (value) {
                         case 1:
                             today_sky = "맑음";
-                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/clear-day.svg";
+                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/clear-day.svg";
                             break;
                         case 2:
                             today_sky = "구름 조금";
-                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/partly-cloudy-day.svg";
+                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/partly-cloudy-day.svg";
                             break;
                         case 3:
                             today_sky = "구름 많음";
-                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/cloudy.svg";
+                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/cloudy.svg";
                             break;
                         case 4:
                             today_sky = "흐림";
-                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/overcast.svg";
+                            today_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/overcast.svg";
                             break;
                     }
                 }
@@ -301,19 +301,19 @@ const Weather2 = ({ set_current }) => {
                     switch (value) {
                         case 1:
                             today_pty = "비";
-                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/drizzle.svg";
+                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/drizzle.svg";
                             break;
                         case 2:
                             today_pty = "비/눈";
-                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/sleet.svg";
+                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/sleet.svg";
                             break;
                         case 3:
                             today_pty = "눈";
-                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/snow.svg";
+                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/snow.svg";
                             break;
                         case 4:
                             today_pty = "소나기";
-                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/rain.svg";
+                            today_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/rain.svg";
                             break;
                     }
                 }
@@ -330,19 +330,19 @@ const Weather2 = ({ set_current }) => {
                     switch (value) {
                         case 1:
                             tomorrow_sky = "맑음";
-                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/clear-day.svg";
+                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/clear-day.svg";
                             break;
                         case 2:
                             tomorrow_sky = "구름 조금";
-                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/partly-cloudy-day.svg";
+                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/partly-cloudy-day.svg";
                             break;
                         case 3:
                             tomorrow_sky = "구름 많음";
-                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/cloudy.svg";
+                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/cloudy.svg";
                             break;
                         case 4:
                             tomorrow_sky = "흐림";
-                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/overcast.svg";
+                            tomorrow_sky_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/overcast.svg";
                             break;
                     }
                 }
@@ -351,19 +351,19 @@ const Weather2 = ({ set_current }) => {
                     switch (value) {
                         case 1:
                             tomorrow_pty = "비";
-                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/drizzle.svg";
+                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/drizzle.svg";
                             break;
                         case 2:
                             tomorrow_pty = "비/눈";
-                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/sleet.svg";
+                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/sleet.svg";
                             break;
                         case 3:
                             tomorrow_pty = "눈";
-                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/snow.svg";
+                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/snow.svg";
                             break;
                         case 4:
                             tomorrow_pty = "소나기";
-                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/line/rain.svg";
+                            tomorrow_pty_icon = "https://bmcdn.nl/assets/weather-icons/v2.0/fill/rain.svg";
                             break;
                     }
                 }
@@ -456,4 +456,4 @@ const Weather2 = ({ set_current }) => {
     )
 }
 
-export default Weather2 
+export default Weather2
