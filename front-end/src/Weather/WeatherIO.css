@@ -1,0 +1,100 @@
+.board.weatherio-container {
+    width: 100%;
+    padding: 0 40px 20px 50px;
+}
+
+.weatherio-container .contents {
+    width: 100%;
+}
+
+.weatherio-container .binding-container {
+    display: flex;
+    height: 780px;
+}
+
+.weatherio-container .status-container {
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+}
+
+.status-container .title {
+    margin-top: 30px;
+    font-family: "GMM";
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.weatherio-container .status-container .box {
+    width: 360px;
+    height: 360px;
+    background-color: #fff;
+    border-radius: 10px 30px;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15);
+}
+
+.weatherio-container .weather-container {
+    margin-left: 40px;
+    width: 100%;
+    padding-right: 10px;
+    overflow-y: scroll;
+    -webkit-appearance: none;
+}
+
+.weather-container::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 0px;
+}
+
+.weather-container .highlight-box {
+    height: 540px;
+    background-color: #fff;
+    border-radius: 10px 30px;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+}
+
+.highlight-box p {
+    font-family: "GMM";
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.highlight-box .box-container {
+    height: calc(100% - 70px);
+    display: flex;
+    gap: 20px;
+}
+
+.box-container .box-box {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+}
+
+.box-box .section {
+    display: flex;
+    height: 100%;
+    gap: 20px;
+}
+
+.box-box .section .box {
+    background-color: #f4ece0;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+}
+
+.weather-container .title {
+    margin-top: 30px;
+    font-family: "GMM";
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.weather-container .today-at-box {
+    height: 160px;
+    border: 1px solid black;
+}

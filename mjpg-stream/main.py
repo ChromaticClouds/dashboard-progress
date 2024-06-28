@@ -11,6 +11,7 @@ app = FastAPI()
 # Check if GPU is available and load the model accordingly
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model = YOLO("yolov8n.pt").to(device)  # Load the model to GPU if available
+model2 = YOLO("tomato_best.pt").to(device)
 
 class VideoCamera:
     def __init__(self):
@@ -46,7 +47,7 @@ class VideoCamera:
 
 camera = VideoCamera()
 
-def gen_frames():
+def gen_frames(model):
     while True:
         ret, frame = camera.get_frame()
         if not ret:
@@ -69,7 +70,11 @@ def index():
 
 @app.get("/video_feed")
 def video_feed():
-    return StreamingResponse(gen_frames(), media_type='multipart/x-mixed-replace; boundary=frame')
+    return StreamingResponse(gen_frames(model), media_type='multipart/x-mixed-replace; boundary=frame')
+
+@app.get("/video_feed_tomato")
+def video_feed_tomato():
+    return StreamingResponse(gen_frames(model2), media_type='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
     import uvicorn

@@ -65,7 +65,7 @@ const Video = ({ setEmbed, onCancel, setEmbedError }) => {
                         </div>
                     ) : (
                         imageBox(
-                            "http://localhost:8001/video_feed",
+                            "http://localhost:8001/video_feed_tomato",
                             () => ImageError(setImageErrorB),
                             setImageErrorB
                         )

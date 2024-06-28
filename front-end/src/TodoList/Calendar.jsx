@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './Calendar.css'
 
@@ -8,6 +9,10 @@ const Calendar = (props) => {
         month: new Date().getMonth(),
         string_month: new Date().toLocaleString('en-GB', { month: 'long' })
     });
+
+    useEffect(() => {
+        props.viewDate(current_date)
+    }, [current_date])
 
     const [prev_last_days, set_prev_last_days] = useState([]);
     const [days, set_days] = useState([]);
@@ -155,20 +160,86 @@ const Calendar = (props) => {
         if (props.isVisible) {
             set_current_date(props.currentDate);
         }
-    }, [props.currentDate])
+    }, [props.currentDate]);
+
+    const [events, setEvents] = useState([]);
+
+    const monthEvents = async (year, month) => {
+        try {
+            const startDate = new Date(year + 100, month, 1);
+            const endDate = new Date(year - 100, month + 1, 0);
+    
+            const response = await axios.get('http://localhost:5000/api/calendar/month', {
+                params: {
+                    startDate,
+                    endDate
+                }
+            });
+            setEvents(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        monthEvents(current_date.year, current_date.month);
+    }, [current_date, props.detectTodo]);
+
+    const getEventClass = (day) => {
+        const current = new Date(current_date.year, current_date.month, day);
+        let classes = [];
+
+        events.forEach(event => {
+            const startDate = new Date(event.startDate);
+            const endDate = new Date(event.endDate);
+            const color = event.color;
+
+            if (current.toDateString() === startDate.toDateString() && current.toDateString() === endDate.toDateString()) {
+                classes.push(`single ${color}`);
+            } else if (current.toDateString() === startDate.toDateString()) {
+                classes.push(`init ${color}`);
+            } else if (current.toDateString() === endDate.toDateString()) {
+                classes.push(`fin ${color}`);
+            } else if (current > startDate && current < endDate) {
+                classes.push(`between ${color}`);
+            } else {
+                classes.push('ranged')
+            }
+        });
+
+        return classes.join(' ');
+    };
 
     return (
-        <div className="calender-container">
+        <div className="calendar-container">
             <header>
                 <p className="current-date" onClick={current_date_click}>
                     {current_date.string_month} {current_date.year}
                 </p>
                 <div className="chevron-icons">
-                    <span><FontAwesomeIcon icon="fa-solid fa-chevron-left" onClick={prev_month} /></span>
-                    <span><FontAwesomeIcon icon="fa-solid fa-chevron-right" onClick={next_month} /></span>
+                    <span>
+                        <FontAwesomeIcon 
+                            icon="fa-solid fa-chevron-left" 
+                            onClick={() => {
+                                if ((new Date().getFullYear() + 100) > current_date.year) {
+                                    prev_month();
+                                }
+                            }} 
+                        />
+                    </span>
+                    <span>
+                        <FontAwesomeIcon 
+                            icon="fa-solid fa-chevron-right" 
+                            onClick={() => {
+                                if ((new Date().getFullYear() - 100) < current_date.year) {
+                                    next_month();
+                                }
+                            }} 
+                        />
+                    </span>
                 </div>
             </header>
-            <div className="calender">
+            <div className="calendar">
                 <ul className="week">
                     <li>Sun</li>
                     <li>Mon</li>
@@ -178,7 +249,61 @@ const Calendar = (props) => {
                     <li>Fri</li>
                     <li>Sat</li>
                 </ul>
-                <ul className="days">
+                <ul className="days origin">
+                    {prev_last_days.map((o, i) => (
+                        <li 
+                            key={i}
+                            className="inactive" 
+                            onClick={(e) => {
+                                props.setVisible(!visible);
+                                props.setDate({
+                                    year: current_date.month === 0 ? current_date.year - 1 : current_date.year,
+                                    month: current_date.month === 0 ? 12 : current_date.month,
+                                    day: o,
+                                    week: week(current_date.year, current_date.month, o)
+                                });
+                            }}
+                        >
+                            {o}
+                        </li>
+                    ))}
+                    {days.map((o, i) => (
+                        <li 
+                            key={i} 
+                            className={
+                                `${getEventClass(o)}`
+                            }                            
+                            onClick={(e) => {
+                                props.setVisible(!visible);
+                                props.setDate({
+                                    year: current_date.year,
+                                    month: current_date.month + 1,
+                                    day: o,
+                                    week: week(current_date.year, current_date.month + 1, o)
+                                });
+                            }}
+                        >
+                            {o}
+                        </li>
+                    ))}
+                    {next_init_days.map((o, i) => (
+                        <li
+                            className="inactive" 
+                            onClick={() => {
+                                props.setVisible(!visible);
+                                props.setDate({
+                                    year: current_date.month + 2 === 13 ? current_date.year + 1 : current_date.year,
+                                    month: current_date.month + 2 === 13 ? 1 : current_date.month + 2,
+                                    day: o,
+                                    week: week(current_date.year, current_date.month + 2, o)
+                                });
+                            }}
+                        >
+                            {o}
+                        </li>
+                    ))}
+                </ul>
+                <ul className="days cover">
                     {prev_last_days.map((o, i) => (
                         <li 
                             key={i}
@@ -200,12 +325,13 @@ const Calendar = (props) => {
                         <li 
                             key={i} 
                             className={`
+                                ${isSame() ? "" : "ranged"}
                                 ${isActiveDay(o) ? "active" : ""}
                                 ${isStartDate(o) ? "init" : ""}
                                 ${isEndDate(o) ? "fin" : ""}
                                 ${isBetweenDate(o) ? "between" : ""}
-                                ${isSame() ? "" : "ranged"}
-                                ${color}`
+                                ${color}
+                                `
                             }                            
                             onClick={(e) => {
                                 props.setVisible(!visible);

@@ -1,4 +1,4 @@
-.calender-container {
+.calendar-container {
     font-family: "GSR";
     font-weight: 600;
     width: 360px;
@@ -8,14 +8,14 @@
     position: relative;
 }
 
-.calender-container header {
+.calendar-container header {
     display: flex;
     align-items: center;
     padding: 25px 30px 0px;
     justify-content: space-between;
 }
 
-.calender-container header .current-date {
+.calendar-container header .current-date {
     font-size: 1.25rem;
     font-weight: 600;
     border-radius: 50px;
@@ -24,15 +24,15 @@
     cursor: pointer;
 }
 
-.calender-container header .current-date:hover {
+.calendar-container header .current-date:hover {
     background-color: #f2f2f2;
 }
 
-.calender-container header .chevron-icons {
+.calendar-container header .chevron-icons {
     display: flex;
 }
 
-.calender-container header .chevron-icons span {
+.calendar-container header .chevron-icons span {
     display: flex;
     height: 38px;
     width: 38px;
@@ -47,19 +47,20 @@
     align-items: center;
 }
 
-.calender-container header .chevron-icons span:hover {
+.calendar-container header .chevron-icons span:hover {
     background-color: #f2f2f2;
 }
 
-.calender-container header .chevron-icons span:last-child {
+.calendar-container header .chevron-icons span:last-child {
     margin-right: -10px;
 }
 
-.calender {
+.calendar {
     padding: 20px;
+    position: relative;
 }
 
-.calender ul {
+.calendar ul {
     font-family: "GSR";
     display: flex;
     list-style: none;
@@ -68,35 +69,35 @@
     text-align: center;
 }
 
-.calender .days {
+.calendar .days {
     margin-bottom: 10px;
 }
 
-.calender .weeks li {
+.calendar .weeks li {
     font-weight: 500;
 }
 
-.calender ul li {
+.calendar ul li {
     width: calc(100% / 7);
     position: relative;
 }
 
-.calender .days li {
+.calendar .days li {
     z-index: 1;
     cursor: pointer;
     margin-top: 30px;
     font-weight: 500;
 }
 
-.calender .days li.inactive {
+.calendar .days li.inactive {
     color: #aaa;
 }
 
-.calender .days li.active {
+.calendar .days li.active {
     color: #fff;
 }
 
-.calender .days li::before {
+.calendar .days li::before {
     position: absolute;
     content: "";
     height: 40px;
@@ -108,7 +109,7 @@
     transform: translate(-50%, -50%);
 }
 
-.calender .days li::after {
+.calendar .days li::after {
     position: absolute;
     content: "";
     height: 40px;
@@ -119,104 +120,132 @@
     transform: translate(-50%, -50%);
 }
 
-.calender .days li:hover::before {
+.calendar .days.origin li:hover::before {
     background-color: #f2f2f2;
 }
 
-.calender .days li.active::before {
+.calendar .days.cover {
+    padding: 0 20px;
+    position: absolute;
+    top: 55px;
+    left: 0;
+    z-index: 1;
+    pointer-events: none; /* days.cover 요소의 pointer-events를 비활성화 */
+}
+
+.calendar .days.cover li {
+    pointer-events: none; /* days.cover li 요소의 pointer-events를 비활성화 */
+}
+
+.calendar .days.origin {
+    z-index: 0;
+    position: relative; /* days.origin 요소를 relative로 설정하여 z-index가 적용되도록 함 */
+}
+
+.calendar .days.origin li {
+    position: relative; /* days.origin li 요소를 relative로 설정하여 z-index가 적용되도록 함 */
+}
+
+.calendar .days.origin li:hover::before {
+    background-color: #f2f2f2; /* days.origin li 요소의 hover 배경색 */
+}
+
+.calendar .days.cover li.active::before {
     background-color: #282b4f;
     color: #fff;
 }
-
-.calender .days li.init.fin.red::before {
+/*
+    싱글 데이 색 지정
+*/
+.calendar .days li.single.red::before {
     background-color: #d56262;
 }
 
-.calender .days li.init.fin.yellow::before {
+.calendar .days li.single.yellow::before {
     background-color: #e9bd5f;
 }
 
-.calender .days li.init.fin.green::before {
+.calendar .days li.single.green::before {
     background-color: #93eb73;
 }
 
-.calender .days li.init.fin.blue::before {
+.calendar .days li.single.blue::before {
     background-color: #7587c7;
 }
 
-.calender .days li.init.fin.purple::before {
+.calendar .days li.single.purple::before {
     background-color: #b079d1;
 }
 /*
     시작 날짜 색 지정
 */
-.calender .days li.init.red::before {
+.calendar .days li.init.red::before {
     background-color: #d56262;
 }
 
-.calender .days li.init.yellow::before {
+.calendar .days li.init.yellow::before {
     background-color: #e9bd5f;
 }
 
-.calender .days li.init.green::before {
+.calendar .days li.init.green::before {
     background-color: #93eb73;
 }
 
-.calender .days li.init.blue::before {
+.calendar .days li.init.blue::before {
     background-color: #7587c7;
 }
 
-.calender .days li.init.purple::before {
+.calendar .days li.init.purple::before {
     background-color: #b079d1;
 }
 /*
     종료 날짜 색 지정
 */
-.calender .days li.fin.red::before {
+.calendar .days li.fin.red::before {
     background-color: #d56262;
 }
 
-.calender .days li.fin.yellow::before {
+.calendar .days li.fin.yellow::before {
     background-color: #e9bd5f;
 }
 
-.calender .days li.fin.green::before {
+.calendar .days li.fin.green::before {
     background-color: #93eb73;
 }
 
-.calender .days li.fin.blue::before {
+.calendar .days li.fin.blue::before {
     background-color: #7587c7;
 }
 
-.calender .days li.fin.purple::before {
+.calendar .days li.fin.purple::before {
     background-color: #b079d1;
 }
 /*
     범위 날짜 색 지정
 */
-.calender .days li.between.red::after {
+.calendar .days li.between.red::after {
     background-color: #d56262;
 }
 
-.calender .days li.between.yellow::after {
+.calendar .days li.between.yellow::after {
     background-color: #e9bd5f;
 }
 
-.calender .days li.between.green::after {
+.calendar .days li.between.green::after {
     background-color: #93eb73;
 }
 
-.calender .days li.between.blue::after {
+.calendar .days li.between.blue::after {
     background-color: #7587c7;
 }
 
-.calender .days li.between.purple::after {
+.calendar .days li.between.purple::after {
     background-color: #b079d1;
 }
 /*
     범위 지정 시, 모양 지정
 */
-.calender .days li.init.ranged::before {
+.calendar .days li.init.ranged::before {
     border-radius: 50px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
@@ -224,7 +253,7 @@
     width: 46px;
 }
 
-.calender .days li.fin.ranged::before {
+.calendar .days li.fin.ranged::before {
     border-radius: 50px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
@@ -232,7 +261,7 @@
     width: 46px;
 }
 
-.calender-container .month-change {
+.calendar-container .month-change {
     top: 0;
     left: 0;
     width: 100%;
@@ -248,7 +277,7 @@
     margin-left: 30px;
 }
 
-.calender-container .month-list {
+.calendar-container .month-list {
     position: absolute;
     width: 100%;
     height: 90%;

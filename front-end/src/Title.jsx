@@ -3,6 +3,7 @@ import "./Title.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
+import axios from "axios";
 
 import Expand from "./Stream/Expand";
 import Calendar from "./TodoList/Calendar";
@@ -12,7 +13,7 @@ import Summary from "./Summary";
 import Control from "./Control";
 import Chart from "./Chart2";
 import Video from "./Stream/Video";
-import ObjectDetection from "./Detection/ObjectDetection";
+import WeatherIO from "./Weather/WeatherIO";
 
 library.add(fas);
 
@@ -107,6 +108,30 @@ const Title = () => {
     const [embed, setEmbed] = useState(<div></div>);
     const [embedError, setEmbedError] = useState(false);
 
+    const [viewDate, setViewDate] = useState([]);
+    const [viewTodo, setViewTodo] = useState([]);
+    const [detectTodo, setDetectTodo] = useState([]);
+
+    const [viewWeather, setViewWeather] = useState([]);
+
+    const getDate = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/calendar', {
+                params: {
+                    startDate: new Date().toDateString(),
+                    endDate: new Date().toDateString()
+                }
+            });
+            setViewTodo(response.data)
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        getDate();
+    }, [new Date().getDate(), detectTodo]);
+
     return (
         <div>
             <Expand 
@@ -119,6 +144,7 @@ const Title = () => {
                 setVisible = { visible }
                 setCancel = { setVisible }
                 setDate = { date }
+                detectTodo = { setDetectTodo }
             />
             <div className = "ui-container">
                 <div className = "icon-panel">
@@ -148,7 +174,9 @@ const Title = () => {
                                 index === 0 && <Summary />
                             }
                             {
-                                index === 1 && <ObjectDetection />
+                                index === 1 && <WeatherIO 
+                                    viewWeather={viewWeather}
+                                />
                             }
                             {
                                 index === 2 && <Chart />
@@ -185,24 +213,56 @@ const Title = () => {
                                     transition: 'transform 0.3s ease-in-out'
                                 }} // 버튼 클릭 시, 위젯 슬라이드 업
                             />
-                            <Weather2 set_current={set_current} />
+                            <Weather2 
+                                set_current={set_current} // 풍향, 풍속 데이터 전달 위함
+                                viewWeather={setViewWeather}
+                            />
                             <div className="calendar" style = {{ 
                                 marginBottom: rotated ? "40px" : "500px"
                             }}>
                                 <Calendar
                                     setVisible = { setVisible }
                                     setDate = { setDate }
+                                    viewDate = { setViewDate }
+                                    detectTodo = { detectTodo }
                                 />
                                 <div className="todo-list">
                                     <div className="todo-bar">
                                         <p>Todo-List 📅</p>
                                     </div>
-                                    <div className="lists">
-                                        <div className="non-exist">
-                                            <FontAwesomeIcon icon="fa-solid fa-face-sad-tear" className="icon" />
-                                            <h3 className="text">No Schedule...</h3>
-                                        </div>
-                                    </div>
+                                        {viewTodo.length > 0 ? (
+                                            <div className="lists sort">
+                                                <div className="non-exist exist">
+                                                    {viewTodo.map(todo => (
+                                                        <div key={todo._id} className="todo-box">
+                                                            <div className="circle">
+                                                                <div className={`color ${todo.color}`}></div>
+                                                            </div>
+                                                            <div>
+                                                                <div className="time">{todo.todo === '' ? `${todo.startTime} - ${todo.endTime}` : "All Day"}</div>
+                                                                <div className="contents">
+                                                                    <span className="todo-title">{todo.title}</span>
+                                                                    <div></div>
+                                                                    <span>{todo.todo === '' ? todo.message : todo.todo}</span>
+                                                                </div>
+                                                            </div>
+                                                            {todo.event.text ? (
+                                                                <div className={`icon-box color ${todo.color}`}>
+                                                                    <div>{todo.event.text ? <FontAwesomeIcon icon={`${todo.event.icon}`}/> : null}</div>
+                                                                </div>
+                                                            ) : null}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="lists">
+                                                <div className="non-exist">
+                                                    <FontAwesomeIcon icon="fa-solid fa-face-sad-tear" className="icon" />
+                                                    <h3 className="text">No Schedule...</h3>
+                                                </div>
+                                            </div>
+                                        )}
                                 </div>
                             </div>
                         </div>

@@ -78,6 +78,46 @@
     position: relative;
 }
 
+.todo-list .sub-bar {
+    width: 100%;
+    display: flex;
+}
+
+.todo-list .sub {
+    font-size: 20px;
+    margin: 20px;
+    align-self: baseline;
+    color: #2d2b42;
+}
+
+.sub-bar button {
+    position: absolute;
+    right: 0;
+    margin: 14px 10px 0 0;
+    border-radius: 50px;
+    outline: 0;
+    border: 0;
+    background-color: #d56262;
+    width: 36px;
+    height: 36px;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.sub-bar button .button-text {
+    white-space: nowrap;
+    transition: opacity 1s;
+}
+
+.sub-bar button:hover {
+    width: 108px;
+}
+
 .todo-list .title {
     font-family: "GSR";
     width: calc(100% - 40px);
@@ -93,11 +133,109 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: 10px;
     width: calc(100% - 40px);
-    height: 280px;
+    height: 240px;
     border-bottom: 1px solid #8e8e8e;
     color: #767676;
-    margin-top: 20px;
+    overflow-y: auto;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    padding-right: 10px;
+}
+
+.todo-list .space::-webkit-scrollbar {
+    position: absolute;
+    width: 12px;
+    background-color: #ebebeb;
+    border-radius: 10px;
+    right: 20px;
+}
+
+.todo-list .space::-webkit-scrollbar-thumb {
+    background-color: #7587c7;
+    border-radius: 10px;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+}
+
+.space.sort {
+    justify-content: flex-start;
+}
+
+.space .todo-box {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 100px;
+    height: 84px;
+    margin-bottom: 10px;
+    align-items: center;
+    border-radius: 20px;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+}
+
+.todo-box input {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.space .todo-box:hover {
+    background-color: #2d2b42;
+    color: #fff;
+}
+
+.todo-box .color {
+    margin: 0 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.todo-box .color.red {
+    background-color: #d56262;
+}
+
+.todo-box .color.yellow {
+    background-color: #e9bd5f;
+}
+
+.todo-box .color.green {
+    background-color: #93eb73;
+}
+
+.todo-box .color.blue {
+    background-color: #7587c7;
+}
+
+.todo-box .color.purple {
+    background-color: #b079d1;
+}
+
+.todo-box h4 {
+    font-weight: 500;
+    margin: 4px 0;
+}
+
+.todo-box .text-sort {
+    display: inline-block;
+    max-width: 230px;
+    position: absolute;
+    left: 40px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.todo-box .todo-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.todo-box .todo {
+    font-size: 14px;
 }
 
 .todo-list .space .icon {
@@ -240,6 +378,16 @@
 
 #selected {
     margin-left: 20px;
+}
+
+.selected .reset-lists {
+    position: absolute;
+    cursor: pointer;
+    top: 50%;
+    right: 40px;
+    font-size: 18px;
+    transform: translate(0, -50%);
+    color: #8e8e8e;
 }
 
 .selected .caret {

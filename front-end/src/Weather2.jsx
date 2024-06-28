@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import WindSub from "../chart/SubChart2";
 import './Weather.css'
 
-const Weather2 = ({ set_current }) => {
+const Weather2 = ({ set_current, viewWeather }) => {
     const [weather, set_weather] = useState({});
 
     let today_temp = null;
@@ -265,6 +265,8 @@ const Weather2 = ({ set_current }) => {
             const parse_body = parse_response.body;
             const parse_items = parse_body.items;
             const parse_item = parse_items.item;
+
+            viewWeather(parse_item);
 
             parse_item.forEach(item => {
                 const category = item.category;

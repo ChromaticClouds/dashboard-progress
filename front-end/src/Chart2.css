@@ -3,7 +3,6 @@
     justify-content: center;
     gap: 40px;
     margin-bottom: 40px;
-    flex-wrap: wrap;
 }
 
 .chart-container .sort {
@@ -70,77 +69,30 @@
     width: 32px;
 }
 
-@media (min-width: 1901px) {
-    .chart1 {
-        width: 380px;
-        height: 360px;
-    }
-
-    .chart2 {
-        width: 720px;
-        height: 360px;
-    }
-
-    .chart3 {
-        width: 480px;
-        height: 540px;
-    }
-
-    .chart4 {
-        width: 270px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        position: relative;
-    }
-
-    .chart5 {
-        width: 620px;
-        height: 260px;
-    }
+.chart1 {
+    width: 380px;
+    height: 360px;
 }
 
-@media (max-width: 1900px) and (min-width: 1041px) {
-    .chart-box {
-        flex-grow: 1;
-        display: flex;
-        justify-content: center;
-        background-color: white;
-        padding: 20px;
-        border-radius: 10px 30px;
-        box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.15);
-    }
+.chart2 {
+    width: 720px;
+    height: 360px;
+}
 
-    .chart1 {
-        flex-grow: 1;
-        width: 300px;
-        height: 320px;
-    }
+.chart3 {
+    width: 480px;
+    height: 540px;
+}
 
-    .chart2 {
-        flex-grow: 1;
-        width: 640px;
-        height: 320px;
-    }
+.chart4 {
+    width: 270px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
 
-    .chart3 {
-        flex-grow: 1;
-        width: 400px;
-        height: 540px;
-    }
-
-    .chart4 {
-        flex-grow: 1;
-        width: 540px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        position: relative;
-    }
-
-    .chart5 {
-        flex-grow: 1;
-        width: 540px;
-        height: 260px;
-    }
+.chart5 {
+    width: 620px;
+    height: 260px;
 }

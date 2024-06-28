@@ -38,13 +38,26 @@ const Control = () => {
     const [temp, set_temp] = useState(0);
     const [humid, set_humid] = useState(0);
 
+    const [watering, setWatering] = useState(false);
+
     const pushed = () => {
         set_push(true);
-        console.log(sensor_data);
         setTimeout(() => {
             set_push(false);
-        }, 100)
+        }, 100);
+
+        setWatering(prevState => {
+            const newState = !prevState;
+            socket.emit('watering req', {
+                onWatering: newState
+            });
+            return newState;
+        });
     }
+    
+    useEffect(() => {
+        console.log(watering)
+    }, [watering])
 
     let now = new Date();
     let recent = new Date(recent_date);
@@ -85,20 +98,6 @@ const Control = () => {
     }, []);
 
     const water_level = water_lev;
-
-    const is_checked = (e) => { // 전체 센서 이벤트 제어
-        const checked_value = e.target.checked;
-        set_checked(checked_value);
-        localStorage.setItem('check-slider', checked_value);
-
-        if (checked) {
-            set_heater_operate(true);
-            set_cooler_operate(true);
-        } else {
-            set_heater_operate(false);
-            set_cooler_operate(false);
-        }
-    }
 
     // LED 슬라이더 3개 value 스테이트 저장
     const slider_changed_1 = (input) => {
@@ -158,12 +157,6 @@ const Control = () => {
         socket.on("recent watering rec", (data) => {
             set_recent_date(data);
         })
-
-        return () => {
-            socket.off("monitoring rec");
-            socket.off("sensor data");
-            socket.off("recent watering rec");
-        };
     }, [])
 
     useEffect(() => {
@@ -284,9 +277,9 @@ const Control = () => {
     // 온도 디스플레이 표시용
     const temperature = [
         {
-            "ranges": [ 0, 15, 17, 23, 25, 28, 40 ],
+            "ranges": [ 0, 15, 17, 23, 25, 30, 40 ],
             "measures": [ temp ],
-            "markers": [ 24 ]
+            "markers": [ 28 ]
         }
     ]
     // 습도 디스플레이 표시용
@@ -312,7 +305,7 @@ const Control = () => {
         return saved !== null ? Number(saved) : 0;
     });
     const [initial_slider_x, set_initial_slider_x] = useState(0);
-
+    
     const [dragging_c, set_dragging_c] = useState(false);
     const [initial_mouse_x2, set_initial_mouse_x2] = useState(0);
     const [slider_x2, set_slider_x2] = useState(() => {
@@ -426,25 +419,57 @@ const Control = () => {
     const heater_rotate = () => {
         set_heater_operate(prevState => {
             const newState = !prevState;
-            socket.emit("heater power req", newState);
             return newState;
         });
     };
     const cooler_rotate = () => {
         set_cooler_operate(prevState => {
             const newState = !prevState;
-            socket.emit("cooler power req", newState);
             return newState;
         })
     }
 
     // 히터, 쿨러 전원여부 클라이언트 저장소에 저장
     useEffect(() => {
+        socket.emit("cooler temp req", desire_cool.toFixed(0));
         localStorage.setItem('heater-power', heater_operate);
     }, [heater_operate])
     useEffect(() => {
+        socket.emit("cooler temp req", desire_cool.toFixed(0));
         localStorage.setItem('cooler-power', cooler_operate);
     }, [cooler_operate])
+
+    const is_checked = (e) => { // 전체 센서 이벤트 제어
+        const checked_value = e.target.checked;
+        set_checked(checked_value);
+        localStorage.setItem('check-slider', checked_value);
+    }
+    
+    useEffect(() => {
+        if (!checked) {
+            set_heater_operate(true);
+            set_cooler_operate(true);
+        } else {
+            set_heater_operate(false);
+            set_cooler_operate(false);
+        }
+    }, [checked]);
+
+    useEffect(() => {
+        socket.emit("heater power req", {
+            power: heater_operate
+        });
+
+        console.log(heater_operate)
+    }, [heater_operate]);
+    
+    useEffect(() => {
+        socket.emit("cooler power req", {
+            power: cooler_operate
+        });
+
+        console.log(cooler_operate)
+    }, [cooler_operate]);
 
     return (
         <div className = 'board' onMouseMove = { mouse_move } onMouseUp = { stop_drag }>
@@ -581,7 +606,7 @@ const Control = () => {
                                     <div className = 'skill'>
                                         <div className="outer">
                                             <div className="inner">
-                                                <div className = { push ? "pushed" : "number" } onClick = { pushed }>
+                                                <div className = { push ? "pushed" : "number" } onClick = { checked ? pushed : null }>
                                                     { water_level.toFixed(1) } %
                                                     <div className = 'disc'>Water Level</div>
                                                 </div>

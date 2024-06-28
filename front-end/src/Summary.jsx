@@ -1,6 +1,7 @@
 import { React, useEffect, useState } from "react";
 import io from "socket.io-client";
 import LineChart from "../chart/LineChart";
+import Monitoring from "./Monitoring/Monitoring";
 
 import "./Summary.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,11 +27,14 @@ const Summary = () => {
     const [monitoring_data, set_monitoring_data] = useState([]);
 
     const [host, setHost] = useState(1);
+
+    useEffect(() => {
+        console.log(monitoring_data)
+    }, [])
     
     useEffect(() => {
         const repeat = setInterval(() => {
             socket.emit("env req");
-            socket.emit("sensor req");
             socket.emit("monitoring req");
         }, 2000);
 
@@ -385,40 +389,8 @@ const Summary = () => {
                             <h4 className = "monitoring-disc">Status</h4>
                             <h4 className = "monitoring-disc">Value</h4>
                         </div>
-                        <div>
-                            {monitoring_data.map((object, index) => (
-                                <div key = { index } className = "monitoring-value-box">
-                                    {object.map((control, index) => (
-                                        <div key = { index } className = "control-item">
-                                            <div className = "control-icon-sort">
-                                                <p>{ control.sensor_type === "Water Pump" && <FontAwesomeIcon icon="fa-solid fa-fill-drip" />}</p>
-                                                <p>{ control.sensor_type === "Cooling Fan" && <FontAwesomeIcon icon="fa-solid fa-fan" />}</p>
-                                                <p>{ control.sensor_type === "Neopixel LED 1" && <FontAwesomeIcon icon="fa-regular fa-lightbulb" />}</p>
-                                                <p>{ control.sensor_type === "Neopixel LED 2" && <FontAwesomeIcon icon="fa-regular fa-lightbulb" />}</p>
-                                                <p>{ control.sensor_type === "Neopixel LED 3" && <FontAwesomeIcon icon="fa-regular fa-lightbulb" />}</p>
-                                                <p>{ control.sensor_type === "Water Level Sensor" && <FontAwesomeIcon icon="fa-solid fa-bars-progress" />}</p>
-                                                <p>{ control.sensor_type === "DHT Sensor" && <FontAwesomeIcon icon="fa-solid fa-temperature-low" />}</p>
-                                                <p>{ control.sensor_type === "Ultrasonic Sensor 1" && <FontAwesomeIcon icon="fa-solid fa-wifi" />}</p>
-                                                <p>{ control.sensor_type === "Ultrasonic Sensor 2" && <FontAwesomeIcon icon="fa-solid fa-wifi" />}</p>
-                                                <p>{ control.sensor_type === "Ultrasonic Sensor 3" && <FontAwesomeIcon icon="fa-solid fa-wifi" />}</p>
-                                                <p>{ control.sensor_type === "Soil Moisture Sensor 1" && <FontAwesomeIcon icon="fa-solid fa-seedling" />}</p>
-                                                <p>{ control.sensor_type === "Soil Moisture Sensor 2" && <FontAwesomeIcon icon="fa-solid fa-seedling" />}</p>
-                                                <p>{ control.sensor_type === "Soil Moisture Sensor 3" && <FontAwesomeIcon icon="fa-solid fa-seedling" />}</p>
-                                                <p>{ control.sensor_type === "Heater" && <FontAwesomeIcon icon="fa-solid fa-fire" />}</p>
-                                            </div>
-                                            <div className = "control-value1">
-                                                <p>{ control.sensor_type }</p>
-                                            </div>
-                                            <div className = "control-value2">
-                                                <p style = { { color: control.power === 1 ? "teal" : "orange" } }>{ control.power === 1 ? "▲" : "▼"}</p>
-                                            </div>
-                                            <div className = "control-value3">
-                                                <p>{ control.measures }</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ))}
+                        <div className="monitoring-value-box">
+                            <Monitoring monitoring_data={monitoring_data}/>
                         </div>
                     </div>
                     <div className = "harvest-box-sort">
