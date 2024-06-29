@@ -12,7 +12,7 @@ import WindSub from "../chart/SubChart2";
 import HumidSub from "../chart/SubChart3";
 import './Chart2.css';
 
-const Chart = () => {
+const Chart = ({ viewWeatherMap }) => {
     const [socket, set_socket] = useState(null);
     const [temperature, set_temperature] = useState([]);
     const [humidity, set_humidity] = useState([]);
@@ -54,6 +54,8 @@ const Chart = () => {
     }, [socket]);
 
     useEffect(() => {
+        viewWeatherMap(weather);
+
         const deg = weather && weather.wind ? weather.wind.deg : 0;
         const speed = weather && weather.wind ? weather.wind.speed : 0;
 

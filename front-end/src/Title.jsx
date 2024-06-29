@@ -7,7 +7,7 @@ import axios from "axios";
 
 import Expand from "./Stream/Expand";
 import Calendar from "./TodoList/Calendar";
-import TodoList from "./ToDoList/ToDoList";
+import TodoList from "./TodoList/TodoList";
 import Weather2 from "./Weather2"
 import Summary from "./Summary";
 import Control from "./Control";
@@ -107,12 +107,17 @@ const Title = () => {
     const [onCancel, setOnCancel] = useState(true);
     const [embed, setEmbed] = useState(<div></div>);
     const [embedError, setEmbedError] = useState(false);
-
+    /**
+     *  - # 투두 리스트 데이터 및 변화 감지
+     */
     const [viewDate, setViewDate] = useState([]);
     const [viewTodo, setViewTodo] = useState([]);
     const [detectTodo, setDetectTodo] = useState([]);
-
+    /**
+     *  - # 날씨 데이터 스테이트
+     */
     const [viewWeather, setViewWeather] = useState([]);
+    const [viewIcon, setViewIcon] = useState(null);
 
     const getDate = async () => {
         try {
@@ -131,6 +136,8 @@ const Title = () => {
     useEffect(() => {
         getDate();
     }, [new Date().getDate(), detectTodo]);
+
+    const [weatherMap, setWeatherMap] = useState([]);
 
     return (
         <div>
@@ -176,10 +183,14 @@ const Title = () => {
                             {
                                 index === 1 && <WeatherIO 
                                     viewWeather={viewWeather}
+                                    viewWeatherMap={weatherMap}
+                                    viewIcon = {setViewIcon}
                                 />
                             }
                             {
-                                index === 2 && <Chart />
+                                index === 2 && <Chart 
+                                    viewWeatherMap={setWeatherMap}
+                                />
                             }
                             {
                                 index === 3 && <Control />
@@ -269,7 +280,7 @@ const Title = () => {
                         <div className="info-box">
                             <h4 className="now">Now</h4>
                             <div className="main-info">
-                                <img src = { current.pty == null ? current.icon : current.icon2 } className = "info-icon"/>
+                                {viewIcon}
                             </div>
                             <span>{ current.temp }°</span>
                         </div>

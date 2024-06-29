@@ -54,10 +54,6 @@ const Control = () => {
             return newState;
         });
     }
-    
-    useEffect(() => {
-        console.log(watering)
-    }, [watering])
 
     let now = new Date();
     let recent = new Date(recent_date);
@@ -459,16 +455,12 @@ const Control = () => {
         socket.emit("heater power req", {
             power: heater_operate
         });
-
-        console.log(heater_operate)
     }, [heater_operate]);
     
     useEffect(() => {
         socket.emit("cooler power req", {
             power: cooler_operate
         });
-
-        console.log(cooler_operate)
     }, [cooler_operate]);
 
     return (

@@ -29,10 +29,6 @@ const Summary = () => {
     const [host, setHost] = useState(1);
 
     useEffect(() => {
-        console.log(monitoring_data)
-    }, [])
-    
-    useEffect(() => {
         const repeat = setInterval(() => {
             socket.emit("env req");
             socket.emit("monitoring req");
@@ -372,7 +368,7 @@ const Summary = () => {
                             </div>
                             { sensor_stats.map((object, index) => (
                                 <div key = { index } className = "sensor-value">
-                                    { object[sensor_stats[1].length - 1]?.week_watering != null && object[sensor_stats[1].length - 1]?.week_watering / 1000 + " L" }
+                                    { object[sensor_stats[1].length - 1]?.week_watering != null && object[sensor_stats[1].length - 1]?.week_watering / 1000 }
                                 </div>
                             ))}
                         </div>
