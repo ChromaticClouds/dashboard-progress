@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import * as tf from "@tensorflow/tfjs";
+import axios from 'axios'
 import "./Video.css";
-import "./utils/detect"
 
 const Video = ({ setEmbed, onCancel, setEmbedError }) => {
     const [imageErrorA, setImageErrorA] = useState(false);
@@ -81,7 +80,7 @@ const Video = ({ setEmbed, onCancel, setEmbedError }) => {
                         </div>
                     ) : (
                         imageBox(
-                            "http://localhost:8001/video_feed",
+                            "http://localhost:8001/video_feed_leaves",
                             () => ImageError(setImageErrorC),
                             setImageErrorC
                         )

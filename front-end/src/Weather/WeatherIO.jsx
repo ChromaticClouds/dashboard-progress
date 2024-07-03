@@ -24,7 +24,7 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
     const [showWeather, setShowWeather] = useState([]);
 
      /** @type {[WeatherMap, React.Dispatch<React.SetStateAction<WeatherMap>>]} */
-    const [weatherMap, setWeatherMap] = useState([]);
+    const [weatherMap, setWeatherMap] = useState({});
 
     useEffect(() => {
         setShowWeather(viewWeather);
@@ -83,7 +83,7 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
         }
     };
     /**
-     * 현재 날씨 아이콘 조회
+     *  현재 날씨 아이콘 조회
      */
     const [currentIcon, setCurrentIcon] = useState(null);
     const [description, setDescription] = useState(null);
@@ -95,9 +95,9 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
         }
         // Meteocons 변환된 아이콘을 props로 전달
         viewIcon(<WeatherIcon getWeatherIcon = {currentIcon}/>);
-    }, [weatherMap]);
+    }, [weatherMap, currentIcon]);
     /**
-     * 현재 날짜 포맷팅
+     *  현재 날짜 포맷팅
      */
     const [formattedDate, setFormattedDate] = useState('');
 
@@ -106,13 +106,61 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
         setFormattedDate(formatted);
     }, [now.date()]);
     /**
-     * 중기 예보 데이터 상태관리 --------------------------------- *
+     *  미세먼지 농도 데이터 호출
+     */
+    const [airCondition, setAirCondition] = useState([]);
+    const [pollution, setPollution] = useState({});
+
+    useEffect(() => {
+        if (airCondition.length > 0) {
+            let status = '';
+
+            switch (airCondition[0].main.aqi) {
+                case 1:
+                    status = 'Good';
+                    break;
+                case 2:
+                    status = 'Fair';
+                    break;
+                case 3:
+                    status = 'Moderate';
+                    break;
+                case 4:
+                    status = 'Poor';
+                    break;
+                case 5:
+                    status = 'Very Poor';
+                    break;
+                default:
+                    status = 'Unknown'
+                    break;
+            }
+
+            setPollution({
+                status: status,
+                condition: {
+                    pm2_5: airCondition[0].components.pm2_5,
+                    so2: airCondition[0].components.so2,
+                    no2: airCondition[0].components.no2,
+                    o3: airCondition[0].components.o3,
+                }
+            })
+        }
+    }, [airCondition]);
+
+    const [hasData, setHasData] = useState(false);
+
+    useEffect(() => {
+        setHasData(Object.keys(pollution).length > 0);
+    }, [pollution])
+    /**
+     *  중기 예보 데이터 상태관리 --------------------------------- *
      */
     const [mediumForecast, setMediumForecast] = useState([]);
     /**
      *  - # 1. 현재 시간 기준, 예보 시간 호출
      */
-    const forecastHour = ['03:00:00', '06:00:00', '09:00:00', '12:00:00', '15:00:00', '18:00:00', '21:00:00', '00:00:00'];
+    const forecastHour = ['00:00:00', '03:00:00', '06:00:00', '09:00:00', '12:00:00', '15:00:00', '18:00:00', '21:00:00'];
 
     const [castHour, setCastHour] = useState('');
 
@@ -131,7 +179,7 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
         setCastHour(getClosestHour());
     }, [now.hour()]);
     /**
-     *  - # 2. 다음 날부터 5일 차까지 날짜 호출
+     *  - # 2. 현재 날짜부터 5일 차까지 날짜 호출
      */
     const [dates, setDates] = useState([]);
 
@@ -185,14 +233,18 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
     /**
      *  "현재 날짜 + 3시간 단위" <-- 스트링 바인딩
      */
-    const [bindTime, setBindTime] = useState([])
+    const [bindTime, setBindTime] = useState([]);
 
     useEffect(() => {
-        const times = forecastHour.map(time => 
-            `${moment(now).format('YYYY-MM-DD')} ${time}`
-        );
+        const times = [];
+
+        for (let i = 0; i < 8; i++) {
+            const timeIndex = (getCurrentHourIndex() + i) % forecastHour.length;
+            const dayOffset = Math.floor((getCurrentHourIndex() + i) / forecastHour.length);
+            times.push(`${moment().add(dayOffset, 'days').format('YYYY-MM-DD')} ${forecastHour[timeIndex]}`);
+        }
         setBindTime(times);
-    }, [now.date()]);
+    }, [now.hour()]);
     /**
      *  현재 날짜로부터 3시간별로 날씨 조회
      */
@@ -216,7 +268,15 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
 
             setShortForecast(weatherData);
         }
-    }, [mediumForecast, bindTime])
+    }, [mediumForecast, bindTime, now.hour()])
+    /*
+     *  날씨 조회 시, 키값 존재 여부 확인
+     */
+    const [hasValue, setHasValue] = useState(false);
+
+    useEffect(() => {
+        setHasValue(Object.keys(weatherMap).length > 0)
+    }, [weatherMap]);
 
     return (
         <div className="board weatherio-container">
@@ -274,7 +334,10 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
                         {/*
                             - # 중기예보 조회
                          */}
-                        <MediumForecast hostForecast={setMediumForecast}/>
+                        <MediumForecast 
+                            hostForecast={setMediumForecast}
+                            hostAirCondition={setAirCondition}
+                        />
                         <div className="box five-days">
                             <div className="blue-cycle"></div>
                             <div className="sort">
@@ -311,30 +374,110 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
                                 <div className="box-box">
                                     <div className="section">
                                         <div className="box">
-                                            
+                                            {/*
+                                                - # 미세먼지
+                                            */}
+                                            <div className="flat">
+                                                <h4>Air Quality Index</h4>
+                                                <div className={`value ${hasData ? pollution.status.toLowerCase() : "default"}`}>{hasData ? pollution.status : ""}</div>
+                                            </div>
+                                            <div className="icon air">
+                                                <img src="https://bmcdn.nl/assets/weather-icons/v3.0/fill/svg/mist.svg"/>
+                                            </div>
+                                            <section>
+                                                <div className="conditions">
+                                                    <div className="sort-on">
+                                                        <h6>PM2.5</h6>
+                                                        <span>{hasData ? pollution.condition.pm2_5 : null}</span>
+                                                    </div>
+                                                    <div className="sort-on">
+                                                        <h6>SO2</h6>
+                                                        <span>{hasData ? pollution.condition.so2 : null}</span>
+                                                    </div>
+                                                    <div className="sort-on">
+                                                        <h6>NO2</h6>
+                                                        <span>{hasData ? pollution.condition.no2 : null}</span>
+                                                    </div>
+                                                    <div className="sort-on">
+                                                        <h6>O3</h6>
+                                                        <span>{hasData ? pollution.condition.o3 : null}</span>
+                                                    </div>
+                                                </div>
+                                            </section>
                                         </div>
                                     </div>
                                     <div className="section">
                                         <div className="box">
-
+                                            <h4>Humidity</h4>
+                                            {/* @todo: 습도 삽입 */}
+                                            <div className="icon">
+                                                <img src="https://bmcdn.nl/assets/weather-icons/v3.0/line/svg/humidity.svg"/>
+                                            </div>
+                                            <div className="status">
+                                                <span>{hasValue ? weatherMap.main.humidity : null}</span>
+                                                <p>%</p>
+                                            </div>
                                         </div>
                                         <div className="box">
-
+                                            <h4>Pressure</h4>
+                                            {/* @todo: 기압 삽입 */}
+                                            <div className="icon">
+                                                <img src="https://bmcdn.nl/assets/weather-icons/v3.0/line/svg/pressure-low.svg"/>
+                                            </div>
+                                            <div className="status">
+                                                <span>{hasValue ? weatherMap.main.pressure : null}</span>
+                                                <p>hPa</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="box-box">
                                     <div className="section">
                                         <div className="box">
-
+                                            {/*
+                                                - # 일출 & 일몰
+                                            */}
+                                            <h4>Sunrise & Sunset</h4>
+                                            <div className="sunrise-and-sunset">
+                                                <div className="sun-status">
+                                                    <img src="https://bmcdn.nl/assets/weather-icons/v3.0/fill/svg/sunrise.svg"/>
+                                                </div>
+                                                <div className="value">
+                                                    <h6>Sunrise</h6>
+                                                    <span>{hasValue ? moment.unix(weatherMap.sys.sunrise).format('h:mm A') : ""}</span>
+                                                </div>
+                                                <div className="sun-status">
+                                                    <img src="https://bmcdn.nl/assets/weather-icons/v3.0/fill/svg/sunset.svg"/>
+                                                </div>
+                                                <div className="value">
+                                                    <h6>Sunset</h6>
+                                                    <span>{hasValue ? moment.unix(weatherMap.sys.sunset).format('h:mm A') : ""}</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="section">
                                         <div className="box">
-
+                                            <h4>Visibility</h4>
+                                            {/* @todo: 가시성 삽입 */}
+                                            <div className="icon">
+                                                <FontAwesomeIcon icon="fa-regular fa-eye" />
+                                            </div>
+                                            <div className="status">
+                                                <span>{hasValue ? (weatherMap.visibility / 1000).toFixed(1) : null}</span>
+                                                <p>km</p>
+                                            </div>
                                         </div>
                                         <div className="box">
-
+                                            <h4>Feels like</h4>
+                                            {/* @todo: 체감온도 삽입 */}
+                                            <div className="icon">
+                                                <FontAwesomeIcon icon="fa-solid fa-temperature-high" />
+                                            </div>
+                                            <div className="status">
+                                                <span>{hasValue ? weatherMap.main.feels_like.toFixed(0) : null}</span>
+                                                <p>℃</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -362,7 +505,6 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
                         <div className="today-at-box sort">
                             {shortForecast.map((forecast, index) => (
                                 <div key={index} className="shortcasts wind">
-                                    <div className="blue-circle"></div>
                                     <span>{forecast.hour}</span>
                                     <div className="arrow">
                                         <FontAwesomeIcon 

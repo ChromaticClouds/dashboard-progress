@@ -3,7 +3,7 @@ import { ResponsiveLine } from "@nivo/line"
 const LineChart = ({ data }) => (
     <ResponsiveLine
         data={data}
-        margin={{ top: 50, right: 30, bottom: 50, left: 30 }}
+        margin={{ top: 30, right: 30, bottom: 30, left: 30 }}
         xScale={{ type: 'point' }}
         yScale={{
             type: 'linear',
@@ -20,7 +20,7 @@ const LineChart = ({ data }) => (
         axisLeft={null}
         enableGridX={false}
         enableGridY={false}
-        colors={{ scheme: 'dark2' }}
+        colors={'#1f2f40'}
         enablePoints={false}
         pointSize={10}
         pointColor={{ theme: 'background' }}

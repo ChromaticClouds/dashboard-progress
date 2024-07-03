@@ -1,0 +1,57 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+@font-face {
+    font-family: "GMM";
+    src: url("../fonts/GmarketSansTTFMedium.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "GML";
+    src: url("../fonts/GmarketSansTTFLight.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "GSR";
+    src: url("../fonts/ProductSans-Regular.ttf") format("truetype");
+}
+
+.to-chart {
+    padding-left: 20px;
+}
+
+.link-to {
+    color: inherit;
+    text-decoration: none;
+    padding: 10px;
+}
+
+.border {
+    border-right: 1px solid gray;
+    padding: 5px;
+}
+
+.table-container {
+    display: flex;
+    justify-content: center;
+}
+
+.table-box {
+    padding: 20px;
+    position: relative;
+    display: flex;
+    overflow-x: scroll;
+}
+
+.table-binder {
+    margin: 5px;
+    padding: 15px;
+    border-radius: 10px;
+    height: 0;
+    flex-shrink: 0;
+    box-shadow: 0 0 5px 0 gray;
+    background-color: white;
+}
+

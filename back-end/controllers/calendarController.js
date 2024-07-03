@@ -41,7 +41,6 @@ const deleteSchedules = async (req, res) => {
     }
 };
 
-
 module.exports = {
     createSchedule, 
     getSchedules,

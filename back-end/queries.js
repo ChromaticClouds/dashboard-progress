@@ -114,12 +114,16 @@ const sensorQueries = [
     `SELECT soil_humid, plant_id FROM growth`,
     `
     SELECT
-        FLOOR((DATEDIFF(environment.timestamp, plant.timestamp) / 7) + 1) AS week,
-        SUM(water_supply) AS week_watering
-    FROM 
-        environment, plant
-    GROUP BY
-        week;
+        SUM(water_supply) AS this_week_watering
+    FROM
+        environment
+    WHERE
+        date_format(timestamp,'%Y-%m-%d')
+        BETWEEN
+            (SELECT ADDDATE(CURDATE(), - WEEKDAY(CURDATE()) + 0 ))
+        AND
+            (SELECT ADDDATE(CURDATE(), - WEEKDAY(CURDATE()) + 6 ))
+        ORDER BY timestamp DESC;
     `
 ]
 

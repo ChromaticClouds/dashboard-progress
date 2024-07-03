@@ -84,6 +84,7 @@ const socketEvents = (socket, sp) => {
                 environment_id = (SELECT MAX(environment_id) FROM environment) 
             AND 
                 water_supply > 0;`;
+                
         try {
             const results = await query(sql);
             const recent = new Date(results[0].timestamp);

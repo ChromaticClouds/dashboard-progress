@@ -33,7 +33,7 @@ const io = Server(server, {
 });
 
 const sp = new SerialPort({
-    path: "COM4",
+    path: "COM3",
     baudRate: 9600,
     dataBits: 8,
     stopBits: 1,

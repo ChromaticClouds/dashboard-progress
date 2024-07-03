@@ -2,6 +2,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFillDrip, faFan, faLightbulb, faBarsProgress, faTemperatureLow, faWifi, faSeedling, faFire } from '@fortawesome/free-solid-svg-icons';
 
 const getSensorIcon = (sensorType) => {
+    /**
+     *  - # 키-값 형태로 센서 이름 및 아이콘 정렬
+     */
     const iconMap = {
         "Water Pump": faFillDrip,
         "Cooling Fan": faFan,
@@ -21,13 +24,18 @@ const getSensorIcon = (sensorType) => {
 
     return iconMap[sensorType] || null;
 };
-
-const Monitoring = ({ monitoring_data }) => {
+/** - # --------------------------------------- # -
+ *      props로 전달받은 monitoring 스테이트 처리
+ *  - # */
+const Monitoring = ({ monitoring }) => {
     return (
         <div>
-            {monitoring_data.map((control, index) => (
+            {monitoring.map((control, index) => (
                 <div key={index} className="control-item">
                     <div className="control-icon-sort">
+                        {/*
+                            - # 각 센서 타입에 따른 아이콘 정의
+                        */}
                         <p>
                             {getSensorIcon(control.sensor_type) && (
                                 <FontAwesomeIcon icon={getSensorIcon(control.sensor_type)} />
@@ -35,14 +43,23 @@ const Monitoring = ({ monitoring_data }) => {
                         </p>
                     </div>
                     <div className="control-value1">
+                        {/*
+                            - # 1. 각 센서 타입명 정의
+                        */}
                         <p>{control.sensor_type}</p>
                     </div>
                     <div className="control-value2">
+                        {/*
+                            - # 2. 각 센서당 파워값 처리 (binary type)
+                        */}
                         <p style={{ color: control.power === 1 ? "teal" : "orange" }}>
                             {control.power === 1 ? "▲" : "▼"}
                         </p>
                     </div>
                     <div className="control-value3">
+                        {/*
+                            - # 3. 각 센서당 센서값 처리
+                        */}
                         <p>{control.measures}</p>
                     </div>
                 </div>

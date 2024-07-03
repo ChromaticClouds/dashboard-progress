@@ -1,17 +1,40 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import StreamingResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 import cv2
 from ultralytics import YOLO
 import torch
 import threading
 import time
+from collections import defaultdict
+import asyncio
+import json
+from datetime import datetime
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")  # Set the templates directory
+
+# Allow CORS for React app
+origins = ["http://localhost:5173"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Check if GPU is available and load the model accordingly
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model = YOLO("yolov8n.pt").to(device)  # Load the model to GPU if available
-model2 = YOLO("tomato_best.pt").to(device)
+model2 = YOLO("tomato_re_detect.pt").to(device)
+model3 = YOLO("leaves_detect.pt").to(device)
+
+# Track counts of each class
+counts = defaultdict(int)
+frame_interval = 30  # Interval to reset counts
+current_frame = 0
 
 class VideoCamera:
     def __init__(self):
@@ -75,6 +98,45 @@ def video_feed():
 @app.get("/video_feed_tomato")
 def video_feed_tomato():
     return StreamingResponse(gen_frames(model2), media_type='multipart/x-mixed-replace; boundary=frame')
+
+@app.get("/video_feed_leaves")
+def video_feed_tomato():
+    return StreamingResponse(gen_frames(model3), media_type='multipart/x-mixed-replace; boundary=frame')
+
+@app.get("/chart")
+def chart(request: Request):
+    return templates.TemplateResponse("chart.html", {"request": request})
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            ret, frame = camera.get_frame()
+            if not ret:
+                await asyncio.sleep(0.01)
+                continue
+
+            # YOLO inference with model2
+            results = model2(frame)
+
+            # Count detected classes
+            frame_counts = defaultdict(int)
+            for result in results:
+                for cls in result.boxes.cls:
+                    frame_counts[int(cls)] += 1
+
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            data = {
+                "time": current_time,
+                "ripe": frame_counts.get(0, 0),  # Update according to your class IDs
+                "rotten": frame_counts.get(1, 0),
+                "unripe": frame_counts.get(2, 0)
+            }
+            await websocket.send_text(json.dumps(data))
+            await asyncio.sleep(1)  # Send data every second
+    except WebSocketDisconnect:
+        pass
 
 if __name__ == "__main__":
     import uvicorn
