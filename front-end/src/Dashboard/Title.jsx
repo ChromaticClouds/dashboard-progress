@@ -14,7 +14,8 @@ import Control from "./Control";
 import Chart from "./Chart2";
 import Video from "../Stream/Video";
 import WeatherIO from "../Weather/WeatherIO";
-import Footer from "../Footer/Footer"
+import Footer from "../Footer/Footer";
+import Notification from "../Notification/Notification";
 
 library.add(fas);
 
@@ -175,6 +176,9 @@ const Title = () => {
                     </div>
                 </div>
                 <div className = "contents-panel">
+                    <div className="pop-up">
+                        <Notification/>
+                    </div>
                     {icons.map((icon, index) => (
                         <div
                             key={index}
@@ -198,7 +202,9 @@ const Title = () => {
                                 />
                             }
                             {
-                                index === 3 && <Control />
+                                index === 3 && <Control
+
+                                />
                             }
                             {
                                 index === 4 && <Video 

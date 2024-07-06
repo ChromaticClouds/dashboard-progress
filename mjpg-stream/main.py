@@ -27,9 +27,9 @@ app.add_middleware(
 
 # Check if GPU is available and load the model accordingly
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-model = YOLO("yolov8n.pt").to(device)  # Load the model to GPU if available
-model2 = YOLO("tomato_re_detect.pt").to(device)
-model3 = YOLO("leaves_detect.pt").to(device)
+model = YOLO("./models/yolov8n.pt").to(device)  # Load the model to GPU if available
+model2 = YOLO("./models/tomato_re_detect.pt").to(device)
+model3 = YOLO("./models/leaves_detect.pt").to(device)
 
 # Track counts of each class
 counts = defaultdict(int)

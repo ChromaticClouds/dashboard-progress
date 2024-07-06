@@ -195,6 +195,31 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+}
+
+.waterpump .container.sort .power {
+    z-index: 1;
+    font-size: 24px;
+    font-family: "GMM";
+    font-weight: 600;
+    color: #3648d2;
+    transform: rotate(-45deg);
+}
+
+.waterpump .container.sort .white-circle {
+    z-index: 0;
+    top: -15px;
+    left: 35px;
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: rotate(45deg);
+    background-color: #fff;
+    border-radius: 40px;
 }
 
 .waterpump .box {

@@ -137,7 +137,7 @@ const Chart = ({ viewWeatherMap }) => {
                                 </div>
                             </div><div className = "chart-box sort">
                                 <div className = "chart4">
-                                    
+                                    <div>Co2</div>
                                 </div>
                             </div>
                         </div>

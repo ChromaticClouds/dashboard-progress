@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Icon } from "../Icon/Icon";
 
 let socket;
-const Control = () => {
+const Control = ({ forceControl }) => {
     useEffect(() => {
         socket = io.connect("http://localhost:5000");
 
@@ -93,7 +93,7 @@ const Control = () => {
         })
     }, []);
 
-    const water_level = water_lev;
+    const water_level = water_lev ? water_lev : 0;
 
     // LED 슬라이더 3개 value 스테이트 저장
     const slider_changed_1 = (input) => {
@@ -594,6 +594,9 @@ const Control = () => {
                                 </div>
                             </div>
                             <div className = 'container sort'>
+                                <div className='white-circle'>
+                                    <span className='power'>{checked ? (watering ? "ON" : "OFF") : "AUTO"}</span>
+                                </div>
                                 <div className = 'circle'>
                                     <div className = 'skill'>
                                         <div className="outer">

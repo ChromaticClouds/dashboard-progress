@@ -94,7 +94,7 @@ const StreamChart = ({ hostValue }) => {
          * 데이터 배열에서 각 항목의 'ripe', 'unripe', 'rotten' 값을 사용하여 생산 수율을 계산하고, 이를 부모 컴포넌트에 콜백 함수로 전달
          */
         const value = dataRef.current.map(item => (item.ripe / (item.ripe + item.unripe + item.rotten)) * 100);
-
+        
         hostValue(value);
     }, [harvestable]);
     /**
