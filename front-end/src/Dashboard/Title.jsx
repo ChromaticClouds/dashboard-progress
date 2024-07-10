@@ -16,6 +16,8 @@ import Video from "../Stream/Video";
 import WeatherIO from "../Weather/WeatherIO";
 import Footer from "../Footer/Footer";
 import Notification from "../Notification/Notification";
+import NotificationBox from "../Notification/NotificationBox";
+import OpenAI from "../Prediction/OpenAI";
 
 library.add(fas);
 
@@ -94,7 +96,9 @@ const Title = () => {
             });
         };
     }, [sectionRefs]);
-
+    /**
+     *  - # info-contents 패널의 화살표 클릭 이벤트 스테이트 저장
+     */
     const [rotated, set_rotated] = useState(false);
 
     const rotate = () => {
@@ -105,7 +109,9 @@ const Title = () => {
 
     const [visible, setVisible] = useState(false);
     const [date, setDate] = useState({});
-
+    /**
+     *  - # Video 컴포넌트 및 Embed 컴포넌트의 이벤트 관리 스테이트
+     */
     const [onCancel, setOnCancel] = useState(true);
     const [embed, setEmbed] = useState(<div></div>);
     const [embedError, setEmbedError] = useState(false);
@@ -144,6 +150,20 @@ const Title = () => {
      *  - # OpenWeatherMap 데이터 props로 전달하기 위한 state 선언
      */
     const [weatherMap, setWeatherMap] = useState([]);
+    const [isClicked, setIsClicked] = useState(false); /* 노티피케이션 알림 클릭 여부 */
+    const [isEntered, setIsEntered] = useState(false);
+    /**
+     *  - # Notification POST 요청 디텍션
+     */
+    const [noticePost, setNoticePost] = useState([]);
+    const [noticeCount, setNoticeCount] = useState(() => {
+        const savedCount = localStorage.getItem('noticeCount');
+        return savedCount ? parseInt(savedCount, 10) : 0;
+    });
+    /*---------------------------------------------------------------------------------*\
+        # POST 요청 성공 시, 로컬 스토리지에 영구 저장된 노티피케이션 데이터와 함께 로드 #
+    \*---------------------------------------------------------------------------------*/
+    const [unreadNotice, setUnreadNotice] = useState([]);
 
     return (
         <div>
@@ -172,12 +192,45 @@ const Title = () => {
                                     />
                                 </div>
                             ))}
+                            <div className="notice">
+                                <p className={`notice-count ${noticeCount !== 0 ? "exist" : ""}`}>
+                                    {noticeCount !== 0 ? noticeCount : null}
+                                </p>
+                                <FontAwesomeIcon
+                                    icon="fa-solid fa-bell"
+                                    className={isClicked ? "clicked_icon" : "icon"}
+                                    onClick={() => {
+                                        setIsClicked(!isClicked);
+                                        localStorage.setItem('noticeCount', '0');
+                                        setNoticeCount(0);
+                                        if (!isClicked) {
+                                            setUnreadNotice([]);
+                                            localStorage.setItem('unreadNotice', JSON.stringify([]));
+                                        }
+                                    }}
+                                    onMouseEnter={() => setIsEntered(true)}
+                                    onMouseLeave={() => setIsEntered(false)}
+                                />
+                                <div>
+                                    <NotificationBox 
+                                        popupNotification={isClicked}
+                                        hostNotification={noticePost}
+                                        hostMark={unreadNotice}
+                                        popupStatus={setIsClicked}
+                                        enterEvent={isEntered}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div className = "contents-panel">
                     <div className="pop-up">
-                        <Notification/>
+                        <Notification 
+                            hostNotification={setNoticePost}
+                            setNoticeCount={setNoticeCount}
+                            unreadNotice={setUnreadNotice}
+                        />
                     </div>
                     {icons.map((icon, index) => (
                         <div
@@ -297,6 +350,7 @@ const Title = () => {
                     </div>
                 </div>
             </div>
+            <OpenAI />
         </div>
     );
 };

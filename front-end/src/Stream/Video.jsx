@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from 'axios'
 import "./Video.css";
+
+import Display from "../Prediction/Display";
 
 const Video = ({ setEmbed, onCancel, setEmbedError }) => {
     const [imageErrorA, setImageErrorA] = useState(false);
@@ -98,6 +99,12 @@ const Video = ({ setEmbed, onCancel, setEmbedError }) => {
                         )
                     )}
                 </div>
+            </div>
+            <div className="prediction-container">
+                <h3 className="title">Diseases Results</h3>
+                <section className="prediction-box">
+                    <Display />
+                </section>
             </div>
         </div>
     );

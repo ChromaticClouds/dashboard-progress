@@ -2,13 +2,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import io from "socket.io-client";
 import "./Control.css";
 
-import BulletChart from '../../chart/BulletChart';
-import BulletChart2 from '../../chart/BulletChart2';
+import BulletChart from '../../Chart/BulletChart';
+import BulletChart2 from '../../Chart/BulletChart2';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Icon } from "../Icon/Icon";
 
 let socket;
-const Control = ({ forceControl }) => {
+const Control = () => {
     useEffect(() => {
         socket = io.connect("http://localhost:5000");
 

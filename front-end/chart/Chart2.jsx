@@ -13,7 +13,7 @@ import {
     Tooltip,
     Legend
 } from "chart.js";
-import GrowthChart from "./Chart1";
+import GrowthChart from "./Chart";
 import plugin from "chartjs-plugin-datalabels";
   
 ChartJS.register(CategoryScale, LinearScale, PointElement, BarElement, LineElement, Title, Tooltip, Legend);

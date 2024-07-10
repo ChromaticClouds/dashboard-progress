@@ -1,12 +1,15 @@
 import { React, useEffect, useState } from "react";
 import io from "socket.io-client";
 import moment from "moment";
-import LineChart from "../../chart/LineChart";
+import LineChart from "../../Chart/LineChart";
 import Monitoring from "../Monitoring/Monitoring";
-import StreamChart from "../StreamChart/StreamChart"
+import StreamChart from "../Prediction/StreamChart"
 
 import "./Summary.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { MdCo2 } from "react-icons/md";
+import { GiWateringCan } from "react-icons/gi";
+import { PiPottedPlantFill } from "react-icons/pi";
 
 let socket;
 const Summary = () => {
@@ -333,9 +336,8 @@ const Summary = () => {
                         <h4 className = "sensor-box-title">Farm Statistics</h4>
                         <div className = "sensor-box">
                             <div>
-                                <FontAwesomeIcon 
-                                    icon="fa-solid fa-seedling"
-                                    className = "sensor-icon"
+                                <PiPottedPlantFill
+                                    className="sensor-icon"
                                 />
                             </div>
                             <div>
@@ -351,19 +353,28 @@ const Summary = () => {
                             </div>
                         </div>
                         <div className = "sensor-box">
-                            <FontAwesomeIcon 
-                                icon="fa-solid fa-fill-drip"
-                                className = "sensor-icon"
+                            <GiWateringCan 
+                                className="sensor-icon"
                             />
                             <div>
                                 <h3>Watering Amount</h3>
-                                <div className = "watering-disc">This Week</div>
+                                <div className = "sensor-disc">This Week</div>
                             </div>
                             <div className="sensor-value">
                                 {hasValue && watering ? watering : 0}
                             </div>
                         </div>
                         <div className = "sensor-box">
+                            <MdCo2 
+                                className = "sensor-icon"
+                            />
+                            <div>
+                                <h3>Co2 Density</h3>
+                                <div className = "sensor-disc">Now</div>
+                            </div>
+                            <div className="sensor-value">
+                                {hasValue && watering ? watering : 0}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -381,7 +392,7 @@ const Summary = () => {
                     </div>
                     <div className = "harvest-box-sort">
                         <h4 className = "monitoring-title">Available Harvest</h4>
-                        <div className = "harvest-box">
+                        <div>
                             {/* @todo: 생산가능성 표기 */}
                             <span>{`${isEmpty || isNaN(hostValue.slice(-1)[0]) ? '0 %' : `${hostValue.slice(-1)[0].toFixed(0)} %`}`}</span>
                             <StreamChart hostValue={setHostValue}/>

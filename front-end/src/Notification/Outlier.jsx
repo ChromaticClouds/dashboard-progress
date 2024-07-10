@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 
 const Outlier = ({ hostOutlier }) => {
@@ -7,17 +7,14 @@ const Outlier = ({ hostOutlier }) => {
 
     useEffect(() => {
         const socketIo = io("http://localhost:5000");
-        /**
-         *  - # 소켓 이벤트 수신
-         */
+
         const hostSensorData = (data) => {
-            setSensorData(data)
+            setSensorData(data);
         };
+
         socketIo.on('sensor data', hostSensorData);
         setSocket(socketIo);
-        /**
-         *  - # 소켓 이벤트 정리
-         */
+
         return () => {
             if (socket) {
                 socketIo.off('sensor data', hostSensorData);
@@ -25,84 +22,64 @@ const Outlier = ({ hostOutlier }) => {
             }
         };
     }, []);
-    /**
-     *  - # 이상치 스테이트 관리
-     */
-    const [tempOver, setTempOver] = useState({
-        high: false,
-        low: false
-    });
-    const [soilHumidOver, setSoilHumidOver] = useState({
-        high: false,
-        low: false
-    });
-    const [waterLevelOver, setWaterLevelOver] = useState(false);
+
+    // 개별 센서 값에 대한 이상치 여부를 관리
+    const [isTempHigh, setIsTempHigh] = useState(false);
+    const [isTempLow, setIsTempLow] = useState(false);
+    const [isSoilHumidHigh, setIsSoilHumidHigh] = useState(false);
+    const [isSoilHumidLow, setIsSoilHumidLow] = useState(false);
+    const [isWaterLevelLow, setIsWaterLevelLow] = useState(false);
 
     useEffect(() => {
-        if (sensorData) {
-            /**
-             *  - # 각 센서 간의 임계값 정의
-             */
-            const isTempHigh = sensorData.temperature >= 35
-            const isTempLow = sensorData.temperature <= 20
-            setTempOver({
-                high: isTempHigh,
-                low: isTempLow
-            });
+        if (sensorData?.temperature !== undefined) { // 옵셔널 체이닝 연산자 사용
+            const tempHigh = sensorData.temperature >= 35;
+            const tempLow = sensorData.temperature <= 20;
 
-            const isSoilHumidHigh = sensorData.soilHumidity >= 80;
-            const isSoilHumidLow = sensorData.soilHumidity <= 30;
-            setSoilHumidOver({
-                high: isSoilHumidHigh,
-                low: isSoilHumidLow
-            });
-
-            const isWaterLevelOver = sensorData.water_level < 30;
-            setWaterLevelOver(isWaterLevelOver)
+            if (tempHigh !== isTempHigh) setIsTempHigh(tempHigh);
+            if (tempLow !== isTempLow) setIsTempLow(tempLow);
         }
-    }, [sensorData])
-
-    /**
-     *  - # 이상치 밸류 변화 시, 스테이트 저장
-     */
-    const [previousOutlier, setPreviousOutlier] = useState({});
+    }, [sensorData?.temperature]); // 옵셔널 체이닝 연산자 사용
 
     useEffect(() => {
-        const newOutlier = {
+        if (sensorData?.soilHumidity !== undefined) { // 옵셔널 체이닝 연산자 사용
+            const soilHumidHigh = sensorData.soilHumidity >= 80;
+            const soilHumidLow = sensorData.soilHumidity <= 30;
+
+            if (soilHumidHigh !== isSoilHumidHigh) setIsSoilHumidHigh(soilHumidHigh);
+            if (soilHumidLow !== isSoilHumidLow) setIsSoilHumidLow(soilHumidLow);
+        }
+    }, [sensorData?.soilHumidity]); // 옵셔널 체이닝 연산자 사용
+
+    useEffect(() => {
+        if (sensorData?.water_level !== undefined) { // 옵셔널 체이닝 연산자 사용
+            const waterLevelLow = sensorData.water_level < 30;
+
+            if (waterLevelLow !== isWaterLevelLow) setIsWaterLevelLow(waterLevelLow);
+        }
+    }, [sensorData?.water_level]); // 옵셔널 체이닝 연산자 사용
+
+    useEffect(() => {
+        const outliers = {
             temp_out: {
-                high: tempOver.high,
-                low: tempOver.low
+                high: isTempHigh,
+                low: true
             },
             soil_humid_out: {
-                high: soilHumidOver.high,
-                low: soilHumidOver.low
+                high: isSoilHumidHigh,
+                low: isSoilHumidLow // 예제에서는 항상 true로 설정하셨습니다.
             },
-            water_level_out: waterLevelOver
+            water_level_out: isWaterLevelLow
         };
 
-        const changedOutliers = Object.keys(newOutlier).reduce((acc, key) => {
-            if (typeof newOutlier[key] === 'object') {
-                const subChanges = Object.keys(newOutlier[key]).reduce((subAcc, subKey) => {
-                    if (newOutlier[key][subKey] !== previousOutlier[key]?.[subKey]) {
-                        subAcc[subKey] = newOutlier[key][subKey];
-                    }
-                    return subAcc;
-                }, {});
+        const prevOutliers = JSON.parse(localStorage.getItem('prevOutliers'));
 
-                if (Object.keys(subChanges).length > 0) {
-                    acc[key] = subChanges;
-                }
-            } else if (newOutlier[key] !== previousOutlier[key]) {
-                acc[key] = newOutlier[key];
-            }
-            return acc;
-        }, {});
-
-        if (Object.keys(changedOutliers).length > 0) {
-            hostOutlier(changedOutliers);
-            setPreviousOutlier(newOutlier);
+        if (JSON.stringify(prevOutliers) !== JSON.stringify(outliers)) {
+            hostOutlier(outliers);
+            localStorage.setItem('prevOutliers', JSON.stringify(outliers));
         }
-    }, [tempOver, soilHumidOver, waterLevelOver]);
+    }, [isTempHigh, isTempLow, isSoilHumidHigh, isWaterLevelLow]);
+
+    return null;  // 이 컴포넌트는 렌더링하지 않습니다.
 }
 
 export default Outlier;

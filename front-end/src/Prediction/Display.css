@@ -1,0 +1,19 @@
+.prediction-list {
+    width: 1210px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.prediction-list > div {
+    font-family: "GSR";
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 120px;
+}
+
+.prediction-list > div > div {
+    font-weight: lighter;
+    font-size: 24px;
+}

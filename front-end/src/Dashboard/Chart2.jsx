@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 
-import GrowthChart from "../../chart/Chart1";
-import THChart from "../../chart/Chart2";
-import SoilHumidChart from "../../chart/Chart4";
-import WaterSupply from "../../chart/Chart3";
-import GrowthDoughnut from "../../chart/Chart5";
-import BrightnessChart from "../../chart/Chart6";
-import TempSub from "../../chart/SubChart1"
-import WindSub from "../../chart/SubChart2";
-import HumidSub from "../../chart/SubChart3";
+import GrowthChart from "../../Chart/Chart";
+import THChart from "../../Chart/Chart2";
+import SoilHumidChart from "../../Chart/Chart4";
+import WaterSupply from "../../Chart/Chart3";
+import GrowthDoughnut from "../../Chart/Chart5";
+import BrightnessChart from "../../Chart/Chart6";
+import TempSub from "../../Chart/SubChart1"
+import WindSub from "../../Chart/SubChart2";
+import HumidSub from "../../Chart/SubChart3";
+import DiseasesChart from "../../Chart/DiseasesChart";
+import Classification from "../Prediction/Classification";
 import './Chart2.css';
 
 const Chart = ({ viewWeatherMap }) => {
@@ -61,12 +63,15 @@ const Chart = ({ viewWeatherMap }) => {
 
         set_direction(deg);
         set_wind_speed(speed);
-    }, [weather])
+    }, [weather]);
+
+    const [predictions, setPredictions] = useState({});
 
     return (
         <div className = "board">
             <>
                 <WindSub set_weather = { set_weather }/>
+                <Classification predictions = {setPredictions}/>
             </>
             <div className = "sub-contents">
                 <h4 className = 'subtitle'>Chart Panel</h4>
@@ -145,6 +150,13 @@ const Chart = ({ viewWeatherMap }) => {
                             <div className = "chart5">
                                 <BrightnessChart />
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="chart-container">
+                    <div className="chart-box">
+                        <div className="chart6">
+                            <DiseasesChart diseasesList={predictions}/>
                         </div>
                     </div>
                 </div>

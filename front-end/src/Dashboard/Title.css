@@ -315,7 +315,7 @@ body {
     flex-direction: column;
 }
 
-.icon-array .icon {
+.icons .icon {
     width: 36px;
     height: 36px;
     padding: 12px;
@@ -323,12 +323,12 @@ body {
     margin-bottom: 40px;
 }
 
-.icon-array .icon:hover {
+.icons .icon:hover {
     background-color: #e5e5dd;
     cursor: pointer;
 }
 
-.icon-array .clicked_icon {
+.icons .clicked_icon {
     color: white;
     width: 36px;
     height: 36px;
@@ -390,4 +390,29 @@ footer p {
     display: flex;
     justify-content: center;
     width: 100%;
+}
+
+.notice {
+    position: relative;
+}
+
+.notice-count.exist {
+    position: absolute;
+    right: 0;
+    background-color: #dc5858;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "GMM";
+    margin: 0;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 14px;
+}
+
+.notice-count {
+    display: none;
 }

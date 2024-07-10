@@ -13,7 +13,6 @@ import json
 from datetime import datetime
 
 app = FastAPI()
-templates = Jinja2Templates(directory="templates")  # Set the templates directory
 
 # Allow CORS for React app
 origins = ["http://localhost:5173"]
@@ -27,7 +26,7 @@ app.add_middleware(
 
 # Check if GPU is available and load the model accordingly
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-model = YOLO("./models/yolov8n.pt").to(device)  # Load the model to GPU if available
+model = YOLO("./models/tomato_classification.pt").to(device)  # Load the model to GPU if available
 model2 = YOLO("./models/tomato_re_detect.pt").to(device)
 model3 = YOLO("./models/leaves_detect.pt").to(device)
 
@@ -103,11 +102,44 @@ def video_feed_tomato():
 def video_feed_tomato():
     return StreamingResponse(gen_frames(model3), media_type='multipart/x-mixed-replace; boundary=frame')
 
-@app.get("/chart")
-def chart(request: Request):
-    return templates.TemplateResponse("chart.html", {"request": request})
+@app.websocket("/diseases")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        while True:
+            ret, frame = camera.get_frame()
+            if not ret:
+                await asyncio.sleep(0.01)
+                continue
+            
+            results = model3(frame)
+            
+            frame_counts = defaultdict(int)
+            for result in results:
+                for cls in result.boxes.cls:
+                    frame_counts[int(cls)] += 1
+                    
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            data = {
+                "time": current_time,
+                "early_blight": frame_counts.get(0, 0),
+                "healthy": frame_counts.get(1, 0),
+                "late_blight": frame_counts.get(2, 0),
+                "leaf_miner": frame_counts.get(3, 0),
+                "leaf_mold": frame_counts.get(4, 0),
+                "mosaic_virus": frame_counts.get(5, 0),
+                "septoria": frame_counts.get(6, 0),
+                "spider_mites": frame_counts.get(7, 0),
+                "yellow_leaf_curl_virus": frame_counts.get(8, 0)
+            }
+            
+            await websocket.send_text(json.dumps(data))
+            await asyncio.sleep(1)
+    except WebSocketDisconnect:
+        pass
 
-@app.websocket("/ws")
+
+@app.websocket("/healthy")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:

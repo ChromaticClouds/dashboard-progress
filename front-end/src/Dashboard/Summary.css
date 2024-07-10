@@ -361,7 +361,7 @@
     font-family: "GSR";
 }
 
-.watering-disc {
+.sensor-disc {
     font-family: "GSR";
 }
 
@@ -394,6 +394,7 @@
 }
 
 .harvest-box-sort {
+    position: relative;
     margin-left: 20px;
 }
 
@@ -409,13 +410,14 @@
     padding: 20px;
 }
 
-.harvest-box span {
+.harvest-box-sort span {
     position: absolute;
-    top: 80px;
+    top: 180px;
     left: 20px;
     font-size: 56px;
     font-family: "GSR";
     font-weight: 600;
+    z-index: 1;
 }
 
 .monitoring-disc {

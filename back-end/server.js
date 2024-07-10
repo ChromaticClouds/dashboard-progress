@@ -8,21 +8,19 @@ const { SerialPort } = require('serialport');
 const { ReadlineParser } = require('@serialport/parser-readline');
 const { socketEvents } = require('./socketEvents');
 const calendarRouter = require('./routes/calendarRoutes');
-const monthRouter = require("./routes/monthRoutes.js")
+const monthRouter = require("./routes/monthRoutes.js");
+const notificationRouter = require("./routes/notificationRoutes.js")
 
 const app = express();
 app.use(cors());
 
 const { server2 } = require('./chart');
 
-mongoose.connect('mongodb://localhost:27017/todo-list')
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB connection error:', err));
-
 app.use(bodyParser.json());
 
 app.use('/api/calendar', calendarRouter);
 app.use('/api/calendar/month', monthRouter);
+app.use('/api/notification', notificationRouter);
 
 const server = http.createServer(app);
 const io = Server(server, {

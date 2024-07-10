@@ -1,6 +1,6 @@
 import { React, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import WindSub from "../../chart/SubChart2";
+import WindSub from "../../Chart/SubChart2";
 import './Weather.css'
 
 const Weather2 = ({ set_current, viewWeather }) => {

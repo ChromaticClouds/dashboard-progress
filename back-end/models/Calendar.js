@@ -1,3 +1,4 @@
+const { db1 } = require("../config/database");
 const mongoose = require('mongoose');
 
 const todoSchema = new mongoose.Schema({
@@ -16,6 +17,6 @@ const todoSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now }
 });
 
-const Todo = mongoose.model('todo-inputs', todoSchema);
+const Todo = db1.model('todo-inputs', todoSchema);
 
 module.exports = Todo;
