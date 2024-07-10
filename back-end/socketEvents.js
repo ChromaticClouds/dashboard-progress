@@ -1,10 +1,11 @@
 const { query, envQueries, weekQueries, sensorQueries, growthQueries, monitoringQuery } = require('./queries');
-const OpenAI = require("openai");
+const { Configuration, OpenAIApi } = require('openai');
 require('dotenv').config();
 
-const openai = new OpenAI({
+const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
 });
+const openai = new OpenAIApi(configuration);
 
 const socketEvents = (socket, sp) => {
     socket.on("env req", async () => {
