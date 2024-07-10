@@ -1,8 +1,9 @@
 const { query, envQueries, weekQueries, sensorQueries, growthQueries, monitoringQuery } = require('./queries');
 const OpenAI = require("openai");
+require('dotenv').config();
 
 const openai = new OpenAI({
-    apiKey: 'sk-proj-Xl8VzpFqWXluYouMhOyjT3BlbkFJqMVf6dqXFmyGyGSAhzLA',
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
 const socketEvents = (socket, sp) => {

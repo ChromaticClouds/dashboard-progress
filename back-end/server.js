@@ -9,7 +9,8 @@ const { ReadlineParser } = require('@serialport/parser-readline');
 const { socketEvents } = require('./socketEvents');
 const calendarRouter = require('./routes/calendarRoutes');
 const monthRouter = require("./routes/monthRoutes.js");
-const notificationRouter = require("./routes/notificationRoutes.js")
+const notificationRouter = require("./routes/notificationRoutes.js");
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
