@@ -1,85 +1,75 @@
-import React, { useEffect, useState, useRef } from "react";
-import { io } from "socket.io-client";
+import { useEffect, useState, useMemo } from "react";
+import useSocket from "../hooks/socket/useSocket";
+import useOutlierStore from "../hooks/outlier/useOutlierStore";
 
-const Outlier = ({ hostOutlier }) => {
-    const [socket, setSocket] = useState(null);
+const Outlier = () => {
+    const { receivedData } = useSocket(
+        import.meta.env.VITE_SOCKET_URL,
+        'sensor data'
+    );
+
     const [sensorData, setSensorData] = useState({});
 
     useEffect(() => {
-        const socketIo = io("http://localhost:5000");
+        if (receivedData) {
+            setSensorData(receivedData);
+        }
+    }, [receivedData]);
+    /**
+     * 이상치 여부 관리
+     */
+    const thresholds = useMemo(() => ({
+        temperature: { min: 20, max: 40 },
+        humidity: { min: 40, max: 90 },
+        waterLevel: { min: 3 } // cm
+    }), []);
 
-        const hostSensorData = (data) => {
-            setSensorData(data);
-        };
+    const anomalyMessages = useMemo(() => ({
+        low: {
+            temperature: 'Temperature is too low',
+            humidity: 'Humidity is too low',
+            waterLevel: 'Water level is too low'
+        },
+        high: {
+            temperature: 'Temperature is too high',
+            humidity: 'Humidity is too high',
+            waterLevel: 'Water level is too high'
+        }
+    }), []);
+    /**
+     * 이상치를 찾아서 message와 type를 포함한 배열을 반환
+     * @param {Object} data - 센서 데이터 객체
+     * @returns {Array} - 이상치 정보가 포함된 배열
+     */
+    const findAnomalies = (data) => {
+        const anomalies = [];
 
-        socketIo.on('sensor data', hostSensorData);
-        setSocket(socketIo);
+        for (const [key, value] of Object.entries(data)) {
+            const { min, max } = thresholds[key] || {};
 
-        return () => {
-            if (socket) {
-                socketIo.off('sensor data', hostSensorData);
-                socketIo.disconnect();
+            if (min !== undefined && value < min) {
+                anomalies.push({
+                    type: 'warning',
+                    message: anomalyMessages.low[key],
+                });
+            } else if (max !== undefined && value > max) {
+                anomalies.push({
+                    type: 'warning',
+                    message: anomalyMessages.high[key],
+                });
             }
-        };
-    }, []);
+        }
 
-    // 개별 센서 값에 대한 이상치 여부를 관리
-    const [isTempHigh, setIsTempHigh] = useState(false);
-    const [isTempLow, setIsTempLow] = useState(false);
-    const [isSoilHumidHigh, setIsSoilHumidHigh] = useState(false);
-    const [isSoilHumidLow, setIsSoilHumidLow] = useState(false);
-    const [isWaterLevelLow, setIsWaterLevelLow] = useState(false);
+        return anomalies;
+    };
+
+    const { setOutlier } = useOutlierStore();
 
     useEffect(() => {
-        if (sensorData?.temperature !== undefined) { // 옵셔널 체이닝 연산자 사용
-            const tempHigh = sensorData.temperature >= 35;
-            const tempLow = sensorData.temperature <= 20;
+        const detectedOutlier = findAnomalies(sensorData);
 
-            if (tempHigh !== isTempHigh) setIsTempHigh(tempHigh);
-            if (tempLow !== isTempLow) setIsTempLow(tempLow);
-        }
-    }, [sensorData?.temperature]); // 옵셔널 체이닝 연산자 사용
-
-    useEffect(() => {
-        if (sensorData?.soilHumidity !== undefined) { // 옵셔널 체이닝 연산자 사용
-            const soilHumidHigh = sensorData.soilHumidity >= 80;
-            const soilHumidLow = sensorData.soilHumidity <= 30;
-
-            if (soilHumidHigh !== isSoilHumidHigh) setIsSoilHumidHigh(soilHumidHigh);
-            if (soilHumidLow !== isSoilHumidLow) setIsSoilHumidLow(soilHumidLow);
-        }
-    }, [sensorData?.soilHumidity]); // 옵셔널 체이닝 연산자 사용
-
-    useEffect(() => {
-        if (sensorData?.water_level !== undefined) { // 옵셔널 체이닝 연산자 사용
-            const waterLevelLow = sensorData.water_level < 30;
-
-            if (waterLevelLow !== isWaterLevelLow) setIsWaterLevelLow(waterLevelLow);
-        }
-    }, [sensorData?.water_level]); // 옵셔널 체이닝 연산자 사용
-
-    useEffect(() => {
-        const outliers = {
-            temp_out: {
-                high: isTempHigh,
-                low: true
-            },
-            soil_humid_out: {
-                high: isSoilHumidHigh,
-                low: isSoilHumidLow // 예제에서는 항상 true로 설정하셨습니다.
-            },
-            water_level_out: isWaterLevelLow
-        };
-
-        const prevOutliers = JSON.parse(localStorage.getItem('prevOutliers'));
-
-        if (JSON.stringify(prevOutliers) !== JSON.stringify(outliers)) {
-            hostOutlier(outliers);
-            localStorage.setItem('prevOutliers', JSON.stringify(outliers));
-        }
-    }, [isTempHigh, isTempLow, isSoilHumidHigh, isWaterLevelLow]);
-
-    return null;  // 이 컴포넌트는 렌더링하지 않습니다.
+        setOutlier(detectedOutlier);
+    }, [sensorData]);
 }
 
 export default Outlier;

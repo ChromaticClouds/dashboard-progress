@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Bar } from 'react-chartjs-2';
-import io from "socket.io-client";
+import useSocket from '../src/hooks/socket/useSocket';
 
 import {
     Chart as ChartJS,
@@ -16,36 +16,31 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, BarElement, Title, Tooltip, Legend);
 
 const GrowthChart = () => {
-    const [socket, set_socket] = useState(null);
     const [growth, set_growth] = useState([]);
     const chart_ref = useRef(null);
 
-    useEffect(() => {
-        const ws = io.connect("http://localhost:5100");
-        set_socket(ws);
-
-        ws.on("growth chart rec", (value) => {
-            set_growth(value[0]);
-        })
-
-        return () => {
-            ws.disconnect();
-        }
-    }, []);
+    const { socket, receivedData } = useSocket(
+        import.meta.env.VITE_SOCKET_URL,
+        'growth chart rec'
+    );
 
     useEffect(() => {
         if (socket) {
-            socket.emit("growth chart req");
-
             const timer = setInterval(() => {
-                socket.emit("growth chart req");
+                socket.emit('growth chart req');
             }, 2000);
 
             return () => {
                 clearInterval(timer);
-            }
+            };
         }
     }, [socket]);
+
+    useEffect(() => {
+        if (receivedData) {
+            set_growth(receivedData[0]);
+        }
+    }, [receivedData]);
 
     const get_gradient = (ctx, chartArea) => {
         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);

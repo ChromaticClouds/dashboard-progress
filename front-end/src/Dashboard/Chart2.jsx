@@ -11,7 +11,6 @@ import TempSub from "../../Chart/SubChart1"
 import WindSub from "../../Chart/SubChart2";
 import HumidSub from "../../Chart/SubChart3";
 import DiseasesChart from "../../Chart/DiseasesChart";
-import Classification from "../Prediction/Classification";
 import './Chart2.css';
 
 const Chart = ({ viewWeatherMap }) => {
@@ -24,7 +23,7 @@ const Chart = ({ viewWeatherMap }) => {
     const [wind_speed, set_wind_speed] = useState(0);
 
     useEffect(() => {
-        const ws = io.connect("http://localhost:5100");
+        const ws = io.connect(import.meta.env.VITE_SOCKET_URL);
         set_socket(ws);
 
         ws.on("temperature sub chart rec", (value) => {
@@ -71,7 +70,6 @@ const Chart = ({ viewWeatherMap }) => {
         <div className = "board">
             <>
                 <WindSub set_weather = { set_weather }/>
-                <Classification predictions = {setPredictions}/>
             </>
             <div className = "sub-contents">
                 <h4 className = 'subtitle'>Chart Panel</h4>
@@ -110,7 +108,11 @@ const Chart = ({ viewWeatherMap }) => {
                             <div className = "chart-box sort">
                                 <div className = "chart4">
                                     <div>Temperature</div>
-                                    <p>{ temperature.map(value => value.inner_temp) }°</p>
+                                    <p>
+                                        {temperature.map((value, index) => 
+                                            <div key={index}>{value.inner_temp}°</div>
+                                        )}
+                                    </p>
                                     <div className = "sub-chart">
                                         <TempSub />
                                     </div>
@@ -135,7 +137,11 @@ const Chart = ({ viewWeatherMap }) => {
                             <div className = "chart-box sort">
                                 <div className = "chart4">
                                     <div>Humidity</div>
-                                    <p>{ humidity.map(value => value.inner_humid) }%</p>
+                                    <p>
+                                        {humidity.map((value, index) => 
+                                            <div key={index}>{value.inner_humid}%</div>
+                                        )}
+                                    </p>
                                     <div className = "sub-chart">
                                         <HumidSub />
                                     </div>

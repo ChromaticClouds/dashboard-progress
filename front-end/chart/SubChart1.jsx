@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Doughnut } from 'react-chartjs-2';
-import io from "socket.io-client";
+import useSocket from "../src/hooks/socket/useSocket";
 
 import {
     Chart as ChartJS,
@@ -14,35 +14,30 @@ import {
 ChartJS.register(ArcElement, LinearScale, Title, Tooltip, Legend);
 
 const TempSub = () => {
-    const [socket, set_socket] = useState(null);
     const [temperature, set_temperature] = useState([]);
 
-    useEffect(() => {
-        const ws = io.connect("http://localhost:5100");
-        set_socket(ws);
-
-        ws.on("temperature sub chart rec", (value) => {
-            set_temperature(value[0]);
-        })
-
-        return () => {
-            ws.disconnect();
-        }
-    }, []);
+    const { socket, receivedData } = useSocket(
+        import.meta.env.VITE_SOCKET_URL,
+        'temperature sub chart rec'
+    );
 
     useEffect(() => {
         if (socket) {
-            socket.emit("temperature sub chart req");
-
             const timer = setInterval(() => {
-                socket.emit("temperature sub chart req");
+                socket.emit('temperature sub chart req');
             }, 2000);
 
             return () => {
                 clearInterval(timer);
-            }
+            };
         }
     }, [socket]);
+
+    useEffect(() => {
+        if (receivedData) {
+            set_temperature(receivedData[0]);
+        }
+    }, [receivedData]);
 
     const inner_temp = temperature.map(data => data.inner_temp);
 

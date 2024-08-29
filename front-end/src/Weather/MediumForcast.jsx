@@ -7,8 +7,7 @@ const MediumForecast = ({ hostForecast, hostAirCondition }) => {
         longitude: null
     })
 
-    const apiKey = "53c642d1e6caac8a761f075ad9f8951b";
-
+    const apiKey = import.meta.env.VITE_FORECAST_KEY;
     /**
      *  - # 위치 호출 메서드
      */

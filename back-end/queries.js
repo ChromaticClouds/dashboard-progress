@@ -1,11 +1,4 @@
-const mysql = require('mysql');
-
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'dct_farm',
-    database: 'smart_farm'
-});
+const { db } = require('./config/database');
 
 db.connect((error) => {
     error ? console.log(`MySQL connecting failed: ${error}`) : console.log("MySQL connected");
@@ -183,4 +176,4 @@ const growthQueries = [
 
 const monitoringQuery = `SELECT * FROM control;`
 
-module.exports = { query, envQueries, weekQueries, sensorQueries, growthQueries, monitoringQuery };
+module.exports = { query, envQueries, weekQueries, sensorQueries, growthQueries, monitoringQuery, db };

@@ -2,12 +2,14 @@ const Todo = require('../models/Calendar');
 
 const getMonthSchedules = async (req, res) => {
     try {
+        const { _id } = req.user;
         const { startDate, endDate } = req.query;
 
         const startOfStartDate = new Date(startDate);
         const endOfEndDate = new Date(endDate);
 
         const todos = await Todo.find({
+            userId: _id,
             $or: [
                 // Case 1: 일정이 startDate 이후이고 endDate 이전인 경우
                 {

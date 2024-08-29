@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Chart } from 'react-chartjs-2';
 import io from "socket.io-client";
+import moment from 'moment';
+import useSocket from "../src/hooks/socket/useSocket";
 
 import {
     Chart as ChartJS,
@@ -19,21 +21,30 @@ import plugin from "chartjs-plugin-datalabels";
 ChartJS.register(CategoryScale, LinearScale, PointElement, BarElement, LineElement, Title, Tooltip, Legend);
 
 const THChart = () => {
-    const [socket, set_socket] = useState(null);
     const [temp_and_humid, set_temp_and_humid] = useState([]);
 
+    const { receivedData, socket } = useSocket(
+        import.meta.env.VITE_SOCKET_URL,
+        'temp and humid chart rec'
+    );
+
     useEffect(() => {
-        const ws = io.connect("http://localhost:5100");
-        set_socket(ws);
+        if (socket) {
+            const timer = setInterval(() => {
+                socket.emit('temp and humid chart req');
+            }, 2000);
 
-        ws.on("temp and humid chart rec", (value) => {
-            set_temp_and_humid(value[0])
-        });
-
-        return () => {
-            ws.disconnect();
+            return () => {
+                clearInterval(timer);
+            };
         }
-    }, []);
+    }, [socket]);
+
+    useEffect(() => {
+        if (receivedData) {
+            set_temp_and_humid(receivedData[0]);
+        }
+    }, [receivedData]);
 
     useEffect(() => {
         if (socket) {
@@ -52,10 +63,7 @@ const THChart = () => {
     const data = useMemo(() => {
         const times = temp_and_humid.map(data => data.timestamp);
         const labels = times.map(time => {
-            const date = new Date(time);
-            const hour = String(date.getHours()).padStart(2, '0');
-            const minute = String(date.getMinutes()).padStart(2, '0');
-            return `${hour}:${minute}`;
+            return moment(time).format('mm:ss');
         });
 
         return {
@@ -194,6 +202,8 @@ const THChart = () => {
                 grid: {
                     display: false
                 },
+                min: 0,
+                max: 40
             },
             humidity: {
                 position: 'left',

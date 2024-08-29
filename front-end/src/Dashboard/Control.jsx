@@ -5,12 +5,36 @@ import "./Control.css";
 import BulletChart from '../../Chart/BulletChart';
 import BulletChart2 from '../../Chart/BulletChart2';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Icon } from "../Icon/Icon";
+import { Icon } from "../components/Icon/Icon";
+
+const print_date = (date) => {
+    const millis = new Date() - new Date(date);
+
+    const dif_minutes = Math.floor(millis / 1000 / 60);
+    const dif_hours = Math.floor(dif_minutes / 60);
+    const dif_days = Math.floor(dif_hours / 24);
+    const dif_years = Math.floor(dif_days / 365);
+
+    let result;
+    if (dif_minutes < 1) {
+        result = "just before";
+    } else if (dif_minutes < 60) {
+        result = `${dif_minutes} minute${dif_minutes !== 1 ? 's' : ''} ago`;
+    } else if (dif_hours < 24) {
+        result = `${dif_hours} hour${dif_hours !== 1 ? 's' : ''} ago`;
+    } else if (dif_days < 365) {
+        result = `${dif_days} day${dif_days !== 1 ? 's' : ''} ago`;
+    } else {
+        result = `${dif_years} year${dif_years !== 1 ? 's' : ''} ago`;
+    }
+
+    return result;
+}
 
 let socket;
 const Control = () => {
     useEffect(() => {
-        socket = io.connect("http://localhost:5000");
+        socket = io.connect(import.meta.env.VITE_SOCKET_URL);
 
         return () => {
             socket.disconnect();
@@ -55,32 +79,11 @@ const Control = () => {
         });
     }
 
-    let now = new Date();
-    let recent = new Date(recent_date);
-    const print_date = () => {
-        const millis = now - recent;
+    const [wateringDate, setWateringDate] = useState('');
 
-        const dif_minutes = parseInt(millis / 1000 / 60);
-        const dif_hours = parseInt(dif_minutes / 60);
-        const dif_days = parseInt(dif_hours / 24);
-        const dif_years = parseInt(dif_days / 365);
-
-        let result;
-        if (dif_minutes <= 59) {
-            result = dif_minutes == 0 ? "just before" : dif_minutes + " minutes ago";
-        }
-        else if (dif_hours <= 23) {
-            result = dif_hours + " hours ago";
-        }
-        else if (dif_days <= 364) {
-            result = dif_days + " days ago";
-        }
-        else {
-            result = dif_years + " years ago";
-        }
-
-        return result;
-    }
+    useEffect(() => {
+        setWateringDate(print_date(recent_date));
+    }, [recent_date]);
 
     useEffect(() => {
         socket.on('sensor data', (data) => {
@@ -93,7 +96,7 @@ const Control = () => {
         })
     }, []);
 
-    const water_level = water_lev ? water_lev : 0;
+    const water_level = water_lev ? (water_lev / 10) * 100 : 0;
 
     // LED 슬라이더 3개 value 스테이트 저장
     const slider_changed_1 = (input) => {
@@ -641,7 +644,7 @@ const Control = () => {
                                         </div>
                                         <div className='text-box'>
                                             <p>watered</p>
-                                            <span>{ print_date() }</span>
+                                            <span>{ wateringDate }</span>
                                         </div>
                                     </div>
                                 </div>
@@ -716,10 +719,9 @@ const Control = () => {
                                         </div>
                                         <div className = 'temperature-graduation'>
                                             { heat_disc.map((grade, index) => (
-                                                <span className='temperature-element' style = { { transform: `${ heat_element_style(grade) }`} }>
+                                                <span key={index} className='temperature-element' style = { { transform: `${ heat_element_style(grade) }`} }>
                                                     <div className = 'point'>
-                                                        <span 
-                                                            key = { index }
+                                                        <span
                                                             className = 'number'
                                                         >
                                                             { grade }
@@ -764,10 +766,9 @@ const Control = () => {
                                         </div>
                                         <div className = 'temperature-graduation'>
                                             { cool_disc.map((grade, index) => (
-                                                <span className='temperature-element' style = { { transform: `${ cool_element_style(grade) }`} }>
+                                                <span key={index} className='temperature-element' style = { { transform: `${ cool_element_style(grade) }`} }>
                                                     <div className = 'point'>
-                                                        <span 
-                                                            key = { index }
+                                                        <span
                                                             className = 'number'
                                                         >
                                                             { grade }

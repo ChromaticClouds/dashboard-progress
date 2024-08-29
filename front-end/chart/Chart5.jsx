@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Doughnut } from 'react-chartjs-2';
-import io from "socket.io-client";
+import useSocket from "../src/hooks/socket/useSocket";
 
 import {
     Chart as ChartJS,
@@ -15,35 +15,30 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 ChartJS.register(ArcElement, LinearScale, Title, Tooltip, Legend);
 
 const GrowthDoughnut = () => {
-    const [socket, set_socket] = useState(null);
     const [growth, set_growth] = useState([]);
 
-    useEffect(() => {
-        const ws = io.connect("http://localhost:5100");
-        set_socket(ws);
-
-        ws.on("growth chart rec", (value) => {
-            set_growth(value[0]);
-        })
-
-        return () => {
-            ws.disconnect();
-        }
-    }, []);
+    const { socket, receivedData } = useSocket(
+        import.meta.env.VITE_SOCKET_URL,
+        'growth chart rec'
+    )
 
     useEffect(() => {
         if (socket) {
-            socket.emit("growth chart req");
-
             const timer = setInterval(() => {
-                socket.emit("growth chart req");
+                socket.emit('growth chart req');
             }, 2000);
 
             return () => {
                 clearInterval(timer);
-            }
+            };
         }
     }, [socket]);
+
+    useEffect(() => {
+        if (receivedData) {
+            set_growth(receivedData[0]);
+        }
+    }, [receivedData]);
 
     const data = {
         labels: ['tomato1', 'tomato2', 'tomato3'],

@@ -20,9 +20,40 @@
     overflow-y: auto;
 }
 
+.delete-notice {
+    position: absolute;
+    right: -440px;
+    bottom: -220px;
+    transition: opacity 0.3s ease-in-out;
+    font-family: "GSR";
+    font-size: 16px;
+    padding: 3px 10px;
+    z-index: 5;
+    opacity: 0;
+    visibility: hidden;
+    border-radius: 50px;
+    background-color: #989898;
+    color: #e4e4e4;
+}
+
+.delete-notice.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
 .notice-box::-webkit-scrollbar {
-    width: 0;
-    -webkit-appearance: none;
+    position: absolute;
+    width: 12px;
+    background-color: #ebebeb;
+    border-radius: 10px;
+    right: 20px;
+}
+
+.notice-box::-webkit-scrollbar-thumb {
+    background-color: #7587c7;
+    border-radius: 10px;
+    background-clip: padding-box;
+    border: 2px solid transparent;
 }
 
 .notice-box.visible {
@@ -43,15 +74,36 @@
 .notice-box .notice-item:hover {
     color: #fff;
     background-color: #0d0b1c;
+    & .sort .item {
+        border: 1px solid #fff;
+    }
 }
 
 .notice-box .contents {
-    width: 230px;
+    width: 250px;
+    padding-bottom: 10px;
     line-height: 0.6;
 }
 
 .notice-box .notice-icon {
-    padding: 20px;
+    position: relative;
+    padding: 10px;
+    padding-right: 50px;
+    top: 10px;
+    height: 100%;
+}
+
+.notice-icon .sort {
+    position: absolute;
+}
+
+.notice-icon .sort .item {
+    border-radius: 50%;
+    border: 1px solid #0d0b1c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border 0.3s ease-in-out;
 }
 
 .notice-box .notice-time {
@@ -63,6 +115,7 @@
 
 .notice-box .notice-message {
     font-size: 14px;
+    white-space: pre-line;
 }
 
 .notice-box .empty-notice {
@@ -75,11 +128,14 @@
     align-items: center;
 }
 
+.notice-box .mark-sort {
+    height: 100%;
+}
+
 .notice-box .new-notice-icon {
     position: absolute;
     color: #dc5858;
-    top: 50%;
-    transform: translate(0, -50%);
+    top: 10px;
     right: 10px;
     width: 10px;
     height: 10px;

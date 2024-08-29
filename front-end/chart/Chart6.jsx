@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Line } from 'react-chartjs-2';
-import io from "socket.io-client";
+import useSocket from "../src/hooks/socket/useSocket";
 
 import {
     Chart as ChartJS,
@@ -17,21 +17,30 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const BrightnessChart = () => {
-    const [socket, set_socket] = useState(null);
     const [brightness, set_brightness] = useState([]);
 
+    const { socket, receivedData } = useSocket(
+        import.meta.env.VITE_SOCKET_URL,
+        'brightness chart rec'
+    )
+
     useEffect(() => {
-        const ws = io.connect("http://localhost:5100");
-        set_socket(ws);
+        if (socket) {
+            const timer = setInterval(() => {
+                socket.emit('brightness chart req');
+            }, 2000);
 
-        ws.on("brightness chart rec", (value) => {
-            set_brightness(value[0]);
-        })
-
-        return () => {
-            ws.disconnect();
+            return () => {
+                clearInterval(timer);
+            };
         }
-    }, []);
+    }, [socket]);
+
+    useEffect(() => {
+        if (receivedData) {
+            set_brightness(receivedData[0]);
+        }
+    }, [receivedData]);
 
     const times = brightness.map(data => data.timestamp);
     const labels = times.map(time => {
@@ -97,7 +106,7 @@ const BrightnessChart = () => {
                         family: "GSR",
                         size: 14,
                     },
-                    stepSize: 20,
+                    stepSize: 40,
                     padding: 5,
                 },
                 beginAtZero: true,

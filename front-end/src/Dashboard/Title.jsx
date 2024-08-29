@@ -1,27 +1,41 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Tooltip from '../components/Tooltip/Tooltip';
 import "./Title.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
-import axios from "axios";
+import { AiOutlineOpenAI } from "react-icons/ai";
 
-import Expand from "../Stream/Expand";
-import Calendar from "../TodoList/Calendar";
+import useMonthEventStore from "../hooks/useMonthEvents";
+import useTodoEvents from "../hooks/useTodoEvents";
+import useNoticeStore from "../hooks/notification/store/useNoticeStore";
+import useClickStore from "../hooks/store/useClickStore";
+import useGptReqeust from "../Video/Prediction/hooks/useGptRequest";
+import usePredictStore from "../Video/Prediction/hooks/store/usePredictStore";
+
+import Expand from "../Video/Stream/Expand"
 import TodoList from "../TodoList/TodoList";
-import Weather2 from "./Weather2"
 import Summary from "./Summary";
 import Control from "./Control";
 import Chart from "./Chart2";
-import Video from "../Stream/Video";
+import Video from "../Video/Stream/Video"
 import WeatherIO from "../Weather/WeatherIO";
-import Footer from "../Footer/Footer";
+import Footer from "../components/Footer/Footer";
 import Notification from "../Notification/Notification";
 import NotificationBox from "../Notification/NotificationBox";
-import OpenAI from "../Prediction/OpenAI";
+import AILoading from "./Loading/AILoading";
+import OpenAI from "../Video/Prediction/hooks/useOpenAi";
+import Logout from "../Login/Logout";
+import InfoContents from "../components/section/InfoContents";
+import useSocket from "../hooks/socket/useSocket";
+import useOpenAi from "../Video/Prediction/hooks/useOpenAi";
 
 library.add(fas);
 
 const Title = () => {
+    const { events } = useMonthEventStore();
+    const { getTodayTodos } = useTodoEvents();
+
     const [iconIndex, setIconIndex] = useState(parseInt(localStorage.getItem('icon-index')) || 0);
 
     /** 객체 형태로 아이콘 데이터 저장 */
@@ -33,7 +47,7 @@ const Title = () => {
         },
         { 
             icon: ["fas", "cloud"], 
-            text: "Database", 
+            text: "Weather", 
             sectionId: "jump_to2" 
         },
         { 
@@ -71,8 +85,9 @@ const Title = () => {
     }, []);
 
     let options = {
-        threshold: 0.5,
+        threshold: 0.4,
     };
+
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             const visibleEntries = entries.filter(entry => entry.isIntersecting);
@@ -97,73 +112,57 @@ const Title = () => {
         };
     }, [sectionRefs]);
     /**
-     *  - # info-contents 패널의 화살표 클릭 이벤트 스테이트 저장
-     */
-    const [rotated, set_rotated] = useState(false);
-
-    const rotate = () => {
-        set_rotated(!rotated)
-    }
-
-    const [current, set_current] = useState({});
-
-    const [visible, setVisible] = useState(false);
-    const [date, setDate] = useState({});
-    /**
      *  - # Video 컴포넌트 및 Embed 컴포넌트의 이벤트 관리 스테이트
      */
     const [onCancel, setOnCancel] = useState(true);
     const [embed, setEmbed] = useState(<div></div>);
     const [embedError, setEmbedError] = useState(false);
-    /**
-     *  - # 투두 리스트 데이터 및 POST 요청성공 변화 감지
-     */
-    const [viewDate, setViewDate] = useState([]);
-    const [viewTodo, setViewTodo] = useState([]);
-    const [detectTodo, setDetectTodo] = useState([]);
-    /**
-     *  - # 날씨 데이터 스테이트
-     */
-    const [viewWeather, setViewWeather] = useState([]);
-    const [viewIcon, setViewIcon]  = useState(null);
     /*-----------------------------------------------------------------------------*\
         # POST 요청 성공 시, GET 요청으로 title 컴포넌트의 todo list에 데이터 삽입 #
     \*-----------------------------------------------------------------------------*/
-    const getDate = async () => {
-        try {
-            const response = await axios.get('http://localhost:5000/api/calendar', {
-                params: {
-                    startDate: new Date().toDateString(),
-                    endDate: new Date().toDateString()
-                }
-            });
-            setViewTodo(response.data)
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
     useEffect(() => {
-        getDate();
-    }, [new Date().getDate(), detectTodo]); 
+        getTodayTodos(new Date(), new Date());
+    }, [events]); 
     /**
      *  - # OpenWeatherMap 데이터 props로 전달하기 위한 state 선언
      */
     const [weatherMap, setWeatherMap] = useState([]);
+    
     const [isClicked, setIsClicked] = useState(false); /* 노티피케이션 알림 클릭 여부 */
     const [isEntered, setIsEntered] = useState(false);
-    /**
-     *  - # Notification POST 요청 디텍션
+    /** 
+     * 노티피케이션 이벤트 관리 
      */
-    const [noticePost, setNoticePost] = useState([]);
-    const [noticeCount, setNoticeCount] = useState(() => {
-        const savedCount = localStorage.getItem('noticeCount');
-        return savedCount ? parseInt(savedCount, 10) : 0;
-    });
-    /*---------------------------------------------------------------------------------*\
-        # POST 요청 성공 시, 로컬 스토리지에 영구 저장된 노티피케이션 데이터와 함께 로드 #
-    \*---------------------------------------------------------------------------------*/
-    const [unreadNotice, setUnreadNotice] = useState([]);
+    const { setIsOpened, setInitialClick } = useClickStore();
+
+    useEffect(() => {
+        setIsOpened(isClicked);
+    }, [isClicked, setIsOpened]);
+
+    const { notifications } = useNoticeStore();
+
+    const unreadCount = () => {
+        const count = notifications.filter(notification => !notification.isRead).length;
+
+        if (count > 99) {
+            return '99+';
+        }
+
+        return count;
+    }
+
+    const count = unreadCount();
+
+    const hasUnread = typeof count === "number" ? count !== 0 : count === "99+";
+    /**
+     * AI 요청 처리
+     */
+    useOpenAi();
+
+    const { gptHosted, setGptHosted } = useClickStore();
+
+    const { data: predictionData } = usePredictStore();
+    const hostGpt = useGptReqeust();
 
     return (
         <div>
@@ -173,64 +172,70 @@ const Title = () => {
                 isVisible={ onCancel }
                 embedError={ embedError }
             />
-            <TodoList 
-                setVisible = { visible }
-                setCancel = { setVisible }
-                setDate = { date }
-                detectTodo = { setDetectTodo }
-            />
+            <TodoList />
             <div className = "ui-container">
                 <div className = "icon-panel">
                     <div className="icons-bar">
                         <div className="icons">
                             {icons.map((icon, index) => (
                                 <div key = { index } className = "icon-array">
-                                    <FontAwesomeIcon
-                                        icon={icon.icon}
-                                        className={index === iconIndex ? "clicked_icon" : "icon"}
-                                        onClick={() => iconClick(index)}
-                                    />
+                                    <Tooltip text={icon.text}>
+                                        <FontAwesomeIcon
+                                            icon={icon.icon}
+                                            className={index === iconIndex ? "clicked_icon" : "icon"}
+                                            onClick={() => iconClick(index)}
+                                        />
+                                    </Tooltip>
                                 </div>
                             ))}
                             <div className="notice">
-                                <p className={`notice-count ${noticeCount !== 0 ? "exist" : ""}`}>
-                                    {noticeCount !== 0 ? noticeCount : null}
+                                <p className={`notice-count ${hasUnread ? "exist" : ""}`}>
+                                    {count}
                                 </p>
-                                <FontAwesomeIcon
-                                    icon="fa-solid fa-bell"
-                                    className={isClicked ? "clicked_icon" : "icon"}
-                                    onClick={() => {
-                                        setIsClicked(!isClicked);
-                                        localStorage.setItem('noticeCount', '0');
-                                        setNoticeCount(0);
-                                        if (!isClicked) {
-                                            setUnreadNotice([]);
-                                            localStorage.setItem('unreadNotice', JSON.stringify([]));
-                                        }
-                                    }}
-                                    onMouseEnter={() => setIsEntered(true)}
-                                    onMouseLeave={() => setIsEntered(false)}
-                                />
+                                <Tooltip text="Alarm">
+                                    <FontAwesomeIcon
+                                        icon="fa-solid fa-bell"
+                                        className={`${isClicked ? "clicked_icon" : "icon"} bell`}
+                                        onClick={() => {
+                                            setIsClicked(!isClicked);
+                                            setInitialClick(true);
+                                        }}
+                                        onMouseEnter={() => setIsEntered(true)}
+                                        onMouseLeave={() => setIsEntered(false)}
+                                    />
+                                </Tooltip>
                                 <div>
-                                    <NotificationBox 
-                                        popupNotification={isClicked}
-                                        hostNotification={noticePost}
-                                        hostMark={unreadNotice}
+                                    <NotificationBox
                                         popupStatus={setIsClicked}
                                         enterEvent={isEntered}
                                     />
                                 </div>
                             </div>
+                            <div className="openai">
+                                <Tooltip text="OpenAI">
+                                    <AiOutlineOpenAI 
+                                        className={gptHosted ? "clicked_icon" : "icon"}
+                                        onClick={(e) => {
+                                            setGptHosted(true);
+                                            hostGpt(predictionData)
+                                        }}
+                                    />
+                                </Tooltip>
+                            </div>
+                            <div className="logout">
+                                <Tooltip text = "Logout">
+                                    <Logout />
+                                </Tooltip>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div className = "contents-panel">
+                    <div className="loading-bar">
+                        <AILoading />
+                    </div>
                     <div className="pop-up">
-                        <Notification 
-                            hostNotification={setNoticePost}
-                            setNoticeCount={setNoticeCount}
-                            unreadNotice={setUnreadNotice}
-                        />
+                        <Notification />
                     </div>
                     {icons.map((icon, index) => (
                         <div
@@ -244,9 +249,7 @@ const Title = () => {
                             }
                             {
                                 index === 1 && <WeatherIO 
-                                    viewWeather={viewWeather}
                                     viewWeatherMap={weatherMap}
-                                    viewIcon = {setViewIcon}
                                 />
                             }
                             {
@@ -273,84 +276,9 @@ const Title = () => {
                     </footer>
                 </div>
                 <div className = "info-panel">
-                    <div className = "info-content">
-                        <div className="weather-content" style = {{
-                            top: rotated ? '30px' : '480px',
-                            transition: 'top 0.5s ease-in-out'
-                        }}>
-                            <FontAwesomeIcon
-                                icon="fa-solid fa-chevron-up" 
-                                className="content-up"
-                                onClick = { rotate }
-                                style = {{
-                                    transform: rotated ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.3s ease-in-out'
-                                }} // 버튼 클릭 시, 위젯 슬라이드 업
-                            />
-                            <Weather2 
-                                set_current={set_current} // 풍향, 풍속 데이터 전달 위함
-                                viewWeather={setViewWeather}
-                            />
-                            <div className="calendar" style = {{ 
-                                marginBottom: rotated ? "40px" : "500px"
-                            }}>
-                                <Calendar
-                                    setVisible = { setVisible }
-                                    setDate = { setDate }
-                                    viewDate = { setViewDate }
-                                    detectTodo = { detectTodo }
-                                />
-                                <div className="todo-list">
-                                    <div className="todo-bar">
-                                        <p>Todo-List 📅</p>
-                                    </div>
-                                        {viewTodo.length > 0 ? (
-                                            <div className="lists sort">
-                                                <div className="non-exist exist">
-                                                    {viewTodo.map(todo => (
-                                                        <div key={todo._id} className="todo-box">
-                                                            <div className="circle">
-                                                                <div className={`color ${todo.color}`}></div>
-                                                            </div>
-                                                            <div>
-                                                                <div className="time">{todo.todo === '' ? `${todo.startTime} - ${todo.endTime}` : "All Day"}</div>
-                                                                <div className="contents">
-                                                                    <span className="todo-title">{todo.title}</span>
-                                                                    <div></div>
-                                                                    <span>{todo.todo === '' ? todo.message : todo.todo}</span>
-                                                                </div>
-                                                            </div>
-                                                            {todo.event.text ? (
-                                                                <div className={`icon-box color ${todo.color}`}>
-                                                                    <div>{todo.event.text ? <FontAwesomeIcon icon={`${todo.event.icon}`}/> : null}</div>
-                                                                </div>
-                                                            ) : null}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="lists">
-                                                <div className="non-exist">
-                                                    <FontAwesomeIcon icon="fa-solid fa-face-sad-tear" className="icon" />
-                                                    <h3 className="text">No Schedule...</h3>
-                                                </div>
-                                            </div>
-                                        )}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="info-box">
-                            <h4 className="now">Now</h4>
-                            <div className="main-info">
-                                {viewIcon}
-                            </div>
-                            <span>{ current.temp }°</span>
-                        </div>
-                    </div>
+                    <InfoContents />
                 </div>
             </div>
-            <OpenAI />
         </div>
     );
 };

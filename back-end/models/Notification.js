@@ -1,11 +1,30 @@
 const mongoose = require('mongoose');
-const { db2 } = require("../config/database");
+const { mainDb } = require("../config/database");
 
 const notificationSchema = new mongoose.Schema({
-    message: String,
-    time: Date
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Users'
+    },
+    type: {
+        type: String,
+        default: 'normal'
+    },
+    message: {
+        type: String,
+        required: true
+    },
+    isRead: { 
+        type: Boolean,
+        default: false
+    },
+    time: {
+        type: Date,
+        default: Date.now
+    }
 });
 
-const Notification = db2.model('notifications', notificationSchema);
+const Notification = mainDb.model('Notifications', notificationSchema);
 
 module.exports = Notification;

@@ -1,9 +1,10 @@
 import { React, useEffect, useState } from "react";
+import useAuthStore from "../hooks/store/useAuthStore";
 import io from "socket.io-client";
 import moment from "moment";
 import LineChart from "../../Chart/LineChart";
-import Monitoring from "../Monitoring/Monitoring";
-import StreamChart from "../Prediction/StreamChart"
+import Monitoring from "../components/Monitoring/Monitoring";
+import StreamChart from "../Video/Prediction/StreamChart";
 
 import "./Summary.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,8 +14,10 @@ import { PiPottedPlantFill } from "react-icons/pi";
 
 let socket;
 const Summary = () => {
+    const { username } = useAuthStore();
+
     useEffect(() => {
-        socket = io.connect("http://localhost:5000");
+        socket = io.connect(import.meta.env.VITE_SOCKET_URL);
 
         socket.emit("env req");
         socket.emit("sensor req");
@@ -85,7 +88,7 @@ const Summary = () => {
         },
     ]);
     /**
-     *  - # 호스팅 스테이트에 따라 각 식물의 최근 일주일간 평균 성장량 및 날짜를 x, y 데이터로 저장
+     *  - 호스팅 스테이트에 따라 각 식물의 최근 일주일간 평균 성장량 및 날짜를 x, y 데이터로 저장
      */
     const plants = ['Plant1', 'Plant2', 'Plant3'];
 
@@ -125,7 +128,7 @@ const Summary = () => {
     useEffect(() => {
         if (sensor.length > 0) {
             setHumidity(sensor[0]);
-            setWatering(sensor[1].this_week_watering);
+            setWatering(sensor[1][0].this_week_watering);
         }
     }, [sensor]);
     /**
@@ -177,7 +180,7 @@ const Summary = () => {
                         </div>
                     </div>
                 </div>
-                <h4 className = "subtitle">Summary Dashboard</h4>
+                {username !== 'null' && <h4 className = "subtitle">Hello, { username }!</h4>}
                 <div className = "date">
                     <FontAwesomeIcon 
                         icon="fa-regular fa-calendar"
@@ -373,7 +376,7 @@ const Summary = () => {
                                 <div className = "sensor-disc">Now</div>
                             </div>
                             <div className="sensor-value">
-                                {hasValue && watering ? watering : 0}
+                                0
                             </div>
                         </div>
                     </div>

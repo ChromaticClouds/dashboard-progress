@@ -1,70 +1,63 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const http = require('http');
-const Server = require('socket.io');
 const cors = require('cors');
 const { SerialPort } = require('serialport');
 const { ReadlineParser } = require('@serialport/parser-readline');
 const { socketEvents } = require('./socketEvents');
+const { socketProvider } = require('./chart');
+const { gptController } = require('./socketControllers/gptController');
+const {
+    insertRecordData,
+    updateControlData,
+    insertEnvironmentData,
+    updateGrowthData
+} = require('./dbQueries.js');
+require('dotenv').config();
+
+const { getIO, socketConfig } = require('./config/socketConfig.js'); 
+
+const app = express();
+const server = http.createServer(app);
+const PORT = 3100;
+
+app.use(cors());
+
 const calendarRouter = require('./routes/calendarRoutes');
 const monthRouter = require("./routes/monthRoutes.js");
 const notificationRouter = require("./routes/notificationRoutes.js");
-require('dotenv').config();
-
-const app = express();
-app.use(cors());
-
-const { server2 } = require('./chart');
+const registerRouter = require("./routes/registerRoutes");
+const loginRouter = require("./routes/loginRouter");
+const verifyTokenRouter = require("./routes/verifyTokenRouter.js");
 
 app.use(bodyParser.json());
 
 app.use('/api/calendar', calendarRouter);
 app.use('/api/calendar/month', monthRouter);
 app.use('/api/notification', notificationRouter);
+app.use('/api/register', registerRouter);
+app.use('/api/login', loginRouter);
+app.use('/api/verify-token', verifyTokenRouter);
 
-const server = http.createServer(app);
-const io = Server(server, {
-    cors: {
-        origin: "http://localhost:5173",
-        methods: ["GET", "POST"],
-    },
-});
+socketConfig(server);
 
-const sp = new SerialPort({
-    path: "COM4",
-    baudRate: 9600,
-    dataBits: 8,
-    stopBits: 1,
-    flowControl: false
-});
-const parser = sp.pipe(new ReadlineParser({ delimiter: '\r\n' }));
-
-let sensorData;
-
-parser.on("data", (data) => {
-    try {
-        sensorData = JSON.parse(data);
-        console.log(sensorData);
-    } catch (error) {
-        console.error("Parsing error:", error);
-    }
-});
+const io = getIO();
 
 io.on('connection', (socket) => {
-    socketEvents(socket, sp);
+    setInterval(() => {
+        socket.emit('sensor data', {
+            temperature: Math.floor(Math.random() * 30) + 10, // Random temperature between 10 and 40
+            humidity: Math.floor(Math.random() * 60) + 30,    // Random humidity between 30 and 90
+            waterLevel: Math.floor(Math.random() * 10) + 1
+        })
+    }, 180000);
 });
 
-setInterval(() => {
-    io.emit('sensor data', sensorData)
-}, 2000);
+// socketControllers
+socketProvider(io);
+socketEvents(io);
+gptController(io);
 
-const port = 5000;
-server.listen(port, () => {
-    console.log(`server is running on ${port} port`);
+server.listen(PORT, () => {
+    console.log(`서버가 http://localhost:${PORT} 에서 실행 중입니다.`);
 });
-
-const chartPort = 5100;
-server2.listen(chartPort, () => {
-    console.log(`server is running on ${ chartPort } port`)
-})

@@ -471,7 +471,7 @@ section .box .sort-on {
     width: 120px;
     height: 120px;
     position: absolute;
-    background-color: #bbc0dd;
+    background-color: #858fc9;
     border-radius: 50px;
     transform: rotate(30deg);
     top: -30px;

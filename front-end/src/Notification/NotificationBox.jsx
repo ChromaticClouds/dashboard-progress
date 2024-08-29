@@ -1,27 +1,49 @@
 import React, { useEffect, useState, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
-import axios from "axios";
+import useNoticeEvents from "../hooks/notification/useNoticeEvents";
+import useClickStore from "../hooks/store/useClickStore";
+import useNoticeStore from "../hooks/notification/store/useNoticeStore";
+
+import Loading from "../Dashboard/Loading/Loading";
+
 import "./NotificationBox.css";
-
-const NotificationBox = ({ popupNotification, hostNotification, hostMark, popupStatus, enterEvent }) => {
-    const [notifications, setNotifications] = useState([]);
-
-    const getNotification = async () => {
-        try {
-            const response = await axios.get('http://localhost:5000/api/notification');
-            const notificationsData = response.data;
-            setNotifications(notificationsData);
-        } catch (error) {
-            console.error(error);
-        }
-    }
+import { AiOutlineOpenAI } from "react-icons/ai";
+import { faCircleExclamation, faMessage } from "@fortawesome/free-solid-svg-icons";
+/**
+ * NotificationBox 컴포넌트
+ * @param {Function} popupStatus - 알림 팝업창 상태를 설정하는 함수
+ * @param {Function} enterEvent - 엔터 이벤트 핸들러 함수
+ * @returns {JSX.Element} NotificationBox 컴포넌트
+ */
+const NotificationBox = ({ popupStatus, enterEvent }) => {
+    const {
+        getNotification, 
+        updateNotification, 
+        deleteNotification, 
+    } = useNoticeEvents();
+    const { isOpened, setIsOpened, initialClick } = useClickStore();
+    const { notifications, loading } = useNoticeStore();
 
     useEffect(() => {
         getNotification();
-    }, [hostNotification]);
+    }, [])
+
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            try {
+                if (!isOpened && initialClick) {
+                    await updateNotification();
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchNotifications();
+    }, [isOpened]);
     /**
-     *  - # 노티피케이션 박스 영역 참조
+     *  - 노티피케이션 박스 영역 참조
      */
     const wrapperRef = useRef(null);
 
@@ -31,6 +53,7 @@ const NotificationBox = ({ popupNotification, hostNotification, hostMark, popupS
             const popupClose = (e) => {
                 if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
                     popupStatus(false);
+                    setIsOpened(false);
                 }
             }
             
@@ -40,21 +63,47 @@ const NotificationBox = ({ popupNotification, hostNotification, hostMark, popupS
         }
     }, [enterEvent, popupStatus, wrapperRef]);
 
+    const icon = (type) => {
+        switch (type) {
+            case 'gpt':
+                return (
+                    <AiOutlineOpenAI className='item'/>
+                );
+            case 'warning':
+                return (
+                    <FontAwesomeIcon 
+                        icon={faCircleExclamation}
+                        className='item'
+                    />
+                );
+            default:
+                return (
+                    <FontAwesomeIcon 
+                        icon={faMessage}
+                        className='item'
+                    />
+                );
+        }
+    }
+
     return (
-        <div>
-            <section className={`notice-box ${popupNotification ? "visible" : ""}`} ref={wrapperRef}>
+        <div ref={wrapperRef}>
+            <section className={`notice-box ${isOpened ? "visible" : ""}`} ref={wrapperRef}>
                 {/**
                  *  - # GET 요청 성공 시, Notification 호출
                  */}
-                {notifications.length > 0 ? (
-                    notifications.map(notification => {
-                        // hostMark 배열에서 일치하는 객체 찾기
-                        let matchingHostMark = hostMark.find(obj => obj.time === notification.time);
-                        
+                {loading ? (
+                    <div className="empty-notice">
+                        <Loading color="black" />
+                    </div>
+                ) : notifications.length > 0 ? (
+                    notifications.map(notification => {  
                         return (
                             <div key={notification._id} className="notice-item">
                                 <div className="notice-icon">
-                                    <FontAwesomeIcon icon="fa-solid fa-circle-exclamation" />
+                                    <div className="sort">
+                                        {icon(notification.type)}
+                                    </div>
                                 </div>
                                 <div className="contents">
                                     <h4 className="notice-time">{moment(notification.time).calendar(null, {
@@ -65,14 +114,16 @@ const NotificationBox = ({ popupNotification, hostNotification, hostMark, popupS
                                     })}</h4>
                                     <span className="notice-message">{notification.message}</span>
                                 </div>
-                                {matchingHostMark ? (
-                                    <FontAwesomeIcon 
-                                        icon="fa-solid fa-circle"
-                                        className="new-notice-icon"
-                                    />
-                                ) : (
-                                    null
-                                )}
+                                <div className="mark-sort">
+                                    {!notification.isRead ? (
+                                        <FontAwesomeIcon 
+                                            icon="fa-solid fa-circle"
+                                            className="new-notice-icon"
+                                        />
+                                    ) : (
+                                        null
+                                    )}
+                                </div>
                             </div>
                         );
                     })
@@ -80,6 +131,13 @@ const NotificationBox = ({ popupNotification, hostNotification, hostMark, popupS
                     <div className="empty-notice">No notifications</div>
                 )}
             </section>
+            <div 
+                className={`delete-notice ${isOpened ? "visible" : ""}`} 
+                ref={wrapperRef}
+                onClick={deleteNotification}
+            >
+                Delete
+            </div>
         </div>
     )
 }

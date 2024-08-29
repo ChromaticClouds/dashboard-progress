@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Chart } from 'react-chartjs-2';
-import io from "socket.io-client";
+import useSocket from "../src/hooks/socket/useSocket";
 
 import {
     Chart as ChartJS,
@@ -17,35 +17,30 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, BarElement, LineElement, Title, Tooltip, Legend);
 
 const WaterSupply = () => {
-    const [socket, set_socket] = useState(null);
     const [water_supply, set_water_supply] = useState([]);
 
-    useEffect(() => {
-        const ws = io.connect("http://localhost:5100");
-        set_socket(ws);
-
-        ws.on("water supply chart rec", (value) => {
-            set_water_supply(value[0])
-        });
-
-        return () => {
-            ws.disconnect();
-        }
-    }, []);
+    const { socket, receivedData } = useSocket(
+        import.meta.env.VITE_SOCKET_URL,
+        'water supply chart rec'
+    );
 
     useEffect(() => {
         if (socket) {
-            socket.emit("water supply chart req");
-
             const timer = setInterval(() => {
-                socket.emit("water supply chart req");
+                socket.emit('water supply chart req');
             }, 2000);
 
             return () => {
                 clearInterval(timer);
-            }
+            };
         }
     }, [socket]);
+
+    useEffect(() => {
+        if (receivedData) {
+            set_water_supply(receivedData[0]);
+        }
+    }, [receivedData])
 
     const get_gradient = (ctx, chartArea) => {
         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
@@ -219,7 +214,7 @@ const WaterSupply = () => {
                         family: "GSR",
                         size: 14,
                     },
-                    stepSize: 50,
+                    stepSize: 100,
                 },
                 border: {
                     display: false,

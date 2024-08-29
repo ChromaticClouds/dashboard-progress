@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Bar } from 'react-chartjs-2';
-import io from "socket.io-client";
+import useSocket from "../src/hooks/socket/useSocket";
 
 import {
     Chart as ChartJS,
@@ -16,36 +16,31 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, BarElement, Title, Tooltip, Legend);
 
 const SoilHumidChart = () => {
-    const [socket, set_socket] = useState(null);
     const [soil_humid, set_soil_humid] = useState([]);
     const chart_ref = useRef(null);
 
-    useEffect(() => {
-        const ws = io.connect("http://localhost:5100");
-        set_socket(ws);
-
-        ws.on("soil humidity chart rec", (value) => {
-            set_soil_humid(value[0]);
-        })
-
-        return () => {
-            ws.disconnect();
-        }
-    }, []);
+    const { socket, receivedData } = useSocket(
+        import.meta.env.VITE_SOCKET_URL,
+        'soil humidity chart rec'
+    );
 
     useEffect(() => {
         if (socket) {
-            socket.emit("soil humidity chart req");
-
             const timer = setInterval(() => {
-                socket.emit("soil humidity chart req");
+                socket.emit('soil humidity chart req');
             }, 2000);
 
             return () => {
                 clearInterval(timer);
-            }
+            };
         }
     }, [socket]);
+
+    useEffect(() => {
+        if (receivedData) {
+            set_soil_humid(receivedData[0]);
+        }
+    }, [receivedData]);
 
     const get_gradient = (ctx, chartArea) => {
         const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
@@ -139,13 +134,11 @@ const SoilHumidChart = () => {
             },
             y: {
                 ticks: {
-                    callback: function(val, index) {
-                        return index % 2 == 0 ? this.getLabelForValue(val) : '';
-                    },
                     font: {
                         family: "GSR",
                         size: 14,
                     },
+                    stepSize: 20
                 },
                 beginAtZero: true,
                 border: {

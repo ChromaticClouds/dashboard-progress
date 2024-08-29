@@ -6,6 +6,7 @@
     border-radius: 20px;
     box-shadow: 3px 3px 10px -1px rgba(0, 0, 0, 0.3);
     position: relative;
+    margin-bottom: 20px;
 }
 
 .calendar-container header {
@@ -61,7 +62,8 @@
     position: relative;
 }
 
-.calendar ul {
+.calendar ul,
+.calendar .week {
     font-family: "GSR";
     display: flex;
     list-style: none;
@@ -72,13 +74,23 @@
 
 .calendar .days {
     margin-bottom: 10px;
+    height: 310px;
 }
 
-.calendar .weeks li {
-    font-weight: 500;
+.calendar .days.center {
+    display: flex;
+    justify-content: center;
 }
 
-.calendar ul li {
+.calendar .week span {
+    font-weight: 600;
+    text-overflow: hidden;
+    white-space: nowrap;
+    height: 20px;
+}
+
+.calendar ul li,
+.calendar .week span {
     width: calc(100% / 7);
     position: relative;
 }
@@ -128,7 +140,7 @@
 .calendar .days.cover {
     padding: 0 20px;
     position: absolute;
-    top: 55px;
+    top: 40px;
     left: 0;
     z-index: 1;
     pointer-events: none; /* days.cover 요소의 pointer-events를 비활성화 */

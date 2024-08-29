@@ -37,7 +37,7 @@ current_frame = 0
 
 class VideoCamera:
     def __init__(self):
-        self.cap = cv2.VideoCapture("http://192.168.0.221:8000/stream.mjpg")
+        self.cap = cv2.VideoCapture("http://192.168.54.11:8000/stream.mjpg")
         self.lock = threading.Lock()
         self.frame = None
         self.ret = False

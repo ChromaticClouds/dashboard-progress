@@ -1,10 +1,5 @@
 const { query, envQueries, weekQueries, sensorQueries, growthQueries, monitoringQuery } = require('./queries');
-const OpenAI = require("openai");
 require('dotenv').config();
-
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
 
 const socketEvents = (socket, sp) => {
     socket.on("env req", async () => {
@@ -87,9 +82,10 @@ const socketEvents = (socket, sp) => {
             FROM 
                 environment 
             WHERE 
-                environment_id = (SELECT MAX(environment_id) FROM environment) 
-            AND 
-                water_supply > 0;`;
+                water_supply > 0 
+            ORDER BY 
+                environment_id DESC 
+            LIMIT 1;`;
                 
         try {
             const results = await query(sql);
@@ -116,6 +112,7 @@ const socketEvents = (socket, sp) => {
 
     socket.on('cooler temp req', (value) => {
         sp.write(`cooler_${value}\n`);
+
     });
 
     socket.on('control on', () => {
@@ -124,26 +121,6 @@ const socketEvents = (socket, sp) => {
 
     socket.on('control off', () => {
         sp.write("off\n");
-    });
-
-    socket.on('gpt question', async (data) => {
-        try {
-            const response = await openai.chat.completions.create({
-                messages: [
-                    { "role": 'user', "content": "센서 데이터 및 객체 검출된 토마토 데이터입니다: " + JSON.stringify(data) + ". 여기서 어떻게 하면 좋을지 간단히 알려주세요." }
-                ],
-                model: 'gpt-4',
-                temperature: 1,
-                max_tokens: 1280,
-                top_p: 1,
-                frequency_penalty: 0,
-                presence_penalty: 0,
-            });
-
-            socket.emit('gpt answer', response)
-        } catch (error) {
-            console.error('Error with OpenAI API:', error);
-        }
     });
 };
 

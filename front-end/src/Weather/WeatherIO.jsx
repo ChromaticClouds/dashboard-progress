@@ -1,6 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
 import moment from 'moment-timezone';
 import './WeatherIO.css';
+
+import useWeatherStore from "../hooks/useWeatherStore";
+
 import WeatherIcon from './WeatherIcon';
 import MediumForecast from './MediumForcast'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,15 +23,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
  * WeatherComponent component.
  * @returns {JSX.Element} The rendered component.
  */
-const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
+const WeatherIO = ({ viewWeatherMap }) => {
+    const { weatherData, setWeatherIcon } = useWeatherStore();
+
     const [showWeather, setShowWeather] = useState([]);
 
      /** @type {[WeatherMap, React.Dispatch<React.SetStateAction<WeatherMap>>]} */
     const [weatherMap, setWeatherMap] = useState({});
 
     useEffect(() => {
-        setShowWeather(viewWeather);
-    }, [viewWeather]);
+        setShowWeather(weatherData);
+    }, [weatherData]);
 
     useEffect(() => {
         setWeatherMap(viewWeatherMap);
@@ -94,7 +99,7 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
             setDescription(weatherMap.weather[0].description);
         }
         // Meteocons 변환된 아이콘을 props로 전달
-        viewIcon(<WeatherIcon getWeatherIcon = {currentIcon}/>);
+        setWeatherIcon(currentIcon);
     }, [weatherMap, currentIcon]);
     /**
      *  현재 날짜 포맷팅
@@ -204,7 +209,8 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
 
         if (dates.length > 0 && castHour !== '') {
             dates.forEach(day => {
-                formattedDates.push(`${day} ${castHour}`);
+                const localCastHour = moment.utc(`${day} ${castHour}`).format('HH:mm:ss');
+                formattedDates.push(`${day} ${localCastHour}`);
             });
         }
         setBindString(formattedDates);
@@ -241,7 +247,7 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
         for (let i = 0; i < 8; i++) {
             const timeIndex = (getCurrentHourIndex() + i) % forecastHour.length;
             const dayOffset = Math.floor((getCurrentHourIndex() + i) / forecastHour.length);
-            times.push(`${moment().add(dayOffset, 'days').format('YYYY-MM-DD')} ${forecastHour[timeIndex]}`);
+            times.push(`${moment().add(dayOffset, 'days').add(9, 'hours').format('YYYY-MM-DD')} ${forecastHour[timeIndex]}`);
         }
         setBindTime(times);
     }, [now.hour()]);
@@ -252,12 +258,13 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
 
     useEffect(() => {
         if (mediumForecast.length > 0 && bindTime.length > 0) {
-            const weatherList = mediumForecast.filter(forecast =>
-                bindTime.some(time => forecast.dt_txt === time)
-            )
+            const weatherList = mediumForecast.filter(forecast => {
+                const localTime = moment.utc(forecast.dt_txt).add(9, 'hours').format('YYYY-MM-DD HH:mm:ss');
+                return bindTime.includes(localTime);
+            });
 
             const weatherData = weatherList.map(forecast => ({
-                hour: moment(forecast.dt_txt).format('h A'),
+                hour: moment.utc(forecast.dt_txt).add(9, 'hours').format('h A'),
                 icon: forecast.weather[0].icon,
                 temp: kelvinToCelsius(forecast.main.temp),
                 wind: {
@@ -295,7 +302,7 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
                                     {nowTemp !== null ? (
                                         <>
                                             <h1 className="temp-value">{nowTemp}</h1>
-                                            <h2>℃</h2>
+                                            <h2>°Ｃ</h2>
                                         </>
                                     ) : (
                                         <h1 className="temp-value">...</h1>
@@ -379,7 +386,7 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
                                             */}
                                             <div className="flat">
                                                 <h4>Air Quality Index</h4>
-                                                <div className={`value ${hasData ? pollution.status.toLowerCase() : "default"}`}>{hasData ? pollution.status : ""}</div>
+                                                <div className={`value ${hasData ? pollution?.status.toLowerCase() : "default"}`}>{hasData ? pollution.status : ""}</div>
                                             </div>
                                             <div className="icon air">
                                                 <img src="https://bmcdn.nl/assets/weather-icons/v3.0/fill/svg/mist.svg"/>
@@ -388,19 +395,19 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
                                                 <div className="conditions">
                                                     <div className="sort-on">
                                                         <h6>PM2.5</h6>
-                                                        <span>{hasData ? pollution.condition.pm2_5 : null}</span>
+                                                        <span>{hasData ? pollution?.condition?.pm2_5 : null}</span>
                                                     </div>
                                                     <div className="sort-on">
                                                         <h6>SO2</h6>
-                                                        <span>{hasData ? pollution.condition.so2 : null}</span>
+                                                        <span>{hasData ? pollution?.condition?.so2 : null}</span>
                                                     </div>
                                                     <div className="sort-on">
                                                         <h6>NO2</h6>
-                                                        <span>{hasData ? pollution.condition.no2 : null}</span>
+                                                        <span>{hasData ? pollution?.condition?.no2 : null}</span>
                                                     </div>
                                                     <div className="sort-on">
                                                         <h6>O3</h6>
-                                                        <span>{hasData ? pollution.condition.o3 : null}</span>
+                                                        <span>{hasData ? pollution?.condition?.o3 : null}</span>
                                                     </div>
                                                 </div>
                                             </section>
@@ -414,7 +421,7 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
                                                 <img src="https://bmcdn.nl/assets/weather-icons/v3.0/line/svg/humidity.svg"/>
                                             </div>
                                             <div className="status">
-                                                <span>{hasValue ? weatherMap.main.humidity : null}</span>
+                                                <span>{hasValue ? weatherMap?.main?.humidity : null}</span>
                                                 <p>%</p>
                                             </div>
                                         </div>
@@ -425,7 +432,7 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
                                                 <img src="https://bmcdn.nl/assets/weather-icons/v3.0/line/svg/pressure-low.svg"/>
                                             </div>
                                             <div className="status">
-                                                <span>{hasValue ? weatherMap.main.pressure : null}</span>
+                                                <span>{hasValue ? weatherMap?.main?.pressure : null}</span>
                                                 <p>hPa</p>
                                             </div>
                                         </div>
@@ -444,14 +451,14 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
                                                 </div>
                                                 <div className="value">
                                                     <h6>Sunrise</h6>
-                                                    <span>{hasValue ? moment.unix(weatherMap.sys.sunrise).format('h:mm A') : ""}</span>
+                                                    <span>{hasValue ? moment.unix(weatherMap?.sys?.sunrise).format('h:mm A') : ""}</span>
                                                 </div>
                                                 <div className="sun-status">
                                                     <img src="https://bmcdn.nl/assets/weather-icons/v3.0/fill/svg/sunset.svg"/>
                                                 </div>
                                                 <div className="value">
                                                     <h6>Sunset</h6>
-                                                    <span>{hasValue ? moment.unix(weatherMap.sys.sunset).format('h:mm A') : ""}</span>
+                                                    <span>{hasValue ? moment.unix(weatherMap?.sys?.sunset).format('h:mm A') : ""}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -464,7 +471,7 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
                                                 <FontAwesomeIcon icon="fa-regular fa-eye" />
                                             </div>
                                             <div className="status">
-                                                <span>{hasValue ? (weatherMap.visibility / 1000).toFixed(1) : null}</span>
+                                                <span>{hasValue ? (weatherMap?.visibility / 1000).toFixed(1) : null}</span>
                                                 <p>km</p>
                                             </div>
                                         </div>
@@ -475,7 +482,7 @@ const WeatherIO = ({ viewWeather, viewWeatherMap, viewIcon }) => {
                                                 <FontAwesomeIcon icon="fa-solid fa-temperature-high" />
                                             </div>
                                             <div className="status">
-                                                <span>{hasValue ? weatherMap.main.feels_like.toFixed(0) : null}</span>
+                                                <span>{hasValue ? weatherMap?.main?.feels_like.toFixed(0) : null}</span>
                                                 <p>℃</p>
                                             </div>
                                         </div>
