@@ -1,9 +1,9 @@
-import createAxiosInstance from '../utils/axiosInstance';
+import { createAxiosInstance } from '../utils/axiosInstance';
 import moment from 'moment';
 import { useState } from "react";
 
 const useTodoEvents = () => {
-    const axiosInstance = createAxiosInstance(); 
+    const { axiosInstance } = createAxiosInstance(); 
 
     const [todos, setTodos] = useState([]);
     const [todosLoading, setTodosLoading] = useState(false);

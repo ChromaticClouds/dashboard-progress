@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import moment from 'moment';
-import HarvestChart from '../../../Chart/HarvestChart';
+import HarvestChart from '../../components/chart/HarvestChart';
 
 import useWebSocket from '../../hooks/socket/useWebsocket';
 import useStreamChartStore from './hooks/store/useStreamChartStore';

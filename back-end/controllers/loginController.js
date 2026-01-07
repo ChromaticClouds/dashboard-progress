@@ -11,6 +11,7 @@ const login = async (req, res) => {
         const { success, score } = await verifyRecaptcha(token);
 
         if (!success) {
+            console.log(res);
             return res.status(400).json({ message: `reCAPTCHA verification failed.` });
         }
 

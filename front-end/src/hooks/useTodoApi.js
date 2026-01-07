@@ -1,8 +1,8 @@
-import createAxiosInstance from "../utils/axiosInstance";
+import { createAxiosInstance } from "../utils/axiosInstance";
 import { useState } from "react";
 
 const useTodoApi = () => {
-    const axiosInstance = createAxiosInstance(); 
+    const { axiosInstance } = createAxiosInstance(); 
 
     const [loading, setLoading] = useState(false);
 

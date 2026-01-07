@@ -2,17 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const http = require('http');
 const cors = require('cors');
-const { SerialPort } = require('serialport');
-const { ReadlineParser } = require('@serialport/parser-readline');
 const { socketEvents } = require('./socketEvents');
 const { socketProvider } = require('./chart');
 const { gptController } = require('./socketControllers/gptController');
-const {
-    insertRecordData,
-    updateControlData,
-    insertEnvironmentData,
-    updateGrowthData
-} = require('./dbQueries.js');
 require('dotenv').config();
 
 const { getIO, socketConfig } = require('./config/socketConfig.js'); 

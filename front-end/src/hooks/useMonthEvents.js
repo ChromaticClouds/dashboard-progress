@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import createAxiosInstance from '../utils/axiosInstance';
+import { createAxiosInstance } from '../utils/axiosInstance';
 
-const axiosInstance = createAxiosInstance();
+const { axiosInstance } = createAxiosInstance();
 
 const useMonthEventStore = create((set) => ({
     events: [],

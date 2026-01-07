@@ -1,13 +1,13 @@
 import { useState } from "react";
 import useNoticeStore from "./store/useNoticeStore";
-import createAxiosInstance from "../../utils/axiosInstance";
+import { createAxiosInstance } from "../../utils/axiosInstance";
 
 const useNoticeEvents = () => {
     const { setNotifications, addAlarm, setLoading } = useNoticeStore();
 
     const [error, setError] = useState(null);
 
-    const axiosInstance = createAxiosInstance();
+    const { axiosInstance } = createAxiosInstance();
 
     /**
      * 알림 목록을 가져오는 함수
