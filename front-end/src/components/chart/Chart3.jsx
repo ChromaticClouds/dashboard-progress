@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Chart } from 'react-chartjs-2';
-import io from "socket.io-client";
-import moment from 'moment';
-import useSocket from "../src/hooks/socket/useSocket";
+import useSocket from "../../hooks/socket/useSocket";
 
 import {
     Chart as ChartJS,
@@ -15,23 +13,21 @@ import {
     Tooltip,
     Legend
 } from "chart.js";
-import GrowthChart from "./Chart";
-import plugin from "chartjs-plugin-datalabels";
-  
+
 ChartJS.register(CategoryScale, LinearScale, PointElement, BarElement, LineElement, Title, Tooltip, Legend);
 
-const THChart = () => {
-    const [temp_and_humid, set_temp_and_humid] = useState([]);
+const WaterSupply = () => {
+    const [water_supply, set_water_supply] = useState([]);
 
-    const { receivedData, socket } = useSocket(
+    const { socket, receivedData } = useSocket(
         import.meta.env.VITE_SOCKET_URL,
-        'temp and humid chart rec'
+        'water supply chart rec'
     );
 
     useEffect(() => {
         if (socket) {
             const timer = setInterval(() => {
-                socket.emit('temp and humid chart req');
+                socket.emit('water supply chart req');
             }, 2000);
 
             return () => {
@@ -42,28 +38,24 @@ const THChart = () => {
 
     useEffect(() => {
         if (receivedData) {
-            set_temp_and_humid(receivedData[0]);
+            set_water_supply(receivedData[0]);
         }
-    }, [receivedData]);
+    }, [receivedData])
 
-    useEffect(() => {
-        if (socket) {
-            socket.emit("temp and humid chart req");
-
-            const timer = setInterval(() => {
-                socket.emit("temp and humid chart req");
-            }, 2000);
-
-            return () => {
-                clearInterval(timer);
-            }
-        }
-    }, [socket]);
+    const get_gradient = (ctx, chartArea) => {
+        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+        gradient.addColorStop(0, '#97e6e6');
+        gradient.addColorStop(1, '#4d85bd');
+        return gradient;
+    };
 
     const data = useMemo(() => {
-        const times = temp_and_humid.map(data => data.timestamp);
+        const times = water_supply.map(data => data.day);
         const labels = times.map(time => {
-            return moment(time).format('mm:ss');
+            const date = new Date(time);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            return `${month}/${day}`;
         });
 
         return {
@@ -71,31 +63,39 @@ const THChart = () => {
             datasets: [
                 {
                     type: 'bar',
-                    label: 'Temperature',
-                    data: temp_and_humid.map(data => data.inner_temp),
+                    label: 'Supplied Times',
+                    data: water_supply.map(data => data.water_supply_count),
                     maxBarThickness: 30,
                     borderSkipped: false,
                     borderRadius: 6,
-                    backgroundColor: '#536982',
+                    backgroundColor: (context) => {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+    
+                        if (!chartArea) {
+                            return null;
+                        }
+                        return get_gradient(ctx, chartArea);
+                    },
                     order: 1,
-                    yAxisID: 'temperature'
+                    yAxisID: 'count'
                 },
                 {
                     type: 'line',
                     borderWidth: 3,
                     pointStyle: false,
-                    label: 'Humidity',
-                    data: temp_and_humid.map(data => data.inner_humid),
-                    backgroundColor: '#2b354a',
-                    borderColor: '#2b354a',
+                    label: 'Supplied Amount',
+                    data: water_supply.map(data => data.water_supply_amount),
+                    backgroundColor: '#334352',
+                    borderColor: '#334352',
                     fill: true,
                     order: 0,
                     tension: 0.3,
-                    yAxisID: 'humidity'
+                    yAxisID: 'amount'
                 },
             ],
         };
-    }, [temp_and_humid]);
+    }, [water_supply]);
 
 
     const options = {
@@ -108,7 +108,7 @@ const THChart = () => {
         plugins: {
             title: {
                 display: true,
-                text: `Temperature and Humidity`,
+                text: `Water Supply`,
                 font: {
                     family: "GSR",
                     size: 20,
@@ -140,7 +140,7 @@ const THChart = () => {
                 mode: 'index',
                 callbacks: {
                     title: function(context) {
-                        return `Time: ${context[0].label}`;
+                        return `Date: ${context[0].label}`;
                     },
                     label: function(context) {
                         let label = ` ${context.dataset.label}` || '';
@@ -149,11 +149,11 @@ const THChart = () => {
                             label += ': ';
                         }
                         if (context.parsed.y !== null) {
-                            if (context.dataset.label == "Temperature") {
-                                label += `${context.parsed.y}°`;
+                            if (context.dataset.label == "Supplied Amount") {
+                                label += `${context.parsed.y}`;
                             }
                             else {
-                                label += `${context.parsed.y}%`
+                                label += `${context.parsed.y} Times`
                             }
                         }
                         return label;
@@ -185,9 +185,12 @@ const THChart = () => {
                     display: false
                 },
             },
-            temperature: {
+            count: {
                 position: 'right',
+                beginAtZero: true,
+                max: 10,
                 ticks: {
+                    stepSize: 1,
                     font: {
                         family: "GSR",
                         size: 14,
@@ -202,19 +205,16 @@ const THChart = () => {
                 grid: {
                     display: false
                 },
-                min: 0,
-                max: 40
             },
-            humidity: {
+            amount: {
                 position: 'left',
+                beginAtZero: true,
                 ticks: {
                     font: {
                         family: "GSR",
                         size: 14,
                     },
-                    callback: function(val, index) {
-                        return index % 2 == 0 ? this.getLabelForValue(val) : '';
-                    },
+                    stepSize: 100,
                 },
                 border: {
                     display: false,
@@ -234,4 +234,4 @@ const THChart = () => {
     )
 }
 
-export default THChart;
+export default WaterSupply;

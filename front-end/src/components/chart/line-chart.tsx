@@ -1,6 +1,7 @@
 import { ResponsiveLine } from "@nivo/line"
+import type { LineSeries } from "@nivo/line";
 
-const LineChart = ({ data }) => (
+const LineChart = ({ data }: { data: LineSeries[] }) => (
     <ResponsiveLine
         data={data}
         margin={{ top: 30, right: 30, bottom: 30, left: 30 }}

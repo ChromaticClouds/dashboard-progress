@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Doughnut } from 'react-chartjs-2';
-import useSocket from "../src/hooks/socket/useSocket";
+import useSocket from "../../hooks/socket/useSocket";
 
 import {
     Chart as ChartJS,

@@ -96,7 +96,7 @@ const NotificationBox = ({ popupStatus, enterEvent }) => {
                     <div className="empty-notice">
                         <Loading color="black" />
                     </div>
-                ) : notifications.length > 0 ? (
+                ) : Array.isArray(notifications) && notifications.length > 0 ? (
                     notifications.map(notification => {  
                         return (
                             <div key={notification._id} className="notice-item">

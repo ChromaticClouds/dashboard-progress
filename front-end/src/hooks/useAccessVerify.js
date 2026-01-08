@@ -13,16 +13,16 @@ const useAccessVerify = () => {
         navigate('/login');  // 로그인 페이지로 이동
     };
 
-    // 로딩 상태가 아니라면, 로그인 상태에 따라 리디렉션
-    useEffect(() => {
-        if (!accessToken || !refreshToken) {
-            logout();
-        }
+    // // 로딩 상태가 아니라면, 로그인 상태에 따라 리디렉션
+    // useEffect(() => {
+    //     if (!accessToken || !refreshToken) {
+    //         logout();
+    //     }
 
-        if (location.pathname === '/login' && accessToken) {
-            navigate('/main');
-        }
-    }, [location.pathname, accessToken]);
+    //     if (location.pathname === '/login' && accessToken) {
+    //         navigate('/main');
+    //     }
+    // }, [location.pathname, accessToken]);
 
     return { logout }
 };
