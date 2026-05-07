@@ -1,21 +1,33 @@
 import React, { useState, useEffect, useRef } from "react";
+
 import Calendar from "./Calendar";
+import Loading from "../Dashboard/Loading/Loading";
+
+import useMonthEventStore from "../hooks/useMonthEvents";
+import useCalendarEvents from "../hooks/useCalendarEvents";
+import useTodoApi from "../hooks/useTodoApi";
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import './TodoList.css';
+import createAxiosInstance from "../utils/axiosInstance";
 
-const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌트 와의 스테이트 공유
-    const [date, setDate] = useState({}); // Calendar 컴포넌트의 클릭된 날짜의 year, month, day, week 스테이트 할당
+const TodoList = () => {
+    const axiosInstance = createAxiosInstance(); 
+
+    const { date, visible, setVisible, setStatus, status, currentDate } = useCalendarEvents();
+    const { getMonthEvents } = useMonthEventStore();
+    const { createTodo, getTodo, loading } = useTodoApi();
+
     const [startToggle, setStartToggle] = useState(false); // 시작 날짜의 토글 여부
     const [endToggle, setEndToggle] = useState(false); // 종료 날짜의 토글 여부
     const [startDate, setStartDate] = useState(['', {}]); // 날짜의 데이터를 배열 형식으로 보관 ['날짜포맷', { yaer, month, day }]
     const [endDate, setEndDate] = useState(['', {}]);
-    const [startTime, setStartTime] = useState('08:00'); // 디폴트 타임
-    const [endTime, setEndTime] = useState('09:00');
-    const [currentDate, setCurrentDate] = useState({
-        year: new Date().getFullYear(),
-        month: new Date().getMonth(),
-        string_month: new Date().toLocaleString('en-GB', { month: 'long' })
-    });
+    const initialTime = {
+        startTime: '08:00',
+        endTime: '09:00'
+    }
+    const [startTime, setStartTime] = useState(initialTime.startTime);
+    const [endTime, setEndTime] = useState(initialTime.endTime);
 
     const week = (date) => { // getDay() 메서드로 받아온 week 스테이트 키값을 스트링 포맷
         let getDay = '';
@@ -50,27 +62,6 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
         return getDay;
     }
 
-    /** todo 리스트 팝업 창 등장 시 날짜 초기화 */
-    useEffect(() => {
-        setDate(props.setDate);
-        setStartDate([
-            `${week(props.setDate.week)}, ${props.setDate.month}/${props.setDate.day}`,
-            {
-                year: props.setDate.year,
-                month: props.setDate.month,
-                day: props.setDate.day
-            }
-        ]);
-        setEndDate([
-            `${week(props.setDate.week)}, ${props.setDate.month}/${props.setDate.day}`,
-            {
-                year: props.setDate.year,
-                month: props.setDate.month,
-                day: props.setDate.day
-            }
-        ]);
-    }, [props.setDate]);
-
     const handleToggleStartDate = () => {
         setStartToggle(!startToggle);
         if (!startToggle) {
@@ -102,12 +93,24 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
     };
 
     useEffect(() => {
-        setCurrentDate({
-            year: date.year,
-            month: date.month - 1,
-            string_month: new Date(date.year, date.month - 1, date.day).toLocaleString('en-GB', { month: 'long' })
-        })
-    }, [date])
+        setStartDate([
+            `${week(date.week)}, ${date.month}/${date.day}`,
+            {
+                year: date.year,
+                month: date.month,
+                day: date.day
+            }
+        ]);
+
+        setEndDate([
+            `${week(date.week)}, ${date.month}/${date.day}`,
+            {
+                year: date.year,
+                month: date.month,
+                day: date.day
+            }
+        ]);
+    }, [visible]);
 
     useEffect(() => {
         if (startToggle) {
@@ -230,17 +233,6 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
         }
     }, [endDate, endTime]);
 
-    const [visible, setVisible] = useState(false);
-
-    useEffect(() => {
-        if (props.setVisible) {
-            setVisible(true)
-        }
-        else {
-            setVisible(false)
-        }
-    }, [props.setVisible])
-
     // color 드롭다운 메뉴 활성여부
     const [showColor, setShowColor] = useState(false);
     const dropdown = () => {
@@ -255,7 +247,7 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
 
     // 컬러 리스트
     const [items, setItems] = useState([
-        { 
+        {
             color: 'red', 
             className: 'red'
         },
@@ -289,7 +281,7 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
     const lists = [
         { 
             text: '물 주기', 
-            icon: "fa-solid fa-fill-drip" 
+            icon: "fa-solid fa-fill-drip"
         },
         { 
             text: '씨앗 심기', 
@@ -314,10 +306,8 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
         setDroplet(false);
     };
 
-    const [status, setStatus] = useState([])
-
     useEffect(() => {
-        if ((startToggle || endToggle) && props.setVisible) {
+        if ((startToggle || endToggle) && visible) {
             const status = [
                 {
                     initDate: startDate[1],
@@ -327,27 +317,159 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
             ];
             setStatus(status);
         }
-    }, [items, startDate, endDate, startToggle, endToggle, props.setVisible])
+    }, [items, startDate, endDate, startToggle, endToggle, visible]);
 
-    const enterData = e => {
-        if (e.key == "Enter") {
-            alert("엔터 왜 침?");
-        } 
+    const now = new Date();
+
+    const [todoForm, setTodoForm] = useState(
+        {
+            title: "",
+            todo: "",
+            message: "",
+            startDate: now,
+            startTime: startTime,
+            endDate: now,
+            endTime: endTime,
+            color: items[0].color,
+            event: {
+                text: selectedIndex ? lists[selectedIndex].text : null,
+                icon: selectedIndex ? lists[selectedIndex].icon : null
+            },
+        }
+    );
+
+    const inputChange = (e) => {
+        const { name, value } = e.target;
+        setTodoForm(prevForm => ({ ...prevForm, [name]: value }));
+    };
+
+    useEffect(() => {
+        setTodoForm(prevForm => ({ ...prevForm, event: 
+            {
+                text: selectedIndex ? lists[selectedIndex].text : null,
+                icon: selectedIndex ? lists[selectedIndex].icon : null
+            } 
+        }));
+    }, [selectedIndex]);
+
+    useEffect(() => {
+        if (items.length > 0) {
+            setTodoForm(prevForm => ({ ...prevForm, color: items[0].color }));
+        }
+    }, [items]);
+
+    useEffect(() => {
+        if (date) {
+            setTodoForm(prevForm => ({
+                ...prevForm,
+                startDate: new Date(startDate[1].year, startDate[1].month - 1, startDate[1].day).toLocaleDateString(),
+                endDate: new Date(endDate[1].year, endDate[1].month - 1, endDate[1].day).toLocaleDateString(),
+            }));
+        }
+    }, [startDate, endDate]);
+
+    useEffect(() => {
+        setTodoForm(prevForm => ({ 
+            ...prevForm, 
+            startTime: startTime,
+            endTime: endTime }));
+    }, [startTime, endTime]);
+
+    const inputRefs = useRef([React.createRef(), React.createRef(), React.createRef()]);
+
+    const clearInputs = () => {
+        inputRefs.current.forEach((ref, index) => {
+            ref.current.value = ''
+        });
+        setStartTime(initialTime.startTime);
+        setEndTime(initialTime.endTime);
+        setSelectedIndex(null);
     }
 
-    const recruitData = () => {
-        alert("왜 누름?");
+    const submitForm = async (formData) => {
+        try {
+            await createTodo(formData);
+
+            alert('스케줄 등록이 완료됐습니다.');
+
+            await getMonthEvents(currentDate.year, currentDate.month);
+            await getTodos();
+
+            clearInputs();
+            setTodoForm({...todoForm, message:'', title: '', todo: ''});
+        } catch (error) {
+            alert('스케줄 등록에 실패했습니다.');
+            console.error(error);
+        }
     }
+    
+    const enterData = async (e) => {
+        if (e.key === "Enter") {
+            await submitForm(todoForm);
+        }
+    }
+    
+    const recruitData = async () => {
+        await submitForm(todoForm);
+    }
+
+    const [viewTodo, setViewTodo] = useState([]);
+
+    const getTodos = async () => {
+        try {
+            const todos = await getTodo(date); // 결과를 기다림
+            setViewTodo(todos); // Promise의 결과로 상태를 업데이트
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        if (date.year) {
+            getTodos();
+        }
+    }, [date]);
+
+    const [selectedTodos, setSelectedTodos] = useState([]);
+
+    const recruitChecked = (todoId) => {
+        setSelectedTodos(prevSelected => {
+            if (prevSelected.includes(todoId)) {
+                return prevSelected.filter(id => id !== todoId);
+            } else {
+                return [...prevSelected, todoId];
+            }
+        });
+    };
+
+    const [expand, setExpand] = useState(false);
+
+    const deleteTodos = async () => {
+        try {
+            await axiosInstance.delete('/calendar', {
+                data: { ids: selectedTodos }
+            });
+            // 삭제 후 상태 업데이트
+            setViewTodo(viewTodo.filter(todo => !selectedTodos.includes(todo._id)));
+            setSelectedTodos([]);
+            getMonthEvents(currentDate.year, currentDate.month);
+            alert('선택된 일정이 삭제되었습니다.');
+        } catch (error) {
+            alert('일정 삭제에 실패했습니다.');
+        }
+    };
+
+    const [onChangePost, setOnChangePost] = useState({});
 
     return (
         <div>
             <div 
                 className="todolist-window" 
                 style={{
-                    display: props.setVisible ? "inline-flex" : "none"
+                    display: visible ? "inline-flex" : "none"
                 }}
                 onClick = {() => {
-                    props.setCancel(!props.setVisible);
+                    setVisible(!visible);
                     setStartToggle(false);
                     setEndToggle(false);
                     setShowColor(false);
@@ -362,7 +484,7 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
                             icon="fa-solid fa-xmark" 
                             className="window-icon"
                             onClick = {() => {
-                                props.setCancel(!props.setVisible);
+                                setVisible(!visible);
                                 setStartToggle(false);
                                 setEndToggle(false);
                                 setShowColor(false);
@@ -375,19 +497,20 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
                     >
                         <div>
                             <div className="calendar-box">
-                                <Calendar
-                                    isVisible = { visible }
-                                    setVisible = { setVisible }
-                                    setDate = { setDate }
-                                    onStatus = { status }
-                                    currentDate = { currentDate }
+                                <Calendar 
+                                    toChangePost={setOnChangePost}
+                                    intoChangePost={onChangePost}
+                                    intoChangeStatus={status}
                                 />
                                 <div className="submit-form">
                                     <input
+                                        name="todo"
                                         className="todo-input"
                                         placeholder={`Add todo-list on ${date.month}/${date.day}`}
                                         autoComplete="off"
                                         onKeyDown={enterData}
+                                        onChange={inputChange}
+                                        ref={inputRefs.current[0]}
                                     ></input>
                                      <FontAwesomeIcon 
                                         icon="fa-solid fa-circle-chevron-right" 
@@ -399,17 +522,62 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
                         </div>
                         <div className="calendar-box todo-lists">
                             <div className="todo-list">
-                                <div className="space">
-                                    <div style={{display: "flex", flexDirection: "column"}}>
-                                        <FontAwesomeIcon icon="fa-solid fa-circle-exclamation" className="icon" />
-                                        <h3>No schedule!</h3>
-                                    </div>
+                                <div className="sub-bar">
+                                    <div className="sub">Today Lists</div>
+                                    <button 
+                                        onMouseEnter={() => setExpand(true)}
+                                        onMouseLeave={() => setExpand(false)}
+                                        onClick={() => selectedTodos.length > 0 ? deleteTodos() : alert("최소 1개 이상은 선택해주세요.")}
+                                    >
+                                        <FontAwesomeIcon icon="fa-solid fa-xmark" className="icon" />
+                                        <span
+                                            style={{marginLeft: expand ? "10px" : "", opacity: expand ? "1" : "0"}} 
+                                            className="button-text"
+                                        >{expand ? "Delete" : null}</span>
+                                    </button>
                                 </div>
+                                {loading ? (
+                                    <div className="space sort center">
+                                        <Loading color="black" />
+                                    </div>
+                                ) : Array.isArray(viewTodo) && viewTodo.length > 0 ? (
+                                    <div className="space sort">
+                                        {viewTodo.map(todo => (
+                                            <div className="todo-box" key={todo._id}>
+                                                <div className={`color ${todo.color}`}></div>
+                                                <div className="text-sort">
+                                                    <span className="todo-title">{todo.title}</span>
+                                                    <div className="contents">
+                                                        <div>{todo.event.text}</div>
+                                                        <div className="time">
+                                                            {todo.todo === '' ? `${todo.startTime} - ${todo.endTime}` : "All Day"}
+                                                        </div>
+                                                        <span>{todo.todo === '' ? todo.message : todo.todo}</span>
+                                                    </div>
+                                                </div>
+                                                <input 
+                                                    type="checkbox"
+                                                    onChange={() => recruitChecked(todo._id)}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="space">
+                                        <div style={{display: "flex", flexDirection: "column"}}>
+                                            <FontAwesomeIcon icon="fa-solid fa-circle-exclamation" className="icon" />
+                                            <h3>No schedule!</h3>
+                                        </div>
+                                    </div>
+                                )}
                                 <input
+                                    name="title"
                                     className="title"
                                     placeholder="Title"
                                     autoComplete="off"
-                                    onInput={ (e) => console.log(e.target.value) }
+                                    onChange={inputChange}
+                                    onKeyDown={enterData}
+                                    ref={inputRefs.current[1]}
                                 ></input>
                                 <div className="date-list">
                                     <div>
@@ -417,9 +585,11 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
                                             { startDate[0] }
                                         </div>
                                         <input
+                                            name="startTime"
                                             type="time"
                                             value={ startTime }
                                             onChange={(e) => {setStartTime(e.target.value)}}
+                                            onKeyDown={enterData}
                                         ></input>
                                     </div>
                                     <FontAwesomeIcon icon="fa-solid fa-chevron-right" />
@@ -428,9 +598,11 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
                                             { endDate[0] }
                                         </div>
                                         <input
+                                            name="endTime"
                                             type="time"
                                             value={ endTime }
                                             onChange={(e) => {setEndTime(e.target.value)}}
+                                            onKeyDown={enterData}
                                         ></input>
                                     </div>
                                 </div>
@@ -459,6 +631,13 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
                                         <div id = "selected">
                                             {selectedIndex !== null ? lists[selectedIndex].text : '선택하세요'}
                                         </div>
+                                        <div>
+                                            <FontAwesomeIcon 
+                                                icon="fa-solid fa-rotate-left" 
+                                                className="reset-lists"
+                                                onClick={(e) => {setSelectedIndex(null), e.stopPropagation()}}
+                                            />
+                                        </div>
                                         <FontAwesomeIcon 
                                             icon="fa-solid fa-caret-down"
                                             className="caret"
@@ -482,10 +661,13 @@ const TodoList = (props) => { //props를 이용하여 Calendar, Title 컴포넌�
                                 </div>
                                 <div className="submit-box">
                                     <input
+                                        name="message"
                                         className="todo-input left"
                                         placeholder="Todo for..."
                                         autoComplete="off"
                                         onKeyDown={enterData}
+                                        onChange={inputChange}
+                                        ref={inputRefs.current[2]}
                                     ></input>
                                     <FontAwesomeIcon 
                                         icon="fa-solid fa-circle-chevron-right" 

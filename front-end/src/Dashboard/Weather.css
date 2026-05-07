@@ -1,0 +1,133 @@
+@font-face {
+    font-family: "GMM";
+    src: url("../fonts/GmarketSansTTFMedium.ttf") format("truetype");
+}
+  
+@font-face {
+    font-family: "GML";
+    src: url("../fonts/GmarketSansTTFLight.ttf") format("truetype");
+}
+
+.weather-container article {
+    margin-bottom: 20px;
+}
+
+.weather-icon {
+    height: 50px;
+    padding: 10px;
+}
+
+.today-weather {
+    margin: 0;
+    margin: 20px 0;
+    font-family: "GMM";
+    font-size: 25px;
+    color: white;
+}
+
+.today-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "GML";
+    color: white;
+    width: 360px;
+    height: 80px;
+    border-radius: 20px;
+    background-color: #555e90;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.3);
+}
+
+.today-info.tomorrow {
+    margin-top: 20px;
+    background-color: #28343f;
+}
+
+.today-info section,
+.tomorrow-info section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: -16px;
+}
+
+.today-info .center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.weather-info {
+    width: 100px;
+}
+
+.temp-info {
+    margin-left: 84px;
+    color: white;
+    font-family: "GMM";
+    font-size: 20px;
+}
+
+.temp-info.tomorrow {
+    color: #ce5151;
+}
+
+.status-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.status-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 160px;
+    background-color: #28343f;
+    border-radius: 20px;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.3);
+    flex-direction: column;
+}
+
+.status-container .status-box > span {
+    font-family: "GML";
+    font-size: 18px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.status-container .status-box > p {
+    margin: 0;
+    margin-top: 5px;
+    font-family: "GSR";
+    color: #9ea2b5;
+}
+
+.status-box .box-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 28px;
+    width: 60px;
+    height: 60px;
+    background-color: #555e90;
+    border-radius: 14px;
+    margin-bottom: 24px;
+    box-shadow: 6px 6px 10px -1px rgba(0, 0, 0, 0.3);
+}
+
+.status-box .box-icon.visibility {
+    background-color: #497681;
+}
+
+.status-box .box-icon.humidity {
+    background-color: #6d635e;
+}
+
+.weather-container .line {
+    width: 100%;
+    border: 1px solid #52565a;
+    margin-bottom: 20px;
+}

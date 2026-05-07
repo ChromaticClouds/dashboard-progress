@@ -1,0 +1,16 @@
+
+.logout {
+    display: flex;
+    align-items: flex-end;
+    height: 100px;
+}
+
+.icons-bar .icons .icon.red {
+    margin: 0;
+    background-color: #dc5858;
+    color: #fff;
+}
+
+.icons-bar .icons .icon.red:hover {
+    background-color: #be4848;
+}

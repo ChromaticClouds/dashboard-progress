@@ -1,5 +1,4 @@
-import React from "react";
-import { Routes, Route, ScrollRestoration } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Title from "./Title";
 import { SocketProvider } from "./providers/socket-provider.tsx";
 
