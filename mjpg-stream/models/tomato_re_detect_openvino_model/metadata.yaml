@@ -1,0 +1,26 @@
+description: Ultralytics tomato_re_detect model trained on /content/data.yaml
+author: Ultralytics
+date: '2026-05-07T08:03:47.964519'
+version: 8.4.47
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 320
+- 320
+names:
+  0: Ripe
+  1: Rotten
+  2: Unripe
+args:
+  data: null
+  batch: 1
+  fraction: 1.0
+  half: false
+  int8: false
+  dynamic: false
+  nms: false
+channels: 3
+end2end: false

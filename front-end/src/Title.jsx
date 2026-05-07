@@ -5,11 +5,11 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 
 import Expand from "./Stream/Expand";
-import Calendar from "./TodoList/Calendar";
-import TodoList from "./ToDoList/ToDoList";
 import Weather2 from "./Weather2"
+import Calendar from "./TodoList/Calendar";
+import TodoList from "./TodoList/TodoList";
 import Summary from "./Summary";
-import Control from "./Control";
+import Control from "./Control.tsx";
 import Chart from "./Chart2";
 import Video from "./Stream/Video";
 import ObjectDetection from "./Detection/ObjectDetection";
@@ -21,30 +21,30 @@ const Title = () => {
 
     /** 객체 형태로 아이콘 데이터 저장 */
     const icons = [
-        { 
-            icon: ["fas", "home"], 
-            text: "Home", 
-            sectionId: "jump_to1" 
+        {
+            icon: ["fas", "home"],
+            text: "Home",
+            sectionId: "jump_to1"
         },
-        { 
-            icon: ["fas", "cloud"], 
-            text: "Database", 
-            sectionId: "jump_to2" 
+        {
+            icon: ["fas", "cloud"],
+            text: "Database",
+            sectionId: "jump_to2"
         },
-        { 
-            icon: ["fas", "chart-simple"], 
-            text: "Chart", 
-            sectionId: "jump_to3" 
+        {
+            icon: ["fas", "chart-simple"],
+            text: "Chart",
+            sectionId: "jump_to3"
         },
-        { 
+        {
             icon: ["fas", "toggle-on"],
-            text: "Control", 
-            sectionId: "jump_to4" 
+            text: "Control",
+            sectionId: "jump_to4"
         },
-        { 
-            icon: ["fas", "video"], 
-            text: "Video", 
-            sectionId: "jump_to5" 
+        {
+            icon: ["fas", "video"],
+            text: "Video",
+            sectionId: "jump_to5"
         },
     ];
 
@@ -109,13 +109,13 @@ const Title = () => {
 
     return (
         <div>
-            <Expand 
+            <Expand
                 onEmbed = { embed }
                 onCancel={ setOnCancel }
                 isVisible={ onCancel }
                 embedError={ embedError }
             />
-            <TodoList 
+            <TodoList
                 setVisible = { visible }
                 setCancel = { setVisible }
                 setDate = { date }
@@ -157,10 +157,10 @@ const Title = () => {
                                 index === 3 && <Control />
                             }
                             {
-                                index === 4 && <Video 
-                                    setEmbed={setEmbed} 
-                                    onCancel={setOnCancel} 
-                                    setEmbedError={setEmbedError} 
+                                index === 4 && <Video
+                                    setEmbed={setEmbed}
+                                    onCancel={setOnCancel}
+                                    setEmbedError={setEmbedError}
                                 />
                             }
                         </div>
@@ -177,7 +177,7 @@ const Title = () => {
                             transition: 'top 0.5s ease-in-out'
                         }}>
                             <FontAwesomeIcon
-                                icon="fa-solid fa-chevron-up" 
+                                icon="fa-solid fa-chevron-up"
                                 className="content-up"
                                 onClick = { rotate }
                                 style = {{
@@ -186,7 +186,7 @@ const Title = () => {
                                 }} // 버튼 클릭 시, 위젯 슬라이드 업
                             />
                             <Weather2 set_current={set_current} />
-                            <div className="calendar" style = {{ 
+                            <div className="calendar" style = {{
                                 marginBottom: rotated ? "40px" : "500px"
                             }}>
                                 <Calendar

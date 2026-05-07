@@ -1,0 +1,11 @@
+{
+  "git.ignoreLimitWarning": true,
+  "cSpell.words": ["VITE"],
+  "python-envs.pythonProjects": [
+    {
+      "path": "mjpg-stream",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    }
+  ]
+}

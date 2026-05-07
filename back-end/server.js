@@ -266,7 +266,7 @@ const query = (sql) => {
 }
 
 const sp = new SerialPort({
-    path: "COM4",
+    path: "COM1",
     baudRate: 9600,
     dataBits: 8,
     stopBits: 1,
