@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { Icon } from "../icon/Icon";
+import { ClockHistory } from "react-bootstrap-icons";
 
 type WaterStatusCardProps = {
   waterLevel: number;
@@ -66,7 +66,7 @@ const WaterStatusCard = ({
       <div className="line"></div>
       <div className="status-manage">
         <div className="status-box class2">
-          <Icon iconName="ClockHistory" className="status-icon" />
+          <ClockHistory className="status-icon" />
         </div>
         <div className="text-box">
           <p>watered</p>
