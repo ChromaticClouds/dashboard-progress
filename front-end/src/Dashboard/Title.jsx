@@ -20,7 +20,7 @@ import Control from "./Control";
 import Chart from "./Chart2";
 import Video from "../Video/Stream/Video"
 import WeatherIO from "../Weather/WeatherIO";
-import { Footer } from "../components/footer/footer.tsx";
+import { Footer } from "../components/Footer/footer.tsx";
 import Notification from "../Notification/Notification";
 import NotificationBox from "../Notification/NotificationBox";
 import AILoading from "./Loading/AILoading";

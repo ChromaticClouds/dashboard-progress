@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from "react";
 
 import useSocket from "../../../hooks/socket/useSocket";
-import useWebSocket from "../../../hooks/socket/useWebsocket";
+import useWebSocket from "../../../hooks/socket/useWebSocket";
 import usePredictStore from "./store/usePredictStore";
 /**
  * 각 데이터를 결집하기 위한 컴포넌트
