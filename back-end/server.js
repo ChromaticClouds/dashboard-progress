@@ -15,7 +15,7 @@ const {
 } = require('./dbQueries.js');
 require('dotenv').config();
 
-const { getIO, socketConfig } = require('./config/socketConfig.js'); 
+const { getIO, socketConfig } = require('./config/socketConfig.js');
 
 const app = express();
 const server = http.createServer(app);

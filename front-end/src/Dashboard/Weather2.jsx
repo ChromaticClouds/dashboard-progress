@@ -6,7 +6,7 @@ import { faRotate } from '@fortawesome/free-solid-svg-icons';
 
 import useWeatherStore from '../hooks/useWeatherStore';
 
-import WindSub from "../../Chart/SubChart2";
+import WindSub from "../components/chart/SubChart2";
 import Loading from './Loading/Loading';
 import Retry from '../components/Retry';
 

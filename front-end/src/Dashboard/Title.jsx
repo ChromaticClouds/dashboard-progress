@@ -20,7 +20,7 @@ import Control from "./Control";
 import Chart from "./Chart2";
 import Video from "../Video/Stream/Video"
 import WeatherIO from "../Weather/WeatherIO";
-import Footer from "../components/Footer/Footer";
+import { Footer } from "../components/footer/footer.tsx";
 import Notification from "../Notification/Notification";
 import NotificationBox from "../Notification/NotificationBox";
 import AILoading from "./Loading/AILoading";
@@ -142,7 +142,7 @@ const Title = () => {
     const { notifications } = useNoticeStore();
 
     const unreadCount = () => {
-        const count = notifications.filter(notification => !notification.isRead).length;
+        const count = Array.isArray(notifications) && notifications.filter(notification => !notification.isRead).length;
 
         if (count > 99) {
             return '99+';

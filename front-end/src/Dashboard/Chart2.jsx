@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 
-import GrowthChart from "../../Chart/Chart";
-import THChart from "../../Chart/Chart2";
-import SoilHumidChart from "../../Chart/Chart4";
-import WaterSupply from "../../Chart/Chart3";
-import GrowthDoughnut from "../../Chart/Chart5";
-import BrightnessChart from "../../Chart/Chart6";
-import TempSub from "../../Chart/SubChart1"
-import WindSub from "../../Chart/SubChart2";
-import HumidSub from "../../Chart/SubChart3";
-import DiseasesChart from "../../Chart/DiseasesChart";
+import GrowthChart from "../components/chart/Chart";
+import THChart from "../components/chart/Chart2";
+import SoilHumidChart from "../components/chart/Chart4";
+import WaterSupply from "../components/chart/Chart3";
+import GrowthDoughnut from "../components/chart/Chart5";
+import BrightnessChart from "../components/chart/Chart6";
+import TempSub from "../components/chart/SubChart1"
+import WindSub from "../components/chart/SubChart2";
+import HumidSub from "../components/chart/SubChart3";
+import DiseasesChart from "../components/chart/DiseasesChart";
 import './Chart2.css';
 
 const Chart = ({ viewWeatherMap }) => {

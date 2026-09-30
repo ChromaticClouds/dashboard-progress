@@ -540,7 +540,7 @@ const TodoList = () => {
                                     <div className="space sort center">
                                         <Loading color="black" />
                                     </div>
-                                ) : viewTodo.length > 0 ? (
+                                ) : Array.isArray(viewTodo) && viewTodo.length > 0 ? (
                                     <div className="space sort">
                                         {viewTodo.map(todo => (
                                             <div className="todo-box" key={todo._id}>

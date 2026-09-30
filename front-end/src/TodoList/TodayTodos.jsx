@@ -35,7 +35,7 @@ const TodayTodos = () => {
                             <Loading text="grey"/>
                         </div>
                     </div>
-                ) : todos.length > 0 ? (
+                ) : Array.isArray(todos) && todos.length > 0 ? (
                     <div className="lists sort">
                         <div className="non-exist exist">
                             {todos.map(todo => (
