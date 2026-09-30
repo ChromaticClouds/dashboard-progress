@@ -81,6 +81,8 @@ class DetectionPipeline:
         self.inference_lock = inference_lock
         self.min_interval = 1 / INFERENCE_FPS
         self.state_lock = threading.Lock()
+        self.frame_ready = threading.Condition(self.state_lock)
+        self.frame_version = 0
         self.latest_jpeg = None
         self.latest_counts = defaultdict(int)
         self.latest_timestamp = None
@@ -126,6 +128,8 @@ class DetectionPipeline:
                     self.latest_jpeg = buffer.tobytes()
                     self.latest_counts = count_detected_classes(results)
                     self.latest_timestamp = datetime.now()
+                    self.frame_version += 1
+                    self.frame_ready.notify_all()
 
             elapsed = time.perf_counter() - loop_started_at
             time.sleep(max(FRAME_SLEEP_SECONDS, self.min_interval - elapsed))
@@ -133,6 +137,20 @@ class DetectionPipeline:
     def get_jpeg(self):
         with self.state_lock:
             return self.latest_jpeg
+
+    def wait_for_jpeg(self, last_version, timeout=1.0):
+        """Block until a frame newer than last_version is cached.
+
+        Returns (jpeg, version); jpeg is None if nothing newer arrived in time.
+        """
+        with self.frame_ready:
+            self.frame_ready.wait_for(
+                lambda: self.frame_version != last_version,
+                timeout=timeout,
+            )
+            if self.frame_version == last_version:
+                return None, last_version
+            return self.latest_jpeg, self.frame_version
 
     def get_counts(self):
         with self.state_lock:
