@@ -5,14 +5,15 @@ from config import FRAME_SLEEP_SECONDS
 
 
 def gen_frames(detection_pipeline):
+    last_version = 0
     while True:
         if detection_pipeline is None:
             time.sleep(FRAME_SLEEP_SECONDS)
             continue
 
-        frame = detection_pipeline.get_jpeg()
+        # Wait for a newer frame so each viewer is paced by the inference rate
+        frame, last_version = detection_pipeline.wait_for_jpeg(last_version)
         if frame is None:
-            time.sleep(FRAME_SLEEP_SECONDS)
             continue
 
         yield (
