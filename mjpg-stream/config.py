@@ -1,7 +1,8 @@
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-CAMERA_STREAM_URL = "http://100.124.107.121:8001/stream.mjpg"
+CAMERA_STREAM_URL = os.getenv("CAMERA_STREAM_URL", "http://localhost:8000/stream.mjpg")
 FRAME_SLEEP_SECONDS = 0.01
 JPEG_QUALITY = 80
 INFERENCE_FPS = 2
