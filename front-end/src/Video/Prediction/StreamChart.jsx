@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import moment from 'moment';
 import HarvestChart from '../../components/chart/HarvestChart';
 
-import useWebSocket from '../../hooks/socket/useWebsocket';
+import useWebSocket from '../../hooks/socket/useWebSocket';
 import useStreamChartStore from './hooks/store/useStreamChartStore';
 /**
  * 실시간 데이터를 사용하여 생산 수율을 보여주는 차트 컴포넌트
