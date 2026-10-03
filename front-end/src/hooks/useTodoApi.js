@@ -7,15 +7,11 @@ const useTodoApi = () => {
     const [loading, setLoading] = useState(false);
 
     const createTodo = async (todoData) => {
-        try {
-            const response = await axiosInstance.post('/calendar', {
-                todoData
-            });
+        const response = await axiosInstance.post('/calendar', {
+            todoData
+        });
 
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
+        return response.data;
     }
 
     const getTodo = async (date) => {
