@@ -131,3 +131,8 @@
     border: 1px solid #52565a;
     margin-bottom: 20px;
 }
+/* 날씨 조회 실패 안내 */
+.weather-error {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}

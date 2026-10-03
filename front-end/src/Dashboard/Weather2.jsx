@@ -13,11 +13,33 @@ import Retry from '../components/Retry';
 import './Weather.css';
 
 import dfs_xy_conv from '../hooks/coords/intoCoord';
+import useCurrentPosition from '../hooks/useCurrentPosition';
+import { kmaVillageForecastRequest } from '../utils/weatherApi';
+
+// 마지막으로 받은 단기예보. 같은 발표 시각이면 재방문 때 바로 보여주고 뒤에서 갱신한다.
+const FORECAST_CACHE_KEY = 'smartfarm:kma-village-forecast';
+
+const readForecastCache = (baseKey) => {
+    try {
+        const cached = JSON.parse(localStorage.getItem(FORECAST_CACHE_KEY));
+        return cached?.baseKey === baseKey && Array.isArray(cached.items) ? cached.items : null;
+    } catch {
+        return null;
+    }
+};
+
+const writeForecastCache = (baseKey, items) => {
+    try {
+        localStorage.setItem(FORECAST_CACHE_KEY, JSON.stringify({ baseKey, items }));
+    } catch {
+        // 저장 공간이 없으면 캐시 없이 동작한다.
+    }
+};
 
 const Weather2 = () => {
     const [weather, setWeather] = useState({});
 
-    const { setWeatherData, setCurrentWeather } = useWeatherStore();
+    const { setWeatherData, setCurrentWeather, setWeatherError } = useWeatherStore();
    
     const [todayWeather, setTodayWeather] = useState({
         month: '',
@@ -42,49 +64,18 @@ const Weather2 = () => {
         minTemp: 0
     });
 
-    const [location, setLocation] = useState({
-        latitude: null,
-        longitude: null
-    });
+    // 위치는 공용 훅에서 받는다. 권한 거부·시간 초과면 기본 좌표가 온다.
+    const position = useCurrentPosition();
+    const grid = position ? dfs_xy_conv("toXY", position.latitude, position.longitude) : null;
+    const gridX = grid?.x ?? null;
+    const gridY = grid?.y ?? null;
 
-    const [coords, setCoords] = useState({ 
-        x: null, 
-        y: null 
-    });
-
-    const getLocation = () => {
-        navigator.geolocation.getCurrentPosition((position) => {
-            setLocation({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude
-            })
-        });
-    }
-    /**
-     *  - # 60초마다 위치 호출
-     */
+    // 같은 예보 격자 안에서 위치가 조금 바뀐 것만으로는 다시 요청하지 않는다.
     useEffect(() => {
-        getLocation();
-
-        const interval = setInterval(() => {
-            getLocation();
-        }, 60000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    useEffect(() => {
-        if (location.latitude && location.longitude) {
-            const rs = dfs_xy_conv("toXY", location.latitude, location.longitude);
-            setCoords({ x: rs.x, y: rs.y });
-        }
-    }, [location]);
-
-    useEffect(() => {
-        if (coords.x && coords.y) {
+        if (gridX && gridY) {
             hostWeather();
         }
-    }, [coords]);
+    }, [gridX, gridY]);
 
     useEffect(() => {
         setCurrentWeather(todayWeather);
@@ -103,41 +94,53 @@ const Weather2 = () => {
     };
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState([]);
+    const [error, setError] = useState(null);
+
+    // 어제 같은 시각에 발표된 예보를 쓴다. 오늘의 최고·최저 기온(TMX·TMN)이 모두 들어 있다.
+    const forecastBase = (now) => ({
+        baseDate: now.clone().subtract(1, 'days').format('YYYYMMDD'),
+        baseTime: now.clone().subtract(1, 'days').hours(getBaseHour()).format('HH00'),
+    });
+
+    const applyForecast = (items, now) => {
+        setWeatherData(items);
+        parseWeather(items, now.format('YYYYMMDD'), now.clone().add(1, 'days').format('YYYYMMDD'), now);
+    };
+
+    // 같은 발표 시각의 예보를 저장해 두었으면 위치·응답을 기다리지 않고 먼저 보여준다.
+    useEffect(() => {
+        const now = moment();
+        const { baseDate, baseTime } = forecastBase(now);
+        const cached = readForecastCache(`${baseDate}${baseTime}`);
+        if (cached) applyForecast(cached, now);
+    }, []);
 
     const hostWeather = async () => {
+        if (!gridX || !gridY) return;
+
         try {
             setLoading(true);
+            setError(null);
 
             const now = moment();
-            const baseTime = now.clone().subtract(1, 'days').hours(getBaseHour()).format('HH00');
-            const baseDate = now.clone().subtract(1, 'days').format('YYYYMMDD');
-            const today = now.format('YYYYMMDD');
-            const tomorrow = now.clone().add(1, 'days').format('YYYYMMDD');
-    
-            const url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst';
-            const serviceKey = 'TdQd3Xt%2B4OHiUyXW4OunKFr6rCLsJlVInxrkdZfIhQ45NtLhK4pmxQyEZSBnqfv2PS1%2BSxVF6h7h3GWe%2BlQXeQ%3D%3D';
-    
-            const response = await axios.get(url, {
-                params: {
-                    serviceKey: decodeURIComponent(serviceKey),
-                    pageNo: '1',
-                    numOfRows: '1000',
-                    dataType: 'JSON',
-                    base_date: baseDate,
-                    base_time: baseTime,
-                    nx: coords.x,
-                    ny: coords.y
-                }
-            });
-    
-            const items = response.data.response.body.items.item;
-            setWeatherData(items);
-            parseWeather(items, today, tomorrow, now);
+            const { baseDate, baseTime } = forecastBase(now);
+            const { url, params } = kmaVillageForecastRequest({ baseDate, baseTime, nx: gridX, ny: gridY });
 
+            const response = await axios.get(url, { params });
+            const items = response.data?.response?.body?.items?.item;
+            if (!Array.isArray(items)) {
+                throw new Error(response.data?.response?.header?.resultMsg ?? '단기예보 응답 형식 오류');
+            }
+
+            applyForecast(items, now);
+            writeForecastCache(`${baseDate}${baseTime}`, items);
+            setWeatherError(false);
+        } catch (err) {
+            console.error('단기예보 조회 실패:', err.message);
+            setError(err);
+            setWeatherError(true);
+        } finally {
             setLoading(false);
-        } catch (error) {
-            setError(error);
         }
     };
 
@@ -240,11 +243,14 @@ const Weather2 = () => {
         return [pty, pty_icon];
     };
 
-    const [hasValue, setHasValue] = useState(false);
+    // 단기예보 카드는 단기예보 데이터만으로 판단한다. 바람·기압용 OpenWeatherMap 응답과 무관하다.
+    const hasForecast = Boolean(todayWeather.month);
 
-    useEffect(() => {
-        setHasValue(Object.keys(weather).length > 0);
-    }, [weather]);
+    const forecastFallback = (
+        <div className='center'>
+            {error && !hasForecast ? <span className='weather-error'>날씨 정보를 불러오지 못했어요</span> : <Loading />}
+        </div>
+    );
 
     return (
         <div className = 'weather-container'>
@@ -255,7 +261,7 @@ const Weather2 = () => {
             </div>
             <article>
                 <div className = "today-info">
-                    {hasValue && !loading ? (
+                    {hasForecast ? (
                         <section>
                             <img src = {!todayWeather.icon2 ? todayWeather.icon : todayWeather.icon2} className = 'weather-icon'/>
                             <div className = 'weather-info'>
@@ -267,14 +273,10 @@ const Weather2 = () => {
                                 {todayWeather.maxTemp}° / {todayWeather.minTemp}°
                             </div>
                         </section>
-                    ) : (
-                        <div className='center'>
-                            <Loading />
-                        </div>
-                    )}
+                    ) : forecastFallback}
                 </div>
                 <div className = "today-info tomorrow">
-                    {hasValue && !loading ? (
+                    {hasForecast ? (
                         <section>
                             <img src={!tomorrowWeather.icon2 ? tomorrowWeather.icon : tomorrowWeather.icon2} className = 'weather-icon'/>
                             <div className = 'weather-info'>
@@ -286,11 +288,7 @@ const Weather2 = () => {
                                 {tomorrowWeather.maxTemp}° / {tomorrowWeather.minTemp}°
                             </div>
                         </section>
-                    ) : (
-                        <div className='center'>
-                            <Loading />
-                        </div>
-                    )}
+                    ) : forecastFallback}
                 </div>
             </article>
             <div className = 'line'></div>

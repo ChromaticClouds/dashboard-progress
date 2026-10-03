@@ -1,36 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+import useCurrentPosition from "../hooks/useCurrentPosition";
+import { openWeatherUrl } from "../utils/weatherApi";
+
 const MediumForecast = ({ hostForecast, hostAirCondition }) => {
-    const [location, setLocation] = useState({
-        latitude: null,
-        longitude: null
-    })
-
-    const apiKey = import.meta.env.VITE_FORECAST_KEY;
-    /**
-     *  - # 위치 호출 메서드
-     */
-    const getLocation = () => {
-        navigator.geolocation.getCurrentPosition((position) => {
-            setLocation({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude
-            })
-        });
-    }
-    /**
-     *  - # 60초마다 위치 호출
-     */
-    useEffect(() => {
-        getLocation();
-
-        const interval = setInterval(() => {
-            getLocation();
-        }, 60000);
-
-        return () => clearInterval(interval);
-    }, []);
+    // 위치는 공용 훅에서 받는다. 5일 예보는 위치가 바뀔 때만 다시 요청한다.
+    const position = useCurrentPosition();
     /**
      *  - # OpenWeatherMap API GET 요청
      */
@@ -38,7 +14,7 @@ const MediumForecast = ({ hostForecast, hostAirCondition }) => {
     const [airCondition, setAirCondition] = useState([]);
 
     const getForecast = async (lat, lon) => {
-        const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`
+        const url = openWeatherUrl('forecast', lat, lon);
 
         try {
             const response = await axios.get(url);
@@ -49,7 +25,7 @@ const MediumForecast = ({ hostForecast, hostAirCondition }) => {
     }
 
     const getAirPollution = async (lat, lon) => {
-        const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`
+        const url = openWeatherUrl('air_pollution', lat, lon);
 
         try {
             const response = await axios.get(url);
@@ -60,11 +36,11 @@ const MediumForecast = ({ hostForecast, hostAirCondition }) => {
     }
 
     useEffect(() => {
-        if (location.latitude && location.longitude) {
-            getForecast(location.latitude, location.longitude);
-            getAirPollution(location.latitude, location.longitude)
+        if (position) {
+            getForecast(position.latitude, position.longitude);
+            getAirPollution(position.latitude, position.longitude);
         }
-    }, [location]);
+    }, [position]);
 
     useEffect(() => {
         hostForecast(fiveDaysForecast);

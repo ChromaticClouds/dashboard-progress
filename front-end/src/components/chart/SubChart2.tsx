@@ -1,5 +1,8 @@
 import { useEffect } from 'react';
 
+import useCurrentPosition from '../../hooks/useCurrentPosition';
+import { fetchCurrentWeather } from '../../utils/weatherApi';
+
 interface WeatherResponse {
   weather: {
     id: number;
@@ -25,46 +28,31 @@ interface WindSubProps {
   set_weather: (weather: WeatherResponse) => void;
 }
 
-const WindSub = ({ set_weather }: WindSubProps): JSX.Element => {
-  const api_key = '53c642d1e6caac8a761f075ad9f8951b';
+const REFRESH_MS = 60000;
 
-  const get_location = (): void => {
-    navigator.geolocation.getCurrentPosition(success, error);
-  };
+/**
+ * 현재 위치의 OpenWeatherMap 현재 날씨를 받아 부모에게 넘긴다.
+ * 위치는 useCurrentPosition이, 같은 좌표의 중복 요청은 fetchCurrentWeather가 정리한다.
+ */
+const WindSub = ({ set_weather }: WindSubProps): JSX.Element => {
+  const position = useCurrentPosition();
 
   useEffect(() => {
-    get_location();
+    if (!position) return;
 
-    const timer = setInterval(() => {
-      get_location();
-    }, 60000);
+    const load = (): void => {
+      fetchCurrentWeather(position.latitude, position.longitude)
+        .then((json: WeatherResponse) => set_weather(json))
+        .catch((err: Error) => console.error(err.message));
+    };
+
+    load();
+    const timer = setInterval(load, REFRESH_MS);
 
     return () => {
       clearInterval(timer);
     };
-  }, []);
-
-  const success = (position: GeolocationPosition): void => {
-    const { latitude, longitude } = position.coords;
-    getWeather(latitude, longitude);
-  };
-
-  const error = (err: GeolocationPositionError): void => {
-    console.error('좌표를 받아올 수 없거나 권한이 없습니다.', err.message);
-  };
-
-  const getWeather = (latitude: number, longitude: number): void => {
-    fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${api_key}&units=metric&lang=kr`,
-    )
-      .then((response) => response.json() as Promise<WeatherResponse>)
-      .then((json) => {
-        set_weather(json);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
+  }, [position, set_weather]);
 
   return <div />;
 };
