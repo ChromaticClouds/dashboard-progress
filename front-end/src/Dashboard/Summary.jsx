@@ -1,6 +1,6 @@
 import { React, useEffect, useState } from "react";
 import useAuthStore from "../hooks/store/useAuthStore";
-import io from "socket.io-client";
+import { useSocket } from "@/app/providers/socket-provider";
 import moment from "moment";
 import LineChart from "@/components/chart/line-chart";
 import Monitoring from "../components/monitoring/monitoring";
@@ -12,21 +12,15 @@ import { MdCo2 } from "react-icons/md";
 import { GiWateringCan } from "react-icons/gi";
 import { PiPottedPlantFill } from "react-icons/pi";
 
-let socket;
 const Summary = () => {
   const { username } = useAuthStore();
+  const socket = useSocket();
 
   useEffect(() => {
-    socket = io.connect(import.meta.env.VITE_SOCKET_URL);
-
     socket.emit("env req");
     socket.emit("sensor req");
     socket.emit("monitoring req");
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  }, [socket]);
 
   const [env, setEnv] = useState([]);
   const [growth, setGrowth] = useState([]);
@@ -69,22 +63,21 @@ const Summary = () => {
         - # 소켓 수신 성공 시, 스테이트 저장 # -
     \*------------------------------------------*/
   useEffect(() => {
-    socket.on("env rec", (data) => {
-      setEnv(data);
-    });
-    socket.on("weeks rec", (data) => {
-      setGrowth(data);
-    });
-    socket.on("sensor rec", (data) => {
-      setSensor(data);
-    });
-    socket.on("growth rec", (data) => {
-      setDailyGrowth(data);
-    });
-    socket.on("monitoring rec", (data) => {
-      setMonitoring(data);
-    });
-  }, []);
+    const handlers = {
+      "env rec": setEnv,
+      "weeks rec": setGrowth,
+      "sensor rec": setSensor,
+      "growth rec": setDailyGrowth,
+      "monitoring rec": setMonitoring,
+    };
+
+    Object.entries(handlers).forEach(([event, handler]) => socket.on(event, handler));
+
+    // 공유 소켓이므로 언마운트 시 자기 리스너만 해제한다.
+    return () => {
+      Object.entries(handlers).forEach(([event, handler]) => socket.off(event, handler));
+    };
+  }, [socket]);
 
   const [growthValue, setGrowthValue] = useState([
     {

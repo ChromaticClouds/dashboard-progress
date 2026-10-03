@@ -19,10 +19,7 @@ const SoilHumidChart = () => {
     const [soil_humid, set_soil_humid] = useState([]);
     const chart_ref = useRef(null);
 
-    const { socket, receivedData } = useSocket(
-        import.meta.env.VITE_SOCKET_URL,
-        'soil humidity chart rec'
-    );
+    const { socket, receivedData } = useSocket('soil humidity chart rec');
 
     useEffect(() => {
         if (socket) {

@@ -19,10 +19,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 const BrightnessChart = () => {
     const [brightness, set_brightness] = useState([]);
 
-    const { socket, receivedData } = useSocket(
-        import.meta.env.VITE_SOCKET_URL,
-        'brightness chart rec'
-    )
+    const { socket, receivedData } = useSocket('brightness chart rec')
 
     useEffect(() => {
         if (socket) {

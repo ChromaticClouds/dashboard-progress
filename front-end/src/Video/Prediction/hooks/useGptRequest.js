@@ -5,10 +5,7 @@ import useClickStore from "../../../hooks/store/useClickStore";
 import useNoticeEvents from "../../../hooks/notification/useNoticeEvents";
 
 const useGptReqeust = () => {
-    const { socket, receivedData, setReceivedData } = useSocket(
-        import.meta.env.VITE_SOCKET_URL,
-        'gpt answer'
-    );
+    const { socket, receivedData, setReceivedData } = useSocket('gpt answer');
     const { setGptResponse, setLoading, gptResponse } = usePredictStore();
     const { setGptHosted } = useClickStore();
     const { postNotification } = useNoticeEvents();

@@ -9,10 +9,7 @@ import usePredictStore from "./store/usePredictStore";
 const useOpenAi = () => {
     const { setData } = usePredictStore();
 
-    const { receivedData: sensorData } = useSocket(
-        import.meta.env.VITE_SOCKET_URL,
-        'sensor data'
-    );
+    const { receivedData: sensorData } = useSocket('sensor data');
 
     useEffect(() => {
         if (sensorData) {

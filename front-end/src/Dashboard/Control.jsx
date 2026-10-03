@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import io from "socket.io-client";
+import { useSocket } from "@/app/providers/socket-provider";
 import "./Control.css";
 
 import BulletChart from "../components/chart/BulletChart";
@@ -31,15 +31,8 @@ const print_date = (date) => {
   return result;
 };
 
-let socket;
 const Control = () => {
-  useEffect(() => {
-    socket = io.connect(import.meta.env.VITE_SOCKET_URL);
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  const socket = useSocket();
 
   const [monitoring, set_monitoring_data] = useState([]);
   const [checked, set_checked] = useState(
@@ -98,15 +91,20 @@ const Control = () => {
   }, [recent_date]);
 
   useEffect(() => {
-    socket.on("sensor data", (data) => {
+    const onSensorData = (data) => {
       if (data) {
         set_sensor_data(data);
         set_water_lev(data.water_level);
         set_temp(data.temperature);
         set_humid(data.humidity);
       }
-    });
-  }, []);
+    };
+
+    socket.on("sensor data", onSensorData);
+    return () => {
+      socket.off("sensor data", onSensorData);
+    };
+  }, [socket]);
 
   const water_level = water_lev ? (water_lev / 10) * 100 : 0;
 
@@ -159,16 +157,19 @@ const Control = () => {
   }, []);
 
   useEffect(() => {
-    socket.on("monitoring rec", (data) => {
-      set_monitoring_data(data);
-    });
-    socket.on("sensor data", (data) => {
-      set_sensor_data(data);
-    });
-    socket.on("recent watering rec", (data) => {
-      set_recent_date(data);
-    });
-  }, []);
+    const handlers = {
+      "monitoring rec": set_monitoring_data,
+      "sensor data": set_sensor_data,
+      "recent watering rec": set_recent_date,
+    };
+
+    Object.entries(handlers).forEach(([event, handler]) => socket.on(event, handler));
+
+    // 공유 소켓이므로 언마운트 시 자기 리스너만 해제한다.
+    return () => {
+      Object.entries(handlers).forEach(([event, handler]) => socket.off(event, handler));
+    };
+  }, [socket]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

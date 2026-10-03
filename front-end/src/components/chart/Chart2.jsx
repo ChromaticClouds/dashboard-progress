@@ -23,10 +23,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, BarElement, LineEleme
 const THChart = () => {
     const [temp_and_humid, set_temp_and_humid] = useState([]);
 
-    const { receivedData, socket } = useSocket(
-        import.meta.env.VITE_SOCKET_URL,
-        'temp and humid chart rec'
-    );
+    const { receivedData, socket } = useSocket('temp and humid chart rec');
 
     useEffect(() => {
         if (socket) {

@@ -3,10 +3,7 @@ import useSocket from "../hooks/socket/useSocket";
 import useOutlierStore from "../hooks/outlier/useOutlierStore";
 
 const Outlier = () => {
-    const { receivedData } = useSocket(
-        import.meta.env.VITE_SOCKET_URL,
-        'sensor data'
-    );
+    const { receivedData } = useSocket('sensor data');
 
     const [sensorData, setSensorData] = useState({});
 

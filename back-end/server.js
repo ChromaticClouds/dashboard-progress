@@ -2,9 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const http = require('http');
 const cors = require('cors');
-const { SerialPort } = require('serialport');
-const { ReadlineParser } = require('@serialport/parser-readline');
 const { socketEvents } = require('./socketEvents');
+const { createSerialBridge } = require('./serialBridge');
+const { positiveNumberEnv } = require('./utils/env');
 const { socketProvider } = require('./chart');
 const { gptController } = require('./socketControllers/gptController');
 const {
@@ -42,20 +42,21 @@ app.use('/api/verify-token', verifyTokenRouter);
 socketConfig(server);
 
 const io = getIO();
+const serial = createSerialBridge();
 
-io.on('connection', (socket) => {
-    setInterval(() => {
-        socket.emit('sensor data', {
-            temperature: Math.floor(Math.random() * 30) + 10, // Random temperature between 10 and 40
-            humidity: Math.floor(Math.random() * 60) + 30,    // Random humidity between 30 and 90
-            waterLevel: Math.floor(Math.random() * 10) + 1
-        })
-    }, 180000);
-});
+// 센서 값은 서버 타이머 하나로 모든 클라이언트에 보낸다. 연결마다 타이머를 만들면 끊긴 뒤에도 남는다.
+const SENSOR_BROADCAST_MS = positiveNumberEnv(
+    'SENSOR_BROADCAST_MS',
+    serial.connected ? 2000 : 180000
+);
+setInterval(() => {
+    const data = serial.latestSensorData();
+    if (data) io.emit('sensor data', data);
+}, SENSOR_BROADCAST_MS);
 
 // socketControllers
 socketProvider(io);
-socketEvents(io);
+io.on('connection', (socket) => socketEvents(socket, serial));
 gptController(io);
 
 server.listen(PORT, () => {

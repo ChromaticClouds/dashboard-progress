@@ -16,10 +16,7 @@ ChartJS.register(ArcElement, LinearScale, Title, Tooltip, Legend);
 const HumidSub = () => {
     const [humidity, set_humidity] = useState([]);
 
-    const { socket, receivedData } = useSocket(
-        import.meta.env.VITE_SOCKET_URL,
-        'humidity sub chart rec'
-    );
+    const { socket, receivedData } = useSocket('humidity sub chart rec');
 
     useEffect(() => {
         if (socket) {

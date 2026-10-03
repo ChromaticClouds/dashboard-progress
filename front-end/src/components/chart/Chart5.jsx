@@ -17,10 +17,7 @@ ChartJS.register(ArcElement, LinearScale, Title, Tooltip, Legend);
 const GrowthDoughnut = () => {
     const [growth, set_growth] = useState([]);
 
-    const { socket, receivedData } = useSocket(
-        import.meta.env.VITE_SOCKET_URL,
-        'growth chart rec'
-    )
+    const { socket, receivedData } = useSocket('growth chart rec')
 
     useEffect(() => {
         if (socket) {
