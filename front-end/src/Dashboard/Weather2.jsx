@@ -16,21 +16,25 @@ import dfs_xy_conv from '../hooks/coords/intoCoord';
 import useCurrentPosition from '../hooks/useCurrentPosition';
 import { kmaVillageForecastRequest } from '../utils/weatherApi';
 
-// 마지막으로 받은 단기예보. 같은 발표 시각이면 재방문 때 바로 보여주고 뒤에서 갱신한다.
+// 마지막으로 받은 단기예보. 같은 발표 시각·같은 예보 격자면 재방문 때 바로 보여주고 뒤에서 갱신한다.
 const FORECAST_CACHE_KEY = 'smartfarm:kma-village-forecast';
 
-const readForecastCache = (baseKey) => {
+// 위치가 그대로여도 시각·날짜가 바뀌면 오늘 기온과 날짜를 다시 계산해야 하므로 주기적으로 다시 받는다.
+const FORECAST_REFRESH_MS = 10 * 60 * 1000;
+
+const readForecastCache = (baseKey, nx, ny) => {
     try {
         const cached = JSON.parse(localStorage.getItem(FORECAST_CACHE_KEY));
-        return cached?.baseKey === baseKey && Array.isArray(cached.items) ? cached.items : null;
+        const matches = cached?.baseKey === baseKey && cached.nx === nx && cached.ny === ny;
+        return matches && Array.isArray(cached.items) ? cached.items : null;
     } catch {
         return null;
     }
 };
 
-const writeForecastCache = (baseKey, items) => {
+const writeForecastCache = (baseKey, nx, ny, items) => {
     try {
-        localStorage.setItem(FORECAST_CACHE_KEY, JSON.stringify({ baseKey, items }));
+        localStorage.setItem(FORECAST_CACHE_KEY, JSON.stringify({ baseKey, nx, ny, items }));
     } catch {
         // 저장 공간이 없으면 캐시 없이 동작한다.
     }
@@ -70,11 +74,19 @@ const Weather2 = () => {
     const gridX = grid?.x ?? null;
     const gridY = grid?.y ?? null;
 
-    // 같은 예보 격자 안에서 위치가 조금 바뀐 것만으로는 다시 요청하지 않는다.
+    // 예보 격자가 정해지면 저장된 예보를 먼저 보여주고, 바로 받은 뒤 10분마다 다시 받는다.
+    // 같은 격자 안에서 위치가 조금 바뀐 것만으로는 다시 요청하지 않는다.
     useEffect(() => {
-        if (gridX && gridY) {
-            hostWeather();
-        }
+        if (!gridX || !gridY) return;
+
+        const now = moment();
+        const { baseDate, baseTime } = forecastBase(now);
+        const cached = readForecastCache(`${baseDate}${baseTime}`, gridX, gridY);
+        if (cached) applyForecast(cached, now);
+
+        hostWeather();
+        const timer = setInterval(hostWeather, FORECAST_REFRESH_MS);
+        return () => clearInterval(timer);
     }, [gridX, gridY]);
 
     useEffect(() => {
@@ -107,14 +119,6 @@ const Weather2 = () => {
         parseWeather(items, now.format('YYYYMMDD'), now.clone().add(1, 'days').format('YYYYMMDD'), now);
     };
 
-    // 같은 발표 시각의 예보를 저장해 두었으면 위치·응답을 기다리지 않고 먼저 보여준다.
-    useEffect(() => {
-        const now = moment();
-        const { baseDate, baseTime } = forecastBase(now);
-        const cached = readForecastCache(`${baseDate}${baseTime}`);
-        if (cached) applyForecast(cached, now);
-    }, []);
-
     const hostWeather = async () => {
         if (!gridX || !gridY) return;
 
@@ -133,7 +137,7 @@ const Weather2 = () => {
             }
 
             applyForecast(items, now);
-            writeForecastCache(`${baseDate}${baseTime}`, items);
+            writeForecastCache(`${baseDate}${baseTime}`, gridX, gridY, items);
             setWeatherError(false);
         } catch (err) {
             console.error('단기예보 조회 실패:', err.message);

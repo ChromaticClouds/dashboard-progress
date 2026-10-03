@@ -4,8 +4,10 @@ import axios from "axios";
 import useCurrentPosition from "../hooks/useCurrentPosition";
 import { openWeatherUrl } from "../utils/weatherApi";
 
+const REFRESH_MS = 10 * 60 * 1000;
+
 const MediumForecast = ({ hostForecast, hostAirCondition }) => {
-    // 위치는 공용 훅에서 받는다. 5일 예보는 위치가 바뀔 때만 다시 요청한다.
+    // 위치는 공용 훅에서 받는다. 5일 예보·대기질은 위치가 바뀌면 바로, 그렇지 않으면 10분마다 다시 받는다.
     const position = useCurrentPosition();
     /**
      *  - # OpenWeatherMap API GET 요청
@@ -36,10 +38,16 @@ const MediumForecast = ({ hostForecast, hostAirCondition }) => {
     }
 
     useEffect(() => {
-        if (position) {
+        if (!position) return;
+
+        const load = () => {
             getForecast(position.latitude, position.longitude);
             getAirPollution(position.latitude, position.longitude);
-        }
+        };
+
+        load();
+        const timer = setInterval(load, REFRESH_MS);
+        return () => clearInterval(timer);
     }, [position]);
 
     useEffect(() => {
