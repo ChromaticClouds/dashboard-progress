@@ -1,7 +1,16 @@
 const { query, envQueries, weekQueries, sensorQueries, growthQueries, monitoringQuery } = require('./queries');
 require('dotenv').config();
 
-const socketEvents = (socket, sp) => {
+/**
+ * 소켓 하나에 이벤트 핸들러를 붙인다. 연결마다 io.on('connection')에서 호출한다.
+ * @param socket 연결된 클라이언트 소켓
+ * @param serial createSerialBridge()가 만든 시리얼 연결 (write, latestSensorData)
+ */
+const socketEvents = (socket, serial) => {
+    socket.on('sensor data req', () => {
+        socket.emit('sensor data', serial.latestSensorData());
+    });
+
     socket.on("env req", async () => {
         try {
             const results = await Promise.all(envQueries.map(q => query(q)));
@@ -48,31 +57,31 @@ const socketEvents = (socket, sp) => {
     });
 
     socket.on('led value req', (value1) => {
-        sp.write(`led01_${value1 * 51}\n`);
+        serial.write(`led01_${value1 * 51}\n`);
     });
 
     socket.on('led value req2', (value2) => {
-        sp.write(`led02_${value2 * 51}\n`);
+        serial.write(`led02_${value2 * 51}\n`);
     });
 
     socket.on('led value req3', (value3) => {
-        sp.write(`led03_${value3 * 51}\n`);
+        serial.write(`led03_${value3 * 51}\n`);
     });
 
     socket.on('intensity req', (value) => {
         let resistance = [5, 4, 3, 2, 1, 0][value] || 0;
-        sp.write(`res_${resistance * 10}`);
+        serial.write(`res_${resistance * 10}`);
         console.log("resistance value: ", resistance);
     });
 
     socket.on('duration req', (value) => {
         let duration = value * 2000 + 10000;
-        sp.write(`dur_${duration}`);
+        serial.write(`dur_${duration}`);
     });
 
     socket.on('watering req', (value) => {
         let power = value.onWatering ? 1 : 0;
-        sp.write(`watering_${power}\n`);
+        serial.write(`watering_${power}\n`);
     });
 
     socket.on('recent watering req', async () => {
@@ -98,29 +107,29 @@ const socketEvents = (socket, sp) => {
 
     socket.on('heater power req', (value) => {
         let power = value.power ? 1 : 0;
-        sp.write(`heaterPower_${power}\n`);
+        serial.write(`heaterPower_${power}\n`);
     });
 
     socket.on('cooler power req', (value) => {
         let power = value.power ? 1 : 0;
-        sp.write(`coolerPower_${power}\n`);
+        serial.write(`coolerPower_${power}\n`);
     });
 
     socket.on('heater temp req', (value) => {
-        sp.write(`heater_${value}\n`);
+        serial.write(`heater_${value}\n`);
     });
 
     socket.on('cooler temp req', (value) => {
-        sp.write(`cooler_${value}\n`);
+        serial.write(`cooler_${value}\n`);
 
     });
 
     socket.on('control on', () => {
-        sp.write("on\n");
+        serial.write("on\n");
     });
 
     socket.on('control off', () => {
-        sp.write("off\n");
+        serial.write("off\n");
     });
 };
 
