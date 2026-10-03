@@ -1,4 +1,5 @@
 import { React, useEffect, useState } from "react";
+import { kmaVillageForecastRequest } from "./utils/weatherApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import WindSub from "../chart/SubChart2";
 import "./Weather.css";
@@ -243,20 +244,14 @@ const Weather2 = ({ set_current }) => {
     let today = th_year + "" + th_month + "" + th_day;
     let tomorrow = tm_year + "" + tm_month + "" + tm_day;
 
-    const url =
-      "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst";
-    const serviceKey =
-      "TdQd3Xt%2B4OHiUyXW4OunKFr6rCLsJlVInxrkdZfIhQ45NtLhK4pmxQyEZSBnqfv2PS1%2BSxVF6h7h3GWe%2BlQXeQ%3D%3D";
-    const queryParams = new URLSearchParams({
-      serviceKey: decodeURIComponent(serviceKey),
-      pageNo: "1",
-      numOfRows: "1000",
-      dataType: "JSON",
-      base_date: base_date,
-      base_time: base_time,
+    // 키는 코드에 두지 않고 환경 변수에서만 읽는다.
+    const { url, params } = kmaVillageForecastRequest({
+      baseDate: base_date,
+      baseTime: base_time,
       nx: x,
       ny: y,
-    }).toString();
+    });
+    const queryParams = new URLSearchParams(params).toString();
 
     fetch(`${url}?${queryParams}`)
       .then((response) => response.json())

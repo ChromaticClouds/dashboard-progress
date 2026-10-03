@@ -13,7 +13,9 @@ import useCalendarEvents from "../../hooks/useCalendarEvents";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const InfoContents = () => {
-    const { weatherIcon, currentWeather } = useWeatherStore();
+    const { weatherIcon, currentWeather, weatherError } = useWeatherStore();
+    // OpenWeatherMap 아이콘이 없으면 단기예보(기상청)의 하늘 상태 아이콘으로 대신한다.
+    const forecastIcon = currentWeather.icon2 || currentWeather.icon;
     const { getMonthEvents } = useMonthEventStore();
     const { currentDate } = useCalendarEvents();
 
@@ -62,6 +64,10 @@ const InfoContents = () => {
                     <div className="main-info">
                         {weatherIcon ? (
                             <WeatherIcon getWeatherIcon={weatherIcon} />
+                        ) : forecastIcon ? (
+                            <img src={forecastIcon} alt={currentWeather.pty || currentWeather.sky || '현재 날씨'} />
+                        ) : weatherError ? (
+                            <span className="weather-error">날씨 정보 없음</span>
                         ) : (
                             <Loading />
                         )}
