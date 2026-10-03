@@ -1,5 +1,6 @@
 const { SerialPort } = require('serialport');
 const { ReadlineParser } = require('@serialport/parser-readline');
+const { positiveNumberEnv } = require('./utils/env');
 require('dotenv').config();
 
 // 아두이노 없이 실행할 때 쓰는 테스트용 센서 값
@@ -30,7 +31,7 @@ const createSerialBridge = () => {
 
     const port = new SerialPort({
         path,
-        baudRate: Number(process.env.SERIAL_BAUD_RATE ?? 9600),
+        baudRate: positiveNumberEnv('SERIAL_BAUD_RATE', 9600),
         dataBits: 8,
         stopBits: 1
     });

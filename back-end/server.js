@@ -4,6 +4,7 @@ const http = require('http');
 const cors = require('cors');
 const { socketEvents } = require('./socketEvents');
 const { createSerialBridge } = require('./serialBridge');
+const { positiveNumberEnv } = require('./utils/env');
 const { socketProvider } = require('./chart');
 const { gptController } = require('./socketControllers/gptController');
 const {
@@ -44,8 +45,9 @@ const io = getIO();
 const serial = createSerialBridge();
 
 // 센서 값은 서버 타이머 하나로 모든 클라이언트에 보낸다. 연결마다 타이머를 만들면 끊긴 뒤에도 남는다.
-const SENSOR_BROADCAST_MS = Number(
-    process.env.SENSOR_BROADCAST_MS ?? (serial.connected ? 2000 : 180000)
+const SENSOR_BROADCAST_MS = positiveNumberEnv(
+    'SENSOR_BROADCAST_MS',
+    serial.connected ? 2000 : 180000
 );
 setInterval(() => {
     const data = serial.latestSensorData();
