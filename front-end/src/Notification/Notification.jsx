@@ -20,8 +20,8 @@ const Notification = () => {
   const getAlarm = async () => {
     try {
       await Promise.all(outlier.map((message) => postNotification(message)));
-    } catch {
-      console.log(alarmError);
+    } catch (error) {
+      console.error("알림 전송에 실패했습니다.", error);
     }
   };
 
