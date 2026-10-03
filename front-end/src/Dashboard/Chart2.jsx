@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import io from "socket.io-client";
+import { useSocket } from "@/app/providers/socket-provider";
 
 import GrowthChart from "../components/chart/Chart";
 import THChart from "../components/chart/Chart2";
@@ -14,7 +14,7 @@ import DiseasesChart from "../components/chart/DiseasesChart";
 import './Chart2.css';
 
 const Chart = ({ viewWeatherMap }) => {
-    const [socket, set_socket] = useState(null);
+    const socket = useSocket();
     const [temperature, set_temperature] = useState([]);
     const [humidity, set_humidity] = useState([]);
     const [weather, set_weather] = useState({});
@@ -23,20 +23,18 @@ const Chart = ({ viewWeatherMap }) => {
     const [wind_speed, set_wind_speed] = useState(0);
 
     useEffect(() => {
-        const ws = io.connect(import.meta.env.VITE_SOCKET_URL);
-        set_socket(ws);
+        const onTemperature = (value) => set_temperature(value[0]);
+        const onHumidity = (value) => set_humidity(value[0]);
 
-        ws.on("temperature sub chart rec", (value) => {
-            set_temperature(value[0]);
-        });
-        ws.on("humidity sub chart rec", (value) => {
-            set_humidity(value[0]);
-        });
+        socket.on("temperature sub chart rec", onTemperature);
+        socket.on("humidity sub chart rec", onHumidity);
 
+        // 공유 소켓이므로 언마운트 시 자기 리스너만 해제한다.
         return () => {
-            ws.disconnect();
+            socket.off("temperature sub chart rec", onTemperature);
+            socket.off("humidity sub chart rec", onHumidity);
         }
-    }, []);
+    }, [socket]);
 
     useEffect(() => {
         if (socket) {

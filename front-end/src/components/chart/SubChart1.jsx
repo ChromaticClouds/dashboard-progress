@@ -16,10 +16,7 @@ ChartJS.register(ArcElement, LinearScale, Title, Tooltip, Legend);
 const TempSub = () => {
     const [temperature, set_temperature] = useState([]);
 
-    const { socket, receivedData } = useSocket(
-        import.meta.env.VITE_SOCKET_URL,
-        'temperature sub chart rec'
-    );
+    const { socket, receivedData } = useSocket('temperature sub chart rec');
 
     useEffect(() => {
         if (socket) {

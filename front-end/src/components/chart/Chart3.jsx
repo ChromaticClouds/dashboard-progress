@@ -19,10 +19,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, BarElement, LineEleme
 const WaterSupply = () => {
     const [water_supply, set_water_supply] = useState([]);
 
-    const { socket, receivedData } = useSocket(
-        import.meta.env.VITE_SOCKET_URL,
-        'water supply chart rec'
-    );
+    const { socket, receivedData } = useSocket('water supply chart rec');
 
     useEffect(() => {
         if (socket) {

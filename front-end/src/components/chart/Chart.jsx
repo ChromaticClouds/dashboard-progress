@@ -19,10 +19,7 @@ const GrowthChart = () => {
     const [growth, set_growth] = useState([]);
     const chart_ref = useRef(null);
 
-    const { socket, receivedData } = useSocket(
-        import.meta.env.VITE_SOCKET_URL,
-        'growth chart rec'
-    );
+    const { socket, receivedData } = useSocket('growth chart rec');
 
     useEffect(() => {
         if (socket) {
